@@ -92,3 +92,6 @@ SimpleJWT: A JSON Web Token (JWT) implementation for Django REST Framework. You 
 DRF-YASG: Yet Another Swagger Generator for Django REST Framework. It generates OpenAPI (formerly Swagger) specifications from Django Rest Framework code. You can find the documentation and usage examples at: https://drf-yasg.readthedocs.io/
 
 Feel free to visit these URLs to learn more about each library, including their features, usage, and examples. The documentation will provide you with detailed explanations and code samples to help you understand and utilize these libraries effectively in your Django backend API.
+
+
+change from Anoe
