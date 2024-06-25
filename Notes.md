@@ -3,3 +3,6 @@
 # 2) Also comment out the admin site in urls.py:
 # 3) Make migrations and uncomment the commented lines
 "
+
+# Configure email backed
+# Complete/handle profile pic upload logic
