@@ -9,3 +9,6 @@ def user_save_handler(sender, instance, created, **kwargs):
     if created and instance.username is None:
         instance.username = get_username(instance)
         instance.save()
+        print("username signal function passed now")
+
+    pass

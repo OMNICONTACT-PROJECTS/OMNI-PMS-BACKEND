@@ -34,7 +34,8 @@ urlpatterns = [
     ),
     path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
     path("api/v1/organisations/", include("organisations.urls")),
-    # path('api/v1/accounts/', include('accounts.urls')),
+    path("api/v1/accounts/", include("accounts.urls")),
+    path("api/v1/devs/", include("devs.urls")),
 ]
 
 if settings.DEBUG:

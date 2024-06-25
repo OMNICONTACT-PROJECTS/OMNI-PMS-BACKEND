@@ -65,6 +65,9 @@ class User(AbstractUser):
     )
     contract_tenure = models.CharField(max_length=20, blank=True, null=True)
     account_creation_date = models.DateField(auto_now_add=True, null=True, blank=True)
+    profile_picture = models.ImageField(
+        upload_to="user_profile_pictures", blank=True, null=True
+    )
 
     date_created = models.DateField(
         auto_now_add=True,

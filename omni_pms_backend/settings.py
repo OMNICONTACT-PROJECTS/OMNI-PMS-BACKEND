@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "drf_yasg",
     "organisations.apps.OrganisationsConfig",
     "accounts.apps.AccountsConfig",
+    "devs.apps.DevsConfig",
 ]
 
 MIDDLEWARE = [
@@ -202,7 +203,17 @@ SIMPLE_JWT = {
 
 AUTH_USER_MODEL = "accounts.User"
 
-# AUTHENTICATION_BACKENDS = [
-#     "accounts.custom_auth_backend.UserAuthenticationBackend",
-#     "django.contrib.auth.backends.ModelBackend",
-# ]
+AUTHENTICATION_BACKENDS = [
+    "accounts.custom_auth_backend.UserAuthenticationBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+# Setting up email variables
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "jjmuchazondida@gmail.com"
+EMAIL_HOST_PASSWORD = "iazysgbhzmilstox"
+# ALLOWED_HOSTS = []
