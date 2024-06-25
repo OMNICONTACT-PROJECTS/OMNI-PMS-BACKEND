@@ -36,7 +36,7 @@ class CreateAdministratorView(CreateAPIView):
                 # username = serializer.validated_data['user']['username']
                 email = serializer.validated_data["user"]["email"]
                 full_name = f"{first_name } { last_name}"
-                password = "password"
+                password = "omni-admin-123"
 
                 this_instance = User.objects.get(pk=serializer.data["user"]["id"])
                 username = this_instance.username

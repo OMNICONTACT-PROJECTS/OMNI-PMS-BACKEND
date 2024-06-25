@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "devs.apps.DevsConfig",
     "superusers.apps.SuperusersConfig",
     "administrators.apps.AdministratorsConfig",
+    "subscribers.apps.SubscribersConfig",
 ]
 
 MIDDLEWARE = [

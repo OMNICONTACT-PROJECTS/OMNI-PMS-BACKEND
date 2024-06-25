@@ -6,3 +6,4 @@
 
 # Configure email backed
 # Complete/handle profile pic upload logic
+# Should solve issue of password in views on send_mail fields
