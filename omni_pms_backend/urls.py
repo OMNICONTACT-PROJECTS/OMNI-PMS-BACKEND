@@ -8,9 +8,9 @@ from django.conf.urls.static import static
 
 # schema_view = get_schema_view(
 #     openapi.Info(
-#         title="UNIVERSITY OF ZIMBABWE BACKEND API",
+#         title="OMNICONTACT PMS BACKEND API",
 #         default_version='v1',
-#         description="UNIVERSITY OF ZIMBABWE RECRUITMENT PORTAL BACKEND API",
+#         description="OMNICONTACT PMS BACKEND API",
 #         terms_of_service="",
 #         contact=openapi.Contact(email=""),
 #         license=openapi.License(name=""),
