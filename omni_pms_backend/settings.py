@@ -218,5 +218,5 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 EMAIL_PORT = 587
 EMAIL_HOST_USER = "jjmuchazondida@gmail.com"
-EMAIL_HOST_PASSWORD = "iazysgbhzmilstox"
+EMAIL_HOST_PASSWORD = "utdd gjyq ykni vzpj"
 # ALLOWED_HOSTS = []
