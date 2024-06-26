@@ -6,7 +6,7 @@ class OrganisationSerializer(ModelSerializer):
 
     class Meta:
         model = Organisation
-        exclude = ['organisation_number']
+        exclude = ["organisation_number", "date_created", "last_updated"]
 
         extra_kwargs = {
             "organisation_name": {"required": True},
@@ -22,8 +22,8 @@ class OrganisationRetrieveSerializer(ModelSerializer):
         model = Organisation
         fields = "__all__"
 
-        
+
 class MinimizedOrganisationSerializer(ModelSerializer):
     class Meta:
         model = Organisation
-        fields = ['id', 'organisation_name']
+        fields = ["id", "organisation_name"]
