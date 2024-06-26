@@ -4,6 +4,6 @@
 # 3) Make migrations and uncomment the commented lines
 "
 
-# Configure email backed
-# Complete/handle profile pic upload logic
-# Should solve issue of password in views on send_mail fields
+# Configure email backed    (PENDING)
+# Complete/handle profile pic upload logic  (NOT STARTED)
+# Should solve issue of password in views on send_mail fields     (PENDING)
