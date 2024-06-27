@@ -1,10 +1,15 @@
-from .serializers import AdministratorSerializer, AdministratorRetrieveSerializer
+from .serializers import (
+    AdministratorSerializer,
+    AdministratorRetrieveSerializer,
+    AdministratorUpdateRetrieveSerializer,
+)
 from .models import Administrator
 from rest_framework.response import Response
 from rest_framework.generics import (
     CreateAPIView,
-    RetrieveUpdateDestroyAPIView,
     ListAPIView,
+    RetrieveDestroyAPIView,
+    UpdateAPIView,
 )
 from rest_framework import status
 from django.conf import settings
@@ -93,7 +98,13 @@ class GetAllAdministrators(ListAPIView):
     queryset = Administrator.objects.all()
 
 
-class AdministratorReadUpdateDestroyView(RetrieveUpdateDestroyAPIView):
+class AdministratorReadDestroyView(RetrieveDestroyAPIView):
     permission_classes = []
     serializer_class = AdministratorRetrieveSerializer
+    queryset = Administrator.objects.all()
+
+
+class AdministratorUpdateView(UpdateAPIView):
+    permission_classes = []
+    serializer_class = AdministratorUpdateRetrieveSerializer
     queryset = Administrator.objects.all()
