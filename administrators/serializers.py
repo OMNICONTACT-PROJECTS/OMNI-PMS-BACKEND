@@ -1,6 +1,9 @@
 from rest_framework.serializers import ModelSerializer
 from .models import Administrator
-from accounts.serializers import UserSerializer, RetrieveUserSerializer
+from accounts.serializers import (
+    UserSerializer,
+    RetrieveMinimizedUserSerializer,
+)
 from accounts.models import User
 from django.contrib.auth.models import Group, Permission
 
@@ -78,7 +81,15 @@ class AdministratorSerializer(ModelSerializer):
 
 
 class AdministratorRetrieveSerializer(ModelSerializer):
-    user = RetrieveUserSerializer()
+    user = RetrieveMinimizedUserSerializer()
+
+    class Meta:
+        model = Administrator
+        fields = "__all__"
+
+
+class AdministratorUpdateRetrieveSerializer(ModelSerializer):
+    user = UserSerializer()
 
     class Meta:
         model = Administrator
