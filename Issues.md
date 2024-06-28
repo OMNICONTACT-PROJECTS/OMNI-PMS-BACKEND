@@ -7,3 +7,7 @@
 # Configure email backed    (Done)
 # Complete/handle profile pic upload logic  (Done)
 # Should solve issue of password in views on send_mail fields     (PENDING)
+# Personal docs (Done)
+# Educational Qualifications (Done)
+# Work on bulky uploads
+

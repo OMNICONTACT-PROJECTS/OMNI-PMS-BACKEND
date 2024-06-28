@@ -98,7 +98,13 @@ class EducationalQualification(models.Model):
         ("SECONDARY", "SECONDARY"),
         ("PRIMARY", "PRIMARY"),
     )
-    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name="educational_qualifications",
+    )
     institution_attended = models.CharField(max_length=200, blank=True, null=True)
     qualification_type = models.CharField(
         max_length=200, blank=True, null=True, choices=QUALIFICATION_TYPE
@@ -129,7 +135,11 @@ class UserPersonalDocument(models.Model):
         ("EDUCATIONAL", "EDUCATIONAL"),
     )
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, blank=True, null=True
+        User,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name="personal_documents",
     )
     document_type = models.CharField(
         max_length=200,
