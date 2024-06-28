@@ -2,6 +2,7 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from .models import User
+from organisations.serializers import MinimizedOrganisationSerializer
 
 
 class UserSerializer(ModelSerializer):
@@ -94,3 +95,13 @@ class AuditTrailUserSerializer(ModelSerializer):
             "gender",
             "organisation",
         ]
+
+
+class RetrieveMinimizedUserSerializer(ModelSerializer):
+    organisation = MinimizedOrganisationSerializer()
+
+    class Meta:
+        model = User
+        fields = "__all__"
+
+        extra_kwargs = {"password": {"write_only": True}}
