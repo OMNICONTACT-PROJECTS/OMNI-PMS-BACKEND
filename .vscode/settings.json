@@ -3,6 +3,7 @@
         "corsheaders",
         "csat",
         "devs",
+        "dotenv",
         "iazysgbhzmilstox",
         "iloc",
         "omni",

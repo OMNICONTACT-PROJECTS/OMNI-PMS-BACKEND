@@ -11,19 +11,31 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
 import os
 from datetime import timedelta
+import dj_database_url
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+##################### SETTINGS FOR RENDER PRODUCTION DEPLOYMENT ####################
+load_dotenv(BASE_DIR / ".env")
+SECRET_KEY = os.getenv('SECRET_KEY')
+DEBUG = os.getenv('DEBUG', '0').lower() in ['true', 't', '1']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(' ')
+
+
+
+######################################################################################
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-5n+_6i)n2@511(*q(%cg72f$*011d_)!!1xd14gk!e!3b^2bws"
+# SECRET_KEY = "django-insecure-5n+_6i)n2@511(*q(%cg72f$*011d_)!!1xd14gk!e!3b^2bws"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
