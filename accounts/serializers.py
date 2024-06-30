@@ -105,3 +105,13 @@ class RetrieveMinimizedUserSerializer(ModelSerializer):
         fields = "__all__"
 
         extra_kwargs = {"password": {"write_only": True}}
+
+
+class MinimizedUserSerializer(ModelSerializer):
+    organisation = MinimizedOrganisationSerializer()
+
+    class Meta:
+        model = User
+        fields = ["id", "first_name", "last_name", "organisation"]
+
+        extra_kwargs = {"password": {"write_only": True}}

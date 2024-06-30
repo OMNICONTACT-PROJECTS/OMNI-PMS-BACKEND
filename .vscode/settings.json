@@ -1,13 +1,18 @@
 {
     "cSpell.words": [
         "corsheaders",
+        "csat",
         "devs",
         "iazysgbhzmilstox",
+        "iloc",
         "omni",
         "OMNICONTACT",
+        "openpyxl",
         "Organisation",
         "Organisations",
         "redoc",
-        "simplejwt"
+        "simplejwt",
+        "tablib",
+        "talktime"
     ]
 }
