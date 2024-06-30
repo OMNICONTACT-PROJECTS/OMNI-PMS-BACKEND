@@ -107,20 +107,33 @@ WSGI_APPLICATION = "omni_pms_backend.wsgi.application"
 #     }
 # }
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.mysql",
+#         "NAME": "omni_pms_db",
+#         "USER": "Jeremiah",
+#         "PASSWORD": "0202February.",
+#         "HOST": "localhost",
+#         "PORT": 3306,
+#         "OPTIONS": {
+#             "sql_mode": "STRICT_TRANS_TABLES",
+#         },
+#     }
+# }
+
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": "omni_pms_db",
-        "USER": "Jeremiah",
-        "PASSWORD": "0202February.",
-        "HOST": "localhost",
-        "PORT": 3306,
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("DATABASE_NAME"),
+        "USER": os.getenv("DATABASE_USER"),
+        "PASSWORD": os.getenv("DATABASE_PASSWORD"),
+        "HOST": os.getenv("DBHOSTNAME"),
+        "PORT": os.getenv("DATABASE_PORT"),
         "OPTIONS": {
             "sql_mode": "STRICT_TRANS_TABLES",
-        },
+        }
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
