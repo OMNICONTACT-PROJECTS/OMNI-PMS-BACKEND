@@ -22,11 +22,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 ##################### SETTINGS FOR RENDER PRODUCTION DEPLOYMENT ####################
-load_dotenv(BASE_DIR / ".env")
-SECRET_KEY = os.getenv('SECRET_KEY')
-DEBUG = os.getenv('DEBUG', '0').lower() in ['true', 't', '1']
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(' ')
-
+load_dotenv(BASE_DIR / ".env.render-production")
+SECRET_KEY = os.getenv("SECRET_KEY")
+DEBUG = os.getenv("DEBUG", "0").lower() in ["true", "t", "1"]
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(" ")
 
 
 ######################################################################################
@@ -38,9 +37,9 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(' ')
 # SECRET_KEY = "django-insecure-5n+_6i)n2@511(*q(%cg72f$*011d_)!!1xd14gk!e!3b^2bws"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+# ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 
 # Application definition
