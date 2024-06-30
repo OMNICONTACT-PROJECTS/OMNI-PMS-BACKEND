@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     "superusers.apps.SuperusersConfig",
     "administrators.apps.AdministratorsConfig",
     "subscribers.apps.SubscribersConfig",
-    "departments.apps.DepartmentsConfig",
+    "inbound_insights.apps.InboundInsightsConfig",
+    "import_export",
 ]
 
 MIDDLEWARE = [
@@ -221,3 +222,6 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = "jjmuchazondida@gmail.com"
 EMAIL_HOST_PASSWORD = "utdd gjyq ykni vzpj"
 # ALLOWED_HOSTS = []
+
+
+IMPORT_EXPORT_USE_TRANSACTIONS = True

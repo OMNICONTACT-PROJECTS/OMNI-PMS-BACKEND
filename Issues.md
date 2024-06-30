@@ -9,5 +9,8 @@
 # Should solve issue of password in views on send_mail fields     (PENDING)
 # Personal docs (Done)
 # Educational Qualifications (Done)
-# Work on bulky uploads
+# Work on User bulky uploads (Not Started)
+# Work on Insights (Pending)
+# Work on bulky uploads (Not Started)
+
 
