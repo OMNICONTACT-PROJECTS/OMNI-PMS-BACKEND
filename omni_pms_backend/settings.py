@@ -67,6 +67,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "corsheaders.middleware.CorsMiddleware",
@@ -75,6 +76,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 ROOT_URLCONF = "omni_pms_backend.urls"
 
@@ -107,30 +109,30 @@ WSGI_APPLICATION = "omni_pms_backend.wsgi.application"
 #     }
 # }
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.mysql",
-#         "NAME": "omni_pms_db",
-#         "USER": "Jeremiah",
-#         "PASSWORD": "0202February.",
-#         "HOST": "localhost",
-#         "PORT": 3306,
-#         "OPTIONS": {
-#             "sql_mode": "STRICT_TRANS_TABLES",
-#         },
-#     }
-# }
-
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DATABASE_NAME"),
-        "USER": os.getenv("DATABASE_USER"),
-        "PASSWORD": os.getenv("DATABASE_PASSWORD"),
-        "HOST": os.getenv("DBHOSTNAME"),
-        "PORT": os.getenv("DATABASE_PORT"),
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "omni_pms_db",
+        "USER": "Jeremiah",
+        "PASSWORD": "0202February.",
+        "HOST": "localhost",
+        "PORT": 3306,
+        "OPTIONS": {
+            "sql_mode": "STRICT_TRANS_TABLES",
+        },
     }
 }
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": os.getenv("DATABASE_NAME"),
+#         "USER": os.getenv("DATABASE_USER"),
+#         "PASSWORD": os.getenv("DATABASE_PASSWORD"),
+#         "HOST": os.getenv("DBHOSTNAME"),
+#         "PORT": os.getenv("DATABASE_PORT"),
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators

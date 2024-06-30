@@ -15,6 +15,7 @@
         "redoc",
         "simplejwt",
         "tablib",
-        "talktime"
+        "talktime",
+        "whitenoise"
     ]
 }
