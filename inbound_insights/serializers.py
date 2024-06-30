@@ -1,0 +1,35 @@
+from .models import VoiceInsights, VoiceInsightsFile
+from organisations.serializers import MinimizedOrganisationSerializer
+from accounts.serializers import MinimizedUserSerializer
+from rest_framework.serializers import ModelSerializer
+
+
+class VoiceInsightsSerializer(ModelSerializer):
+
+    class Meta:
+        model = VoiceInsights
+        exclude = ("date_created", "last_updated")
+
+        extra_kwargs = {
+            "user": {"required": True},
+            "agent_type": {"required": True},
+            "year": {"required": True},
+            "month": {"required": True},
+            "week": {"required": True},
+            "aes": {"required": True},
+            "calc_aes": {"required": True},
+            "weighted_aes": {"required": True},
+            "overall_score": {"required": True},
+            "grade": {"required": True},
+        }
+
+
+class VoiceInsightsRetrieveSerializer(ModelSerializer):
+    user = MinimizedUserSerializer()
+
+    class Meta:
+        model = VoiceInsights
+        fields = "__all__"
+
+
+
