@@ -14,4 +14,7 @@
 # Voice insights bulky uploads (DONE)
 # Voice insights statistics (Not started)
 
+# get-all endpoints should include organisation_id (NOT STARTED)
+# Validation url on educational qualification(NOT STARTED) 
+
 
