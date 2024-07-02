@@ -13,4 +13,7 @@
 # Work on Insights (Pending)
 # Work on bulky uploads (Not Started)
 
+# get-all endpoints should include organisation_id (NOT STARTED)
+# Validation url on educational qualification(NOT STARTED) 
+
 
