@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "superusers.apps.SuperusersConfig",
     "administrators.apps.AdministratorsConfig",
     "subscribers.apps.SubscribersConfig",
+    "departments.apps.DepartmentsConfig",
     "inbound_insights.apps.InboundInsightsConfig",
     "import_export",
 ]
