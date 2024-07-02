@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "superusers.apps.SuperusersConfig",
     "administrators.apps.AdministratorsConfig",
     "subscribers.apps.SubscribersConfig",
+    "departments.apps.DepartmentsConfig",
     "inbound_insights.apps.InboundInsightsConfig",
     "import_export",
 ]
@@ -100,8 +101,8 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
         "NAME": "omni_pms_db",
-        "USER": "Jeremiah",
-        "PASSWORD": "0202February.",
+        "USER": "root",
+        "PASSWORD": "root",
         "HOST": "localhost",
         "PORT": 3306,
         "OPTIONS": {
