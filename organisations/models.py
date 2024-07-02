@@ -30,4 +30,4 @@ class Organisation(models.Model):
     last_updated = models.DateTimeField(auto_now=True, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.organisation_number}"
+        return f"{self.organisation_name}"

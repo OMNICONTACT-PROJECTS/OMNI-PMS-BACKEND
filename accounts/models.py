@@ -82,3 +82,75 @@ class User(AbstractUser):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+
+
+class EducationalQualification(models.Model):
+    QUALIFICATION_TYPE = (
+        ("PHD", "PHD"),
+        ("MASTERS", "MASTERS"),
+        ("DEGREE", "DEGREE"),
+        ("DIPLOMA", "DIPLOMA"),
+        ("NATIONAL CERTIFICATE", "NATIONAL CERTIFICATE"),
+        ("OTHER", "OTHER"),
+    )
+    EDUCATIONAL_LEVEL = (
+        ("TERTIARY", "TERTIARY"),
+        ("SECONDARY", "SECONDARY"),
+        ("PRIMARY", "PRIMARY"),
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name="educational_qualifications",
+    )
+    institution_attended = models.CharField(max_length=200, blank=True, null=True)
+    qualification_type = models.CharField(
+        max_length=200, blank=True, null=True, choices=QUALIFICATION_TYPE
+    )
+    educational_level = models.CharField(
+        max_length=200, blank=True, null=True, choices=EDUCATIONAL_LEVEL
+    )
+    qualification = models.CharField(max_length=200, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
+    file = models.FileField(
+        upload_to="users_educational_documents", blank=True, null=True
+    )
+
+    date_created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    last_updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user.first_name} {self.user.last_name}"
+
+
+class UserPersonalDocument(models.Model):
+    APPLICANT_PERSONAL_DOCUMENT_TYPE = (
+        ("CV", "CV"),
+        ("RESUME", "RESUME"),
+        ("IDENTIFICATION", "IDENTIFICATION"),
+        ("EDUCATIONAL", "EDUCATIONAL"),
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name="personal_documents",
+    )
+    document_type = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        choices=APPLICANT_PERSONAL_DOCUMENT_TYPE,
+    )
+    file = models.FileField(upload_to="applicant_documents", blank=True, null=True)
+
+    date_created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    last_updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.id}"

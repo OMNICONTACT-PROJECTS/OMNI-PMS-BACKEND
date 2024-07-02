@@ -1,8 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from django.contrib.auth.models import Group, Permission
-
-from departments.models import Department
-
+from .models import Department
 
 
 class DepartmentSerializer(ModelSerializer):
@@ -13,9 +10,3 @@ class DepartmentSerializer(ModelSerializer):
             "organisation": {"required": True},
             "name": {"required": True},
         }
-  
-
-
-
-        
-
