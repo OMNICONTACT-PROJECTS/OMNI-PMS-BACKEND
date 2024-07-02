@@ -101,8 +101,8 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
         "NAME": "omni_pms_db",
-        "USER": "root",
-        "PASSWORD": "root",
+        "USER": "Jeremiah",
+        "PASSWORD": "0202February.",
         "HOST": "localhost",
         "PORT": 3306,
         "OPTIONS": {
