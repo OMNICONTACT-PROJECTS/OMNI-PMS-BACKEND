@@ -47,8 +47,12 @@ urlpatterns = [
     path("api/v1/subscribers/", include("subscribers.urls")),
     path("api/v1/departments/", include("departments.urls")),
     path(
-        "api/v1/inbound/voice-insights/",
+        "api/v1/voice-insights/inbound/",
         include("inbound_insights.voice_insights.urls"),
+    ),
+    path(
+        "api/v1/follow-up-insights/inbound/",
+        include("inbound_insights.follow_up_insights.urls"),
     ),
 ]
 

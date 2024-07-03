@@ -1,13 +1,13 @@
 from .serializers import (
-    VoiceInsightsSerializer,
-    VoiceInsightsRetrieveSerializer,
-    VoiceInsightsUpdateSerializer,
+    FollowUpInsightsSerializer,
+    FollowUpInsightsRetrieveSerializer,
+    FollowUpInsightsUpdateSerializer,
 )
 from ..campaign_insight_files.serializers import (
     CampaignInsightFileSerializer,
     CampaignInsightFileRetrieveSerializer,
 )
-from ..models import VoiceInsights, CampaignInsightFile
+from ..models import FollowUpInsights, CampaignInsightFile
 from accounts.models import User
 from organisations.models import Organisation
 from rest_framework.response import Response
@@ -19,7 +19,7 @@ from rest_framework.generics import (
     UpdateAPIView,
 )
 from rest_framework import status
-from .resources import VoiceInsightsResource
+from .resources import FollowUpInsightsResource
 from rest_framework.parsers import MultiPartParser, FormParser
 from tablib import Dataset
 import pandas as pd
@@ -27,10 +27,10 @@ import pandas as pd
 # Create your views here.
 
 
-class CreateVoiceInsightsView(CreateAPIView):
+class CreateFollowUpInsightsView(CreateAPIView):
     permission_classes = []
-    serializer_class = VoiceInsightsSerializer
-    queryset = VoiceInsights.objects.all()
+    serializer_class = FollowUpInsightsSerializer
+    queryset = FollowUpInsights.objects.all()
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -40,7 +40,7 @@ class CreateVoiceInsightsView(CreateAPIView):
             if serializer.is_valid():
                 self.perform_create(serializer)
                 data = {
-                    "message": "VoiceInsights created successfully",
+                    "message": "Follow Up Insights created successfully",
                     "data": serializer.data,
                 }
 
@@ -48,7 +48,7 @@ class CreateVoiceInsightsView(CreateAPIView):
 
             return Response(
                 {
-                    "message": "Failed to create voice insights, Validation error occurred.",
+                    "message": "Failed to create follow up insights, Validation error occurred.",
                     "error": serializer.errors,
                 },
                 status=status.HTTP_400_BAD_REQUEST,
@@ -57,39 +57,39 @@ class CreateVoiceInsightsView(CreateAPIView):
         except Exception as e:
             return Response(
                 {
-                    "message": "Failed to create Voice Insights. Exception error occurred",
+                    "message": "Failed to create follow up Insights. Exception error occurred",
                     "error": str(e),
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
 
-class GetAllVoiceInsights(ListAPIView):
+class GetAllFollowUpInsights(ListAPIView):
     permission_classes = []
-    serializer_class = VoiceInsightsRetrieveSerializer
-    queryset = VoiceInsights.objects.all()
+    serializer_class = FollowUpInsightsRetrieveSerializer
+    queryset = FollowUpInsights.objects.all()
 
 
-class VoiceInsightsReadDestroyView(RetrieveDestroyAPIView):
+class FollowUpInsightsReadDestroyView(RetrieveDestroyAPIView):
     permission_classes = []
-    serializer_class = VoiceInsightsRetrieveSerializer
-    queryset = VoiceInsights.objects.all()
+    serializer_class = FollowUpInsightsRetrieveSerializer
+    queryset = FollowUpInsights.objects.all()
 
 
-class VoiceInsightsUpdateView(UpdateAPIView):
+class FollowUpInsightsUpdateView(UpdateAPIView):
     permission_classes = []
-    serializer_class = VoiceInsightsUpdateSerializer
-    queryset = VoiceInsights.objects.all()
+    serializer_class = FollowUpInsightsUpdateSerializer
+    queryset = FollowUpInsights.objects.all()
 
 
-class GetVoiceInsightsByUserId(GenericAPIView):
+class GetFollowUpInsightsByUserId(GenericAPIView):
     permission_classes = []
-    serializer_class = VoiceInsightsRetrieveSerializer
-    queryset = VoiceInsights.objects.all()
+    serializer_class = FollowUpInsightsRetrieveSerializer
+    queryset = FollowUpInsights.objects.all()
 
     def get(self, request, user_id, *args, **kwargs):
         try:
-            user = User.objects.get(pk=user_id)
+            User.objects.get(pk=user_id)
         except User.DoesNotExist:
             return Response(
                 {"message": "User does not exist"}, status=status.HTTP_404_NOT_FOUND
@@ -102,10 +102,10 @@ class GetVoiceInsightsByUserId(GenericAPIView):
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
-class GetVoiceInsightsForHVCAgentsByOrganisationId(GenericAPIView):
+class GetFollowUpInsightsForHVCAgentsByOrganisationId(GenericAPIView):
     permission_classes = []
-    serializer_class = VoiceInsightsRetrieveSerializer
-    queryset = VoiceInsights.objects.all()
+    serializer_class = FollowUpInsightsRetrieveSerializer
+    queryset = FollowUpInsights.objects.all()
 
     def get(self, request, organisation_id, *args, **kwargs):
         try:
@@ -123,10 +123,10 @@ class GetVoiceInsightsForHVCAgentsByOrganisationId(GenericAPIView):
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
-class GetVoiceInsightsForLVCAgentsByOrganisationId(GenericAPIView):
+class GetFollowUpInsightsForLVCAgentsByOrganisationId(GenericAPIView):
     permission_classes = []
-    serializer_class = VoiceInsightsRetrieveSerializer
-    queryset = VoiceInsights.objects.all()
+    serializer_class = FollowUpInsightsRetrieveSerializer
+    queryset = FollowUpInsights.objects.all()
 
     def get(self, request, organisation_id, *args, **kwargs):
         try:
@@ -144,10 +144,10 @@ class GetVoiceInsightsForLVCAgentsByOrganisationId(GenericAPIView):
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
-class GetVoiceInsightsByGradeAndOrganisationId(GenericAPIView):
+class GetFollowUpInsightsByGradeAndOrganisationId(GenericAPIView):
     permission_classes = []
-    serializer_class = VoiceInsightsRetrieveSerializer
-    queryset = VoiceInsights.objects.all()
+    serializer_class = FollowUpInsightsRetrieveSerializer
+    queryset = FollowUpInsights.objects.all()
 
     def get(self, request, grade, organisation_id, *args, **kwargs):
         try:
@@ -165,10 +165,10 @@ class GetVoiceInsightsByGradeAndOrganisationId(GenericAPIView):
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
-class GetVoiceInsightsByDateAndOrganisationId(GenericAPIView):
+class GetFollowUpInsightsByDateAndOrganisationId(GenericAPIView):
     permission_classes = []
-    serializer_class = VoiceInsightsRetrieveSerializer
-    queryset = VoiceInsights.objects.all()
+    serializer_class = FollowUpInsightsRetrieveSerializer
+    queryset = FollowUpInsights.objects.all()
 
     def get(self, request, year, month, week, organisation_id, *args, **kwargs):
         try:
@@ -186,7 +186,7 @@ class GetVoiceInsightsByDateAndOrganisationId(GenericAPIView):
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
-class BulkUploadVoiceInsightsDataView(GenericAPIView):
+class BulkUploadFollowUpInsightsDataView(GenericAPIView):
     permission_classes = []
     serializer_class = CampaignInsightFileSerializer
     parser_classes = [MultiPartParser, FormParser]
@@ -210,7 +210,7 @@ class BulkUploadVoiceInsightsDataView(GenericAPIView):
                         status=status.HTTP_400_BAD_REQUEST,
                     )
 
-                voice_insights_resource = VoiceInsightsResource()
+                followup_insights_resource = FollowUpInsightsResource()
                 df = None
 
                 if file_type == "CSV":
@@ -252,7 +252,7 @@ class BulkUploadVoiceInsightsDataView(GenericAPIView):
 
                 dataset = Dataset().load(df)
                 try:
-                    result = voice_insights_resource.import_data(
+                    result = followup_insights_resource.import_data(
                         dataset, dry_run=True, raise_errors=True
                     )
                 except Exception as e:
@@ -269,15 +269,17 @@ class BulkUploadVoiceInsightsDataView(GenericAPIView):
                     )
 
                 if not result.has_errors():
-                    voice_insights_resource.import_data(dataset, dry_run=False)
+                    followup_insights_resource.import_data(dataset, dry_run=False)
                     try:
                         serializer = self.serializer_class(data=request.data)
                         if serializer.is_valid():
-                            serializer.save()
+                            saved_instance = serializer.save()
+                            saved_instance.campaign_name = "Follow Up Campaign"
+                            saved_instance.save()
                     except Exception as e:
                         pass
                     return Response(
-                        {"message": "Voice Insights Data Uploaded Successfully."},
+                        {"message": "Follow up Insights Data Uploaded Successfully."},
                         status=status.HTTP_201_CREATED,
                     )
                 else:
@@ -295,12 +297,12 @@ class BulkUploadVoiceInsightsDataView(GenericAPIView):
                 )
 
 
-class GetVoiceInsightsUploadedFilesView(GenericAPIView):
+class GetFollowUpInsightsUploadedFilesView(GenericAPIView):
     permission_classes = []
     serializer_class = CampaignInsightFileSerializer
     queryset = CampaignInsightFile.objects.all()
 
-    def get(self, request, organisation_id, *args, **kwargs):
+    def get(self, request, organisation_id, campaign_name, *args, **kwargs):
         try:
             Organisation.objects.get(pk=organisation_id)
         except Organisation.DoesNotExist:
@@ -310,13 +312,13 @@ class GetVoiceInsightsUploadedFilesView(GenericAPIView):
             )
         else:
             voice_insights_files = self.queryset.filter(
-                organisation_id=organisation_id
+                organisation_id=organisation_id, campaign_name=campaign_name
             ).order_by("-date_created")
             serializer = self.serializer_class(voice_insights_files, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class UploadVoiceInsightsBulkUploadTemplate(GenericAPIView):
+class UploadFollowUpInsightsBulkUploadTemplate(GenericAPIView):
     permission_classes = []
     parser_classes = [MultiPartParser, FormParser]
     serializer_class = CampaignInsightFileSerializer
@@ -338,12 +340,12 @@ class UploadVoiceInsightsBulkUploadTemplate(GenericAPIView):
         )
 
 
-class GetVoiceInsightsBulkUploadTemplate(GenericAPIView):
+class GetFollowUpInsightsBulkUploadTemplate(GenericAPIView):
     permission_classes = []
     serializer_class = CampaignInsightFileRetrieveSerializer
     queryset = CampaignInsightFile.objects.all()
 
-    def get(self, request, organisation_id, *args, **kwargs):
+    def get(self, request, organisation_id, campaign_name, *args, **kwargs):
         try:
             Organisation.objects.get(pk=organisation_id)
         except Organisation.DoesNotExist:
@@ -353,7 +355,9 @@ class GetVoiceInsightsBulkUploadTemplate(GenericAPIView):
             )
         else:
             voice_insights_files = self.queryset.filter(
-                organisation_id=organisation_id, is_upload_template=True
+                organisation_id=organisation_id,
+                campaign_name=campaign_name,
+                is_upload_template=True,
             ).order_by("-date_created")
             serializer = self.serializer_class(voice_insights_files, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
