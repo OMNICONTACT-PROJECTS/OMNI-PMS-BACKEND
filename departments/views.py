@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from rest_framework.generics import (
     CreateAPIView,
-    RetrieveUpdateDestroyAPIView,
     ListAPIView,
+    UpdateAPIView,
+    RetrieveDestroyAPIView,
 
 )
 from rest_framework import  status
@@ -11,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 
 from departments.models import Department
-from departments.serializers import DepartmentSerializer
+from departments.serializers import  DepartmentSerializer, DepartmentRetrieveSerializer
 
 # Create your views here.
 
@@ -22,25 +23,18 @@ class CreateDepartmentView(CreateAPIView):
 
 class ListDepartmentView(ListAPIView):
     queryset = Department.objects.all()
-    serializer_class = DepartmentSerializer
+    serializer_class = DepartmentRetrieveSerializer
     permission_classes = []
 
 
 
-class RetrieveDepartmentView(RetrieveUpdateDestroyAPIView):
+class RetrieveDepartmentView(RetrieveDestroyAPIView):
+    queryset = Department.objects.all()
+    serializer_class = DepartmentRetrieveSerializer
+    permission_classes = []
+
+
+class UpdateDepartmentView(UpdateAPIView):
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
     permission_classes = []
-
-    def update(self, request, *args, **kwargs):
-        try:
-            return super().update(request, *args, **kwargs)
-        except ValidationError as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
-    def destroy(self, request, *args, **kwargs):
-        try:
-            return super().destroy(request, *args, **kwargs)
-        except ValidationError as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
