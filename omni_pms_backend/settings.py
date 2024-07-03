@@ -40,8 +40,7 @@ DEBUG = os.getenv("DEBUG", "0").lower() in ["true", "t", "1"]
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
 
-
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "https://omni-pms-backend.onrender.com"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "omni-pms-backend.onrender.com"]
 
 
 # Application definition
