@@ -12,7 +12,7 @@
 # Work on User bulky uploads (Not Started)
 # Work on Insights (Pending)
 # Work on voice insights bulky uploads (DONE)
-
+# Voice insights bulky uploads (DONE)
 # get-all endpoints should include organisation_id (NOT STARTED)
 # Validation url on educational qualification(NOT STARTED) 
 # Follow ups Insights(PENDING)
