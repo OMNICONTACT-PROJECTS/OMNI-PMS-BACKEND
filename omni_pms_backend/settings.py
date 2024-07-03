@@ -39,7 +39,8 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(" ")
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
 
-# ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "https://omni-pms-backend.onrender.com"]
 
 
 # Application definition
@@ -110,19 +111,19 @@ WSGI_APPLICATION = "omni_pms_backend.wsgi.application"
 #     }
 # }
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.mysql",
-#         "NAME": "omni_pms_db",
-#         "USER": "Jeremiah",
-#         "PASSWORD": "0202February.",
-#         "HOST": "localhost",
-#         "PORT": 3306,
-#         "OPTIONS": {
-#             "sql_mode": "STRICT_TRANS_TABLES",
-#         },
-#     }
-# }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "omni_pms_db",
+        "USER": "Jeremiah",
+        "PASSWORD": "0202February.",
+        "HOST": "localhost",
+        "PORT": 3306,
+        "OPTIONS": {
+            "sql_mode": "STRICT_TRANS_TABLES",
+        },
+    }
+}
 
 DATABASES = {
     "default": {
