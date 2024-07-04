@@ -1,13 +1,13 @@
-from ..models import VoiceInsights, CampaignInsightFile
+from ..models import FollowUpInsights, CampaignInsightFile
 from accounts.serializers import MinimizedUserSerializer
 from organisations.serializers import MinimizedOrganisationSerializer
 from rest_framework.serializers import ModelSerializer
 
 
-class VoiceInsightsSerializer(ModelSerializer):
+class FollowUpInsightsSerializer(ModelSerializer):
 
     class Meta:
-        model = VoiceInsights
+        model = FollowUpInsights
         fields = "__all__"
 
         extra_kwargs = {
@@ -24,16 +24,16 @@ class VoiceInsightsSerializer(ModelSerializer):
         }
 
 
-class VoiceInsightsRetrieveSerializer(ModelSerializer):
+class FollowUpInsightsRetrieveSerializer(ModelSerializer):
     user = MinimizedUserSerializer()
 
     class Meta:
-        model = VoiceInsights
+        model = FollowUpInsights
         fields = "__all__"
 
 
-class VoiceInsightsUpdateSerializer(ModelSerializer):
+class FollowUpInsightsUpdateSerializer(ModelSerializer):
 
     class Meta:
-        model = VoiceInsights
+        model = FollowUpInsights
         fields = "__all__"

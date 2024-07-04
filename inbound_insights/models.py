@@ -131,14 +131,17 @@ class VoiceInsights(models.Model):
         return f"{self.user.first_name} ({self.user.last_name}"
 
 
-class VoiceInsightsFile(models.Model):
+class CampaignInsightFile(models.Model):
     FILE_TYPE = (
         ("XLSX", "XLSX"),
         ("XLS", "XLS"),
         ("CSV", "CSV"),
         ("JSON", "JSON"),
     )
-    organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE, blank=False, null=False)
+    organisation = models.ForeignKey(
+        Organisation, on_delete=models.CASCADE, blank=False, null=False
+    )
+    campaign_name = models.CharField(max_length=150, blank=True, null=True)
     file_type = models.CharField(
         max_length=50, blank=False, null=False, choices=FILE_TYPE
     )
@@ -148,4 +151,71 @@ class VoiceInsightsFile(models.Model):
     last_updated = models.DateTimeField(auto_now=True, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.file_type}"
+        return f"{self.campaign_name}.{self.file_type}"
+
+
+class FollowUpInsights(models.Model):
+    AGENT_TYPE = (
+        ("LVC", "LVC"),
+        ("HVC", "HVC"),
+    )
+    GRADE = (
+        ("SP", "SP"),
+        ("A", "A"),
+        ("B", "B"),
+        ("C", "C"),
+        ("D", "D"),
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        blank=False,
+        null=False,
+        related_name="user_follow_up_insights",
+    )
+    agent_type = models.CharField(
+        max_length=50,
+        blank=False,
+        null=False,
+        choices=AGENT_TYPE,
+    )
+    year = models.PositiveIntegerField(null=False, blank=False)
+    month = models.CharField(max_length=50, null=False, blank=False)
+    week = models.PositiveIntegerField(
+        null=False, blank=False, help_text="week should be a number"
+    )
+    aes = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="Average Evaluation Score (AES)",
+    )
+    outbound = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="This is the Weekly Outbound calls achieved by the agent",
+    )
+    csat = models.PositiveIntegerField(
+        null=True, blank=True, help_text="This is the weekly csat"
+    )
+    calc_aes = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="This is the weekly calculated aes",
+    )
+    calc_outbound = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="This is the Weekly calculated Outbound calls achieved by the agent",
+    )
+    calc_csat = models.PositiveIntegerField(null=True, blank=True)
+    weighted_aes = models.PositiveIntegerField(null=False, blank=False)
+    weighted_outbound = models.PositiveIntegerField(null=True, blank=True)
+    weighted_csat = models.PositiveIntegerField(null=True, blank=True)
+    overall_score = models.PositiveIntegerField(null=True, blank=True)
+    grade = models.CharField(max_length=20, choices=GRADE)
+
+    date_created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    last_updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user.first_name} ({self.user.last_name}"

@@ -11,9 +11,15 @@
 # Educational Qualifications (Done)
 # Work on User bulky uploads (Not Started)
 # Work on Insights (Pending)
-# Work on bulky uploads (Not Started)
-
+# Work on voice insights bulky uploads (DONE)
+# Voice insights bulky uploads (DONE)
 # get-all endpoints should include organisation_id (NOT STARTED)
 # Validation url on educational qualification(NOT STARTED) 
+# Follow ups Insights(PENDING)
+# higher_life_foundation Insights (NOT STARTED)
+# sassai Insights(NOT STARTED)
+# freshdesk Insights (NOT STARTED)
+# freshchat Insights (NOT STARTED)
+# yamurai Insights (NOT STARTED)
 
 
