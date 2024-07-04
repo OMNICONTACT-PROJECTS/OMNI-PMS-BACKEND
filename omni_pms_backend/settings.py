@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 ##################### SETTINGS FOR RENDER PRODUCTION DEPLOYMENT ####################
-load_dotenv(BASE_DIR / ".env.render-production")
+load_dotenv(BASE_DIR / ".env.anoe")
 SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG", "0").lower() in ["true", "t", "1"]
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(" ")
@@ -114,8 +114,8 @@ WSGI_APPLICATION = "omni_pms_backend.wsgi.application"
 #     "default": {
 #         "ENGINE": "django.db.backends.mysql",
 #         "NAME": "omni_pms_db",
-#         "USER": "Jeremiah",
-#         "PASSWORD": "0202February.",
+#         "USER": "root",
+#         "PASSWORD": "root",
 #         "HOST": "localhost",
 #         "PORT": 3306,
 #         "OPTIONS": {
@@ -126,7 +126,7 @@ WSGI_APPLICATION = "omni_pms_backend.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
+        "ENGINE": "django.db.backends.mysql",
         "NAME": os.getenv("DATABASE_NAME"),
         "USER": os.getenv("DATABASE_USER"),
         "PASSWORD": os.getenv("DATABASE_PASSWORD"),
