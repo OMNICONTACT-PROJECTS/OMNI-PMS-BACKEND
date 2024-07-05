@@ -152,6 +152,7 @@ venv.bak/
 ./env/
 ./env
 /env
+.env.anoe
 
 # Spyder project settings
 .spyderproject
