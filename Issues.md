@@ -6,7 +6,7 @@
 
 # Configure email backed    (Done)
 # Complete/handle profile pic upload logic  (Done)
-# Should solve issue of password in views on send_mail fields     (PENDING)
+# Should solve issue of password in views on send_mail fields (PENDING)
 # Personal docs (Done)
 # Educational Qualifications (Done)
 # Work on User bulky uploads (Not Started)
@@ -21,5 +21,6 @@
 # freshdesk Insights (NOT STARTED)
 # freshchat Insights (NOT STARTED)
 # yamurai Insights (NOT STARTED)
+# Average metrics of all kpi on all campaign (NOT STARTED)
 
 

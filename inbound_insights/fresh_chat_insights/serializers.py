@@ -1,6 +1,5 @@
-from ..models import FreshChatInsights, CampaignInsightFile
+from ..models import FreshChatInsights
 from accounts.serializers import MinimizedUserSerializer
-from organisations.serializers import MinimizedOrganisationSerializer
 from rest_framework.serializers import ModelSerializer
 
 

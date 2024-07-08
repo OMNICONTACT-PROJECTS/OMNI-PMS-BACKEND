@@ -382,12 +382,12 @@ class FreshDeskInsights(models.Model):
     resolved_count = models.PositiveIntegerField(
         null=False,
         blank=False,
-        help_text="Average Evaluation Score (AES)",
+        help_text="",
     )
     complaints = models.PositiveIntegerField(
         null=False,
         blank=False,
-        help_text="Average Evaluation Score (AES)",
+        help_text="",
     )
   
     csat = models.PositiveIntegerField(
@@ -484,7 +484,7 @@ class FreshChatInsights(models.Model):
     customer_complaint = models.PositiveIntegerField(
         null=False,
         blank=False,
-        help_text="Average Evaluation Score (AES)",
+        help_text="",
     )
   
     csat = models.PositiveIntegerField(
