@@ -413,7 +413,7 @@ class FreshDeskInsights(models.Model):
     calc_csat = models.PositiveIntegerField(null=True, blank=True)
 
     weighted_aes = models.PositiveIntegerField(null=False, blank=False)
-    weighted_resolve_count = models.PositiveIntegerField(null=True, blank=True)
+    weighted_resolved_count = models.PositiveIntegerField(null=True, blank=True)
     weighted_complaints = models.PositiveIntegerField(null=True, blank=True)
     weighted_csat = models.PositiveIntegerField(null=True, blank=True)
     overall_score = models.PositiveIntegerField(null=True, blank=True)

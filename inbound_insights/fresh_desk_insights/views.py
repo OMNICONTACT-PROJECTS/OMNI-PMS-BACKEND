@@ -274,7 +274,7 @@ class BulkUploadFreshDeskInsightsDataView(GenericAPIView):
                         serializer = self.serializer_class(data=request.data)
                         if serializer.is_valid():
                             saved_instance = serializer.save()
-                            saved_instance.campaign_name = "Fresh Desk Campaign"
+                            saved_instance.campaign_name = "Fresh Desk"
                             saved_instance.save()
                     except Exception as e:
                         pass

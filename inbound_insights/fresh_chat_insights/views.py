@@ -274,7 +274,7 @@ class BulkUploadFreshChatInsightsDataView(GenericAPIView):
                         serializer = self.serializer_class(data=request.data)
                         if serializer.is_valid():
                             saved_instance = serializer.save()
-                            saved_instance.campaign_name = "Fresh Chat Campaign"
+                            saved_instance.campaign_name = "Fresh Chat"
                             saved_instance.save()
                     except Exception as e:
                         pass

@@ -22,5 +22,6 @@
 # freshchat Insights (NOT STARTED)
 # yamurai Insights (NOT STARTED)
 # Average metrics of all kpi on all campaign (NOT STARTED)
+# Assign agent to a campaign(NOT STARTED)
 
 
