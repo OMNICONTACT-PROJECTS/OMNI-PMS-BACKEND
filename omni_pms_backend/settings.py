@@ -11,24 +11,35 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
 import os
 from datetime import timedelta
+import dj_database_url
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+##################### SETTINGS FOR RENDER PRODUCTION DEPLOYMENT ####################
+load_dotenv(BASE_DIR / ".env.local")
+SECRET_KEY = os.getenv("SECRET_KEY")
+DEBUG = os.getenv("DEBUG", "0").lower() in ["true", "t", "1"]
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(" ")
+
+
+######################################################################################
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-5n+_6i)n2@511(*q(%cg72f$*011d_)!!1xd14gk!e!3b^2bws"
+# SECRET_KEY = "django-insecure-5n+_6i)n2@511(*q(%cg72f$*011d_)!!1xd14gk!e!3b^2bws"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+# ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 
 # Application definition
@@ -57,6 +68,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "corsheaders.middleware.CorsMiddleware",
@@ -65,6 +77,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 ROOT_URLCONF = "omni_pms_backend.urls"
 
@@ -97,20 +110,30 @@ WSGI_APPLICATION = "omni_pms_backend.wsgi.application"
 #     }
 # }
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.mysql",
+#         "NAME": "omni_pms_db",
+#         "USER": "root",
+#         "PASSWORD": "root",
+#         "HOST": "localhost",
+#         "PORT": 3306,
+#         "OPTIONS": {
+#             "sql_mode": "STRICT_TRANS_TABLES",
+#         },
+#     }
+# }
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "omni_pms_db",
-        "USER": "Jeremiah",
-        "PASSWORD": "0202February.",
-        "HOST": "localhost",
-        "PORT": 3306,
-        "OPTIONS": {
-            "sql_mode": "STRICT_TRANS_TABLES",
-        },
+        "NAME": os.getenv("DATABASE_NAME"),
+        "USER": os.getenv("DATABASE_USER"),
+        "PASSWORD": os.getenv("DATABASE_PASSWORD"),
+        "HOST": os.getenv("DBHOSTNAME"),
+        "PORT": os.getenv("DATABASE_PORT"),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators

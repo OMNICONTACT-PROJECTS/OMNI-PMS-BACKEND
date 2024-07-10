@@ -6,13 +6,13 @@
 
 # Configure email backed    (Done)
 # Complete/handle profile pic upload logic  (Done)
-# Should solve issue of password in views on send_mail fields     (PENDING)
+# Should solve issue of password in views on send_mail fields (PENDING)
 # Personal docs (Done)
 # Educational Qualifications (Done)
 # Work on User bulky uploads (Not Started)
 # Work on Insights (Pending)
 # Work on voice insights bulky uploads (DONE)
-
+# Voice insights bulky uploads (DONE)
 # get-all endpoints should include organisation_id (NOT STARTED)
 # Validation url on educational qualification(NOT STARTED) 
 # Follow ups Insights(PENDING)
@@ -21,5 +21,8 @@
 # freshdesk Insights (NOT STARTED)
 # freshchat Insights (NOT STARTED)
 # yamurai Insights (NOT STARTED)
+# Average metrics of all kpi on all campaign (NOT STARTED)
+# Assign agent to a campaign(NOT STARTED)
+# add more on agent type (NOT STARTED)
 
 

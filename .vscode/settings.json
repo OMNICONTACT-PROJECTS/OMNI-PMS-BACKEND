@@ -2,7 +2,9 @@
     "cSpell.words": [
         "corsheaders",
         "csat",
+        "DBHOSTNAME",
         "devs",
+        "dotenv",
         "iazysgbhzmilstox",
         "iloc",
         "omni",
@@ -13,6 +15,7 @@
         "redoc",
         "simplejwt",
         "tablib",
-        "talktime"
+        "talktime",
+        "whitenoise"
     ]
 }

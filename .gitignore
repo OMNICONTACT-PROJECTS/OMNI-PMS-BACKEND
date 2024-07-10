@@ -152,6 +152,12 @@ venv.bak/
 ./env/
 ./env
 /env
+.env.local
+.env.anoe
+.env.mutepfa
+.env.ilah
+.env.tyronetest
+
 
 # Spyder project settings
 .spyderproject
