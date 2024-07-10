@@ -23,7 +23,7 @@ from .resources import VoiceInsightsResource
 from rest_framework.parsers import MultiPartParser, FormParser
 from tablib import Dataset
 import pandas as pd
-
+from django.db.models import Avg
 # Create your views here.
 
 
@@ -357,3 +357,41 @@ class GetVoiceInsightsBulkUploadTemplate(GenericAPIView):
             ).order_by("-date_created")
             serializer = self.serializer_class(voice_insights_files, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
+
+class GetAllAverageInsightsStatisticsView(GenericAPIView):
+    permission_classes = []
+    serializer_class = VoiceInsightsRetrieveSerializer
+    queryset = VoiceInsights.objects.all()
+
+    def get(self, request, organisation_id, agent_type, *args, **kwargs):
+        try:
+            organisation = Organisation.objects.get(pk=organisation_id)
+        except Organisation.DoesNotExist:
+            return Response(
+                {"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        voice_insights = self.queryset.filter(
+            user__organisation=organisation,
+            agent_type="HVC",
+        )
+
+        if not voice_insights.exists():
+            return Response(
+                {"message": "No voice insights data found for the given organisation"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        average_statistics = {
+            "year": round(voice_insights.values("year").aggregate(Avg("year"))["year__avg"], 2),
+            "week": round(voice_insights.values("week").aggregate(Avg("week"))["week__avg"], 2),
+            "weighted_aes": round(voice_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
+            "weighted_actual_outbound": round(voice_insights.values("weighted_actual_outbound").aggregate(Avg("weighted_actual_outbound"))["weighted_actual_outbound__avg"], 2),
+            "weighted_actual_talktime": round(voice_insights.values("weighted_actual_talktime").aggregate(Avg("weighted_actual_talktime"))["weighted_actual_talktime__avg"], 2),
+            "weighted_actual_inbound_calls": round(voice_insights.values("weighted_actual_inbound_calls").aggregate(Avg("weighted_actual_inbound_calls"))["weighted_actual_inbound_calls__avg"], 2),
+            "weighted_csat": round(voice_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "overall_score": round(voice_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+        }
+
+        return Response(average_statistics, status=status.HTTP_200_OK)
