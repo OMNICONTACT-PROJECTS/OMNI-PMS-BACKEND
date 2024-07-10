@@ -114,20 +114,6 @@ WSGI_APPLICATION = "omni_pms_backend.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "omni_pms_db",
-        "USER": "Jeremiah",
-        "PASSWORD": "0202February.",
-        "HOST": "localhost",
-        "PORT": 3306,
-        "OPTIONS": {
-            "sql_mode": "STRICT_TRANS_TABLES",
-        },
-    }
-}
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
         "NAME": os.getenv("DATABASE_NAME"),
         "USER": os.getenv("DATABASE_USER"),
         "PASSWORD": os.getenv("DATABASE_PASSWORD"),
