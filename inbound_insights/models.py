@@ -219,3 +219,409 @@ class FollowUpInsights(models.Model):
 
     def __str__(self):
         return f"{self.user.first_name} ({self.user.last_name}"
+
+
+
+class HigherLifeFoundationInsights(models.Model):
+    AGENT_TYPE = (
+        ("LVC", "LVC"),
+        ("HVC", "HVC"),
+    )
+    GRADE = (
+        ("SP", "SP"),
+        ("A", "A"),
+        ("B", "B"),
+        ("C", "C"),
+        ("D", "D"),
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        blank=False,
+        null=False,
+        related_name="user_higher_life_foundation_insights",
+    )
+    agent_type = models.CharField(
+        max_length=50,
+        blank=False,
+        null=False,
+        choices=AGENT_TYPE,
+    )
+    year = models.PositiveIntegerField(null=False, blank=False)
+    month = models.CharField(max_length=50, null=False, blank=False)
+    week = models.PositiveIntegerField(
+        null=False, blank=False, help_text="week should be a number"
+    )
+    aes = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="Average Evaluation Score (AES)",
+    )
+   
+    csat = models.PositiveIntegerField(
+        null=True, blank=True, help_text="This is the weekly csat"
+    )
+
+    resolved_count = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="",
+    )
+    service_level = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="",
+    )
+
+    overall_score = models.PositiveIntegerField(null=True, blank=True)
+    grade = models.CharField(max_length=20, choices=GRADE)
+
+    date_created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    last_updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user.first_name} ({self.user.last_name}"
+    
+
+class SasaiInsights(models.Model):
+    AGENT_TYPE = (
+        ("LVC", "LVC"),
+        ("HVC", "HVC"),
+    )
+    GRADE = (
+        ("SP", "SP"),
+        ("A", "A"),
+        ("B", "B"),
+        ("C", "C"),
+        ("D", "D"),
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        blank=False,
+        null=False,
+        related_name="user_sasai_insights",
+    )
+    agent_type = models.CharField(
+        max_length=50,
+        blank=False,
+        null=False,
+        choices=AGENT_TYPE,
+    )
+    year = models.PositiveIntegerField(null=False, blank=False)
+    month = models.CharField(max_length=50, null=False, blank=False)
+    week = models.PositiveIntegerField(
+        null=False, blank=False, help_text="week should be a number"
+    )
+    aes = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="Average Evaluation Score (AES)",
+    )
+   
+    csat = models.PositiveIntegerField(
+        null=True, blank=True, help_text="This is the weekly csat"
+    )
+
+    resolved_count = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="",
+    )
+    service_level = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="",
+    )
+
+    overall_score = models.PositiveIntegerField(null=True, blank=True)
+    grade = models.CharField(max_length=20, choices=GRADE)
+
+    date_created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    last_updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user.first_name} ({self.user.last_name}"
+    
+
+class FreshDeskInsights(models.Model):
+    AGENT_TYPE = (
+        ("LVC", "LVC"),
+        ("HVC", "HVC"),
+    )
+    GRADE = (
+        ("SP", "SP"),
+        ("A", "A"),
+        ("B", "B"),
+        ("C", "C"),
+        ("D", "D"),
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        blank=False,
+        null=False,
+        related_name="user_fresh_desk_insights",
+    )
+    agent_type = models.CharField(
+        max_length=50,
+        blank=False,
+        null=False,
+        choices=AGENT_TYPE,
+    )
+    year = models.PositiveIntegerField(null=False, blank=False)
+    month = models.CharField(max_length=50, null=False, blank=False)
+    week = models.PositiveIntegerField(
+        null=False, blank=False, help_text="week should be a number"
+    )
+    aes = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="Average Evaluation Score (AES)",
+    )
+    resolved_count = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="",
+    )
+    complaints = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="",
+    )
+  
+    csat = models.PositiveIntegerField(
+        null=True, blank=True, help_text="This is the weekly csat"
+    )
+
+    
+    calc_aes = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="This is the weekly calculated aes",
+    )
+    calc_resolved_count = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="This is the weekly calculated resolve count",
+    )
+    calc_complaints = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="This is the weekly calculated complaints",
+    )
+    calc_csat = models.PositiveIntegerField(null=True, blank=True)
+
+    weighted_aes = models.PositiveIntegerField(null=False, blank=False)
+    weighted_resolved_count = models.PositiveIntegerField(null=True, blank=True)
+    weighted_complaints = models.PositiveIntegerField(null=True, blank=True)
+    weighted_csat = models.PositiveIntegerField(null=True, blank=True)
+    overall_score = models.PositiveIntegerField(null=True, blank=True)
+    grade = models.CharField(max_length=20, choices=GRADE)
+
+    date_created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    last_updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user.first_name} ({self.user.last_name}"
+    
+
+class FreshChatInsights(models.Model):
+    AGENT_TYPE = (
+        ("LVC", "LVC"),
+        ("HVC", "HVC"),
+    )
+    GRADE = (
+        ("SP", "SP"),
+        ("A", "A"),
+        ("B", "B"),
+        ("C", "C"),
+        ("D", "D"),
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        blank=False,
+        null=False,
+        related_name="user_fresh_chat_insights",
+    )
+    agent_type = models.CharField(
+        max_length=50,
+        blank=False,
+        null=False,
+        choices=AGENT_TYPE,
+    )
+    year = models.PositiveIntegerField(null=False, blank=False)
+    month = models.CharField(max_length=50, null=False, blank=False)
+    week = models.PositiveIntegerField(
+        null=False, blank=False, help_text="week should be a number"
+    )
+    aes = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="Average Evaluation Score (AES)",
+    )
+    targeted_interactions = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="",
+    )
+    actual_interactions = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="",
+    )
+    login_time_variance = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="",
+    )
+    handling_time = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="",
+    )
+    customer_complaint = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="",
+    )
+  
+    csat = models.PositiveIntegerField(
+        null=True, blank=True, help_text="This is the weekly csat"
+    )
+
+    
+    calc_aes = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="This is the weekly calculated aes",
+    )
+    calc_targeted_interactions = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="This is the weekly calculated targeted interactions",
+    )
+    calc_actual_interactions = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="This is the weekly calculated actual interactions",
+    )
+    calc_login_time_variance = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="This is the weekly calculated login time variance",
+    )
+    calc_handling_time = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="This is the weekly calculated handling time",
+    )
+    calc_customer_complaint = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="This is the weekly calculated customer complaint",
+    )
+    calc_csat = models.PositiveIntegerField(null=True, blank=True)
+
+    weighted_aes = models.PositiveIntegerField(null=False, blank=False)
+    weighted_targeted_interactions = models.PositiveIntegerField(null=True, blank=True)
+    weighted_actual_interactions = models.PositiveIntegerField(null=True, blank=True)
+    weighted_login_time_variance = models.PositiveIntegerField(null=True, blank=True)
+    weighted_handling_time = models.PositiveIntegerField(null=True, blank=True)
+    weighted_customer_complaint = models.PositiveIntegerField(null=True, blank=True)
+    weighted_csat = models.PositiveIntegerField(null=True, blank=True)
+    overall_score = models.PositiveIntegerField(null=True, blank=True)
+    grade = models.CharField(max_length=20, choices=GRADE)
+
+    date_created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    last_updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user.first_name} ({self.user.last_name}"
+    
+class YamuraiInsights(models.Model):
+    AGENT_TYPE = (
+        ("LVC", "LVC"),
+        ("HVC", "HVC"),
+    )
+    GRADE = (
+        ("SP", "SP"),
+        ("A", "A"),
+        ("B", "B"),
+        ("C", "C"),
+        ("D", "D"),
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        blank=False,
+        null=False,
+        related_name="user_yamurai_insights",
+    )
+    agent_type = models.CharField(
+        max_length=50,
+        blank=False,
+        null=False,
+        choices=AGENT_TYPE,
+    )
+    year = models.PositiveIntegerField(null=False, blank=False)
+    month = models.CharField(max_length=50, null=False, blank=False)
+    week = models.PositiveIntegerField(
+        null=False, blank=False, help_text="week should be a number"
+    )
+    aes = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="Average Evaluation Score (AES)",
+    )
+   
+    csat = models.PositiveIntegerField(
+        null=True, blank=True, help_text="This is the weekly csat"
+    )
+
+    resolved_queries = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="",
+    )
+    calc_aes = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="",
+    )
+    calc_resolved_queries = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="",
+    )
+    calc_csat = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="",
+    )
+    weighted_aes = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="",
+    )
+    weighted_resolved_queries = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="",
+    )
+    weighted_csat = models.PositiveIntegerField(
+        null=False,
+        blank=False,
+        help_text="",
+    )
+   
+
+    overall_score = models.PositiveIntegerField(null=True, blank=True)
+    grade = models.CharField(max_length=20, choices=GRADE)
+
+    date_created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    last_updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user.first_name} ({self.user.last_name}"

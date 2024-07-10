@@ -54,6 +54,26 @@ urlpatterns = [
         "api/v1/follow-up-insights/inbound/",
         include("inbound_insights.follow_up_insights.urls"),
     ),
+    path(
+        "api/v1/higher-life-foundation-insights/inbound/",
+        include("inbound_insights.higher_life_foundation_insights.urls"),
+    ),
+    path(
+        "api/v1/sasai-insights/inbound/",
+        include("inbound_insights.sasai_insights.urls"),
+    ),
+    path(
+        "api/v1/fresh-desk-insights/inbound/",
+        include("inbound_insights.fresh_desk_insights.urls"),
+    ),
+    path(
+        "api/v1/fresh-chat-insights/inbound/",
+        include("inbound_insights.fresh_chat_insights.urls"),
+    ),
+    path(
+        "api/v1/yamurai-insights/inbound/",
+        include("inbound_insights.yamurai_insights.urls"),
+    ),
 ]
 
 if settings.DEBUG:
