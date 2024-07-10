@@ -42,4 +42,8 @@ urlpatterns = [
         "get-by-date/year/<int:year>/month/<str:month>/week/<int:week>/organisation_id/<int:organisation_id>/",
         views.GetVoiceInsightsByDateAndOrganisationId.as_view(),
     ),
+    path(
+        "get-all-average-statistics-by-organisation-id/<int:organisation_id>/agent-type/<str:agent_type>/",
+        views.GetAllAverageVoiceInsightsStatisticsView.as_view(),
+    ),
 ]
