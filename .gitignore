@@ -152,7 +152,8 @@ venv.bak/
 ./env/
 ./env
 /env
-
+.env.render-production
+.env.secrets.render-production
 # Spyder project settings
 .spyderproject
 .spyproject
