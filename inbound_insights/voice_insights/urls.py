@@ -43,7 +43,19 @@ urlpatterns = [
         views.GetVoiceInsightsByDateAndOrganisationId.as_view(),
     ),
     path(
-        "get-all-average-statistics-by-organisation-id/<int:organisation_id>/agent-type/<str:agent_type>/",
+        "get-all-average-statists-by-organisation-id/<int:organisation_id>/agent-type/<str:agent_type>/",
         views.GetAllAverageVoiceInsightsStatisticsView.as_view(),
+    ),
+    path(
+        "get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/month/<str:month>/week/<int:week>/agent_type/<str:agent_type>/",
+        views.GetAllVoiceInsightsStatisticsView.as_view(),
+    ),
+    path(
+        "get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/month/<str:month>/agent_type/<str:agent_type>/",
+        views.GetAllVoiceInsightsStatisticsWithoutWeekView.as_view(),
+    ),
+    path(
+        "get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/agent_type/<str:agent_type>/",
+        views.GetAllVoiceInsightsStatisticsWithoutMonthAndWeekView.as_view(),
     ),
 ]
