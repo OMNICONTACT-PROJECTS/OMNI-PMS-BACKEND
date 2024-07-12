@@ -17,7 +17,7 @@ class User(AbstractUser):
         ("DEV", "DEV"),
         ("SUPERUSER", "SUPERUSER"),
         ("ADMIN", "ADMIN"),
-        ("SUBSCRIBER", "SUBSCRIBER"),
+        ("AGENT", "AGENT"),
     )
     USER_STATUS = (
         ("ACTIVE", "ACTIVE"),
