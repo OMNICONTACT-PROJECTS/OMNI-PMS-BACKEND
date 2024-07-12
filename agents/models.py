@@ -4,7 +4,7 @@ from accounts.models import User
 # Create your models here.
 
 
-class Subscriber(models.Model):
+class Agent(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):

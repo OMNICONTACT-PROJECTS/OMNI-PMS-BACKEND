@@ -25,7 +25,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env.render-production")
 SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG", "0").lower() in ["true", "t", "1"]
-
 # ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(" ")
 
 
@@ -40,8 +39,7 @@ DEBUG = os.getenv("DEBUG", "0").lower() in ["true", "t", "1"]
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "omni-pms-backend.onrender.com"]
-
+ALLOWED_HOSTS = ["omni-pms-backend.onrender.com"]
 
 # Application definition
 
@@ -61,7 +59,7 @@ INSTALLED_APPS = [
     "devs.apps.DevsConfig",
     "superusers.apps.SuperusersConfig",
     "administrators.apps.AdministratorsConfig",
-    "subscribers.apps.SubscribersConfig",
+    "agents.apps.AgentsConfig",
     "departments.apps.DepartmentsConfig",
     "inbound_insights.apps.InboundInsightsConfig",
     "import_export",

@@ -44,7 +44,7 @@ urlpatterns = [
     path("api/v1/devs/", include("devs.urls")),
     path("api/v1/superusers/", include("superusers.urls")),
     path("api/v1/administrators/", include("administrators.urls")),
-    path("api/v1/subscribers/", include("subscribers.urls")),
+    path("api/v1/agents/", include("agents.urls")),
     path("api/v1/departments/", include("departments.urls")),
     path(
         "api/v1/voice-insights/inbound/",
