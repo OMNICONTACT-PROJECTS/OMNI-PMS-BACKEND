@@ -23,6 +23,7 @@ from .resources import FollowUpInsightsResource
 from rest_framework.parsers import MultiPartParser, FormParser
 from tablib import Dataset
 import pandas as pd
+from django.db.models import Avg, Count
 
 # Create your views here.
 
@@ -95,10 +96,10 @@ class GetFollowUpInsightsByUserId(GenericAPIView):
                 {"message": "User does not exist"}, status=status.HTTP_404_NOT_FOUND
             )
         else:
-            voice_insights = self.queryset.filter(user_id=user_id).order_by(
+            follow_up_insights = self.queryset.filter(user_id=user_id).order_by(
                 "-date_created"
             )
-            serializer = self.serializer_class(voice_insights, many=True)
+            serializer = self.serializer_class(follow_up_insights, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
@@ -116,10 +117,10 @@ class GetFollowUpInsightsForHVCAgentsByOrganisationId(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
         else:
-            voice_insights = self.queryset.filter(agent_type="HVC").order_by(
+            follow_up_insights = self.queryset.filter(agent_type="HVC").order_by(
                 "-date_created"
             )
-            serializer = self.serializer_class(voice_insights, many=True)
+            serializer = self.serializer_class(follow_up_insights, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
@@ -137,10 +138,10 @@ class GetFollowUpInsightsForLVCAgentsByOrganisationId(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
         else:
-            voice_insights = self.queryset.filter(agent_type="LVC").order_by(
+            follow_up_insights = self.queryset.filter(agent_type="LVC").order_by(
                 "-date_created"
             )
-            serializer = self.serializer_class(voice_insights, many=True)
+            serializer = self.serializer_class(follow_up_insights, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
@@ -158,10 +159,10 @@ class GetFollowUpInsightsByGradeAndOrganisationId(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
         else:
-            voice_insights = self.queryset.filter(
+            follow_up_insights = self.queryset.filter(
                 user__organisation_id=organisation_id, grade=grade
             ).order_by("-date_created")
-            serializer = self.serializer_class(voice_insights, many=True)
+            serializer = self.serializer_class(follow_up_insights, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
@@ -179,10 +180,10 @@ class GetFollowUpInsightsByDateAndOrganisationId(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
         else:
-            voice_insights = self.queryset.filter(
+            follow_up_insights = self.queryset.filter(
                 user__organisation_id=organisation_id, year=year, month=month, week=week
             ).order_by("-date_created")
-            serializer = self.serializer_class(voice_insights, many=True)
+            serializer = self.serializer_class(follow_up_insights, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
@@ -262,7 +263,7 @@ class BulkUploadFollowUpInsightsDataView(GenericAPIView):
                         error_message = error_message[: error_index + 1]
                     return Response(
                         {
-                            "message": "Failed to upload voice insights data, an error occurred",
+                            "message": "Failed to upload follow up insights data, an error occurred",
                             "error": error_message,
                         },
                         status=status.HTTP_400_BAD_REQUEST,
@@ -290,7 +291,7 @@ class BulkUploadFollowUpInsightsDataView(GenericAPIView):
             except Exception as e:
                 return Response(
                     {
-                        "message": "Failed to upload voice insights data, an error occurred",
+                        "message": "Failed to upload follow up insights data, an error occurred",
                         "error": str(e),
                     },
                     status=status.HTTP_400_BAD_REQUEST,
@@ -311,10 +312,10 @@ class GetFollowUpInsightsUploadedFilesView(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
         else:
-            voice_insights_files = self.queryset.filter(
+            follow_up_insights_files = self.queryset.filter(
                 organisation_id=organisation_id, campaign_name=campaign_name
             ).order_by("-date_created")
-            serializer = self.serializer_class(voice_insights_files, many=True)
+            serializer = self.serializer_class(follow_up_insights_files, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -354,10 +355,269 @@ class GetFollowUpInsightsBulkUploadTemplate(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
         else:
-            voice_insights_files = self.queryset.filter(
+            follow_up_insights_files = self.queryset.filter(
                 organisation_id=organisation_id,
                 campaign_name=campaign_name,
                 is_upload_template=True,
             ).order_by("-date_created")
-            serializer = self.serializer_class(voice_insights_files, many=True)
+            serializer = self.serializer_class(follow_up_insights_files, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
+        
+
+    # Averages
+
+class GetAllAverageFollowUpInsightsStatisticsView(GenericAPIView):
+    permission_classes = []
+    serializer_class = FollowUpInsightsRetrieveSerializer
+    queryset = FollowUpInsights.objects.all()
+
+    def get(self, request, organisation_id, agent_type, *args, **kwargs):
+        try:
+            organisation = Organisation.objects.get(pk=organisation_id)
+        except Organisation.DoesNotExist:
+            return Response(
+                {"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        follow_up_insights = self.queryset.filter(
+            user__organisation=organisation,
+            agent_type=agent_type,
+        )
+
+        if not follow_up_insights.exists():
+            return Response(
+                {"message": "No follow up insights data found for the given organisation"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        
+        year= round(follow_up_insights.values("year").aggregate(Avg("year"))["year__avg"], 2),
+        grade_counts = follow_up_insights.values("grade").annotate(count=Count("grade"))
+        total_agents = follow_up_insights.values("user_id").annotate(count=Count("user_id")).count()
+        
+        male_agents = User.objects.filter(
+            organisation=organisation,
+            gender="MALE",
+            id__in=follow_up_insights.values_list("user_id", flat=True)
+        ).count()
+        female_agents = User.objects.filter(
+            organisation=organisation,
+            gender="FEMALE",
+            id__in=follow_up_insights.values_list("user_id", flat=True)
+        ).count()
+
+        average_stats = {
+            "average_aes": round(follow_up_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
+            "average_outbound": round(follow_up_insights.values("weighted_outbound").aggregate(Avg("weighted_outbound"))["weighted_outbound__avg"], 2),
+            "average_csat": round(follow_up_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_overall_score": round(follow_up_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+        }
+
+        all_follow_up_insights_stats = {
+            "total_male_agents": male_agents,
+            "total_female_agents": female_agents,
+            "total_agents": total_agents,
+            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
+            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
+            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
+            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
+            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "average_stats": average_stats,
+        }
+
+        return Response(all_follow_up_insights_stats, status=status.HTTP_200_OK)
+    
+class GetAllFollowUpInsightsStatisticsView(GenericAPIView):
+    permission_classes = []
+    serializer_class = FollowUpInsightsRetrieveSerializer
+    queryset = FollowUpInsights.objects.all()
+
+    def get(self, request, organisation_id, year, month, week, agent_type, *args, **kwargs):
+        try:
+            organisation = Organisation.objects.get(pk=organisation_id)
+        except Organisation.DoesNotExist:
+            return Response(
+                {"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        follow_up_insights = self.queryset.filter(
+            user__organisation=organisation,
+            agent_type=agent_type,
+            year=year,
+            month=month,
+            week=week,
+        )
+
+        if not follow_up_insights.exists():
+            return Response(
+                {"message": "No follow up insights data found for the given organisation"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        
+        grade_counts = follow_up_insights.values("grade").annotate(count=Count("grade"))
+        total_agents = follow_up_insights.values("user_id").annotate(count=Count("user_id")).count()
+        
+        male_agents = User.objects.filter(
+            organisation=organisation,
+            gender="MALE",
+            id__in=follow_up_insights.values_list("user_id", flat=True)
+        ).count()
+        female_agents = User.objects.filter(
+            organisation=organisation,
+            gender="FEMALE",
+            id__in=follow_up_insights.values_list("user_id", flat=True)
+        ).count()
+
+        average_stats = {
+            "average_aes": round(follow_up_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
+            "average_outbound": round(follow_up_insights.values("weighted_outbound").aggregate(Avg("weighted_outbound"))["weighted_outbound__avg"], 2),
+            "average_csat": round(follow_up_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_overall_score": round(follow_up_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+        }
+
+        all_follow_up_insights_stats = {
+            "Year": year,
+            "Month": month,
+            "week": week,
+            "agent_type": agent_type,
+            "total_male_agents": male_agents,
+            "total_female_agents": female_agents,
+            "total_agents": total_agents,
+            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
+            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
+            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
+            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
+            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "average_stats": average_stats,
+        }
+
+        return Response(all_follow_up_insights_stats, status=status.HTTP_200_OK)
+    
+class GetAllFollowUpInsightsStatisticsWithoutWeekView(GenericAPIView):
+    permission_classes = []
+    serializer_class = FollowUpInsightsRetrieveSerializer
+    queryset = FollowUpInsights.objects.all()
+
+    def get(self, request, organisation_id, year, month, agent_type, *args, **kwargs):
+        try:
+            organisation = Organisation.objects.get(pk=organisation_id)
+        except Organisation.DoesNotExist:
+            return Response(
+                {"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        follow_up_insights = self.queryset.filter(
+            user__organisation=organisation,
+            agent_type=agent_type,
+            year=year,
+            month=month,
+        )
+
+        if not follow_up_insights.exists():
+            return Response(
+                {"message": "No follow up insights data found for the given organisation"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        
+        grade_counts = follow_up_insights.values("grade").annotate(count=Count("grade"))
+        total_agents = follow_up_insights.values("user_id").annotate(count=Count("user_id")).count()
+        
+        male_agents = User.objects.filter(
+            organisation=organisation,
+            gender="MALE",
+            id__in=follow_up_insights.values_list("user_id", flat=True)
+        ).count()
+        female_agents = User.objects.filter(
+            organisation=organisation,
+            gender="FEMALE",
+            id__in=follow_up_insights.values_list("user_id", flat=True)
+        ).count()
+
+        average_stats = {
+            "average_aes": round(follow_up_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
+            "average_outbound": round(follow_up_insights.values("weighted_outbound").aggregate(Avg("weighted_outbound"))["weighted_outbound__avg"], 2),
+            "average_csat": round(follow_up_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_overall_score": round(follow_up_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+        }
+
+        all_follow_up_insights_stats = {
+            "Year": year,
+            "Month": month,
+            "agent_type": agent_type,
+            "total_male_agents": male_agents,
+            "total_female_agents": female_agents,
+            "total_agents": total_agents,
+            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
+            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
+            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
+            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
+            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "average_stats": average_stats,
+        }
+
+        return Response(all_follow_up_insights_stats, status=status.HTTP_200_OK)
+    
+class GetAllFollowUpInsightsStatisticsWithoutMonthAndWeekView(GenericAPIView):
+    permission_classes = []
+    serializer_class = FollowUpInsightsRetrieveSerializer
+    queryset = FollowUpInsights.objects.all()
+
+    def get(self, request, organisation_id, year, agent_type, *args, **kwargs):
+        try:
+            organisation = Organisation.objects.get(pk=organisation_id)
+        except Organisation.DoesNotExist:
+            return Response(
+                {"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        follow_up_insights = self.queryset.filter(
+            user__organisation=organisation,
+            agent_type=agent_type,
+            year=year,
+        )
+
+        if not follow_up_insights.exists():
+            return Response(
+                {"message": "No follow up insights data found for the given organisation"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        
+        grade_counts = follow_up_insights.values("grade").annotate(count=Count("grade"))
+        total_agents = follow_up_insights.values("user_id").annotate(count=Count("user_id")).count()
+        
+        male_agents = User.objects.filter(
+            organisation=organisation,
+            gender="MALE",
+            id__in=follow_up_insights.values_list("user_id", flat=True)
+        ).count()
+        female_agents = User.objects.filter(
+            organisation=organisation,
+            gender="FEMALE",
+            id__in=follow_up_insights.values_list("user_id", flat=True)
+        ).count()
+
+        average_stats = {
+            "average_aes": round(follow_up_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
+            "average_outbound": round(follow_up_insights.values("weighted_outbound").aggregate(Avg("weighted_outbound"))["weighted_outbound__avg"], 2),
+            "average_csat": round(follow_up_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_overall_score": round(follow_up_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+        }
+
+        all_follow_up_insights_stats = {
+            "Year": year,
+            "agent_type": agent_type,
+            "total_male_agents": male_agents,
+            "total_female_agents": female_agents,
+            "total_agents": total_agents,
+            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
+            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
+            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
+            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
+            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "average_stats": average_stats,
+        }
+
+        return Response(all_follow_up_insights_stats, status=status.HTTP_200_OK)
