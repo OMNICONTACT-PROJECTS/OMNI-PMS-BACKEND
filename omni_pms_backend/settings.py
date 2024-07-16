@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     "departments.apps.DepartmentsConfig",
     "inbound_insights.apps.InboundInsightsConfig",
     "import_export",
+    "personal_development_plans.apps.PersonalDevelopmentPlansConfig",
 ]
 
 MIDDLEWARE = [
