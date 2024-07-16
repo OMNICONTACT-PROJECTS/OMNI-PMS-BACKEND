@@ -10,4 +10,9 @@ urlpatterns = [
         views.BulkUploadSubscriberDataView.as_view(),
         name="bulk-upload_subscriber",
     ),
+    path(
+        "get-all-by-organisation-id/<int:organisation_id>/",
+        views.GetAllSubscriberByOrganisationId.as_view(),
+    ),
+    
 ]

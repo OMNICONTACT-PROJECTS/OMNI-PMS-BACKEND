@@ -124,3 +124,6 @@ class SubscriberRetrieveSerializer(ModelSerializer):
             instance.user.user_permissions.set(permissions)
 
         return super().update(instance, validated_data)
+    
+
+    

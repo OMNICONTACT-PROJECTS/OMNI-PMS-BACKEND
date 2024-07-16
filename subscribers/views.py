@@ -220,3 +220,22 @@ class BulkUploadSubscriberDataView(GenericAPIView):
                     },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+
+
+class GetAllSubscriberByOrganisationId(GenericAPIView):
+    permission_classes = []
+    serializer_class = SubscriberRetrieveSerializer
+    queryset = Subscriber.objects.all()
+
+    def get(self, request, organisation_id):
+        try:
+            organisation = Organisation.objects.get(pk=organisation_id)
+        except Organisation.DoesNotExist:
+            return Response(
+                data={"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        else:
+            subscriber_info_by_organisation = self.queryset.filter(user__organisation_id=organisation_id)
+            serializer = self.serializer_class(subscriber_info_by_organisation, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)

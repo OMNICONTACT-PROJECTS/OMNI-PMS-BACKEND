@@ -120,3 +120,6 @@ class SubscriberResource(resources.ModelResource):
         else:
             # Handle the case where instance.user is None
             raise ValueError("User instance is None, cannot update user_id.")
+
+
+
