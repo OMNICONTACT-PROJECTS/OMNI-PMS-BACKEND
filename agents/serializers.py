@@ -1,35 +1,11 @@
 from rest_framework.serializers import ModelSerializer
-<<<<<<< HEAD:subscribers/serializers.py
-from .models import Subscriber, SubscriberFile
-=======
 from .models import Agent
->>>>>>> 4554fa613482b9478d4c44efc35b9a1d863dae26:agents/serializers.py
 from accounts.serializers import UserSerializer, RetrieveUserSerializer
 from accounts.models import User
 from django.contrib.auth.models import Group, Permission
 
 
-<<<<<<< HEAD:subscribers/serializers.py
-
-
-
-
-class SubscriberFileSerializer(ModelSerializer):
-    class Meta:
-        model =SubscriberFile
-        exclude = ("date_created", "last_updated", "is_upload_template")
-
-        extra_kwargs = {
-            "organisation": {"required": True},
-            "file": {"required": True},
-            "file_type": {"required": True},
-        }
-
-
-class SubscriberSerializer(ModelSerializer):
-=======
 class AgentSerializer(ModelSerializer):
->>>>>>> 4554fa613482b9478d4c44efc35b9a1d863dae26:agents/serializers.py
     user = UserSerializer()
 
     class Meta:
