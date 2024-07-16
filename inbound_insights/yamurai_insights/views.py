@@ -621,3 +621,161 @@ class GetAllYamuraiInsightsStatisticsWithoutMonthAndWeekView(GenericAPIView):
         }
 
         return Response(all_yamurai_insights_stats, status=status.HTTP_200_OK)
+    
+
+
+####################################################
+class NewGetAllYamuraiInsightsStatisticsWithWeekView(GenericAPIView):
+    permission_classes = []
+    serializer_class = YamuraiInsightsRetrieveSerializer
+    queryset = YamuraiInsights.objects.all()
+
+    def get(self, request, organisation_id, year, month, agent_type, *args, **kwargs):
+        try:
+            organisation = Organisation.objects.get(pk=organisation_id)
+        except Organisation.DoesNotExist:
+            return Response(
+                {"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        yamurai_insights = self.queryset.filter(
+            user__organisation=organisation,
+            agent_type=agent_type,
+            year=year,
+            month=month,
+        )
+
+        if not yamurai_insights.exists():
+            return Response(
+                {"message": "No yamurai insights data found for the given organisation"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        grade_counts = yamurai_insights.values("grade").annotate(count=Count("grade"))
+        total_agents = yamurai_insights.values("user_id").annotate(count=Count("user_id")).count()
+
+        male_agents = User.objects.filter(
+            organisation=organisation,
+            gender="MALE",
+            id__in=yamurai_insights.values_list("user_id", flat=True)
+        ).count()
+        female_agents = User.objects.filter(
+            organisation=organisation,
+            gender="FEMALE",
+            id__in=yamurai_insights.values_list("user_id", flat=True)
+        ).count()
+
+        weekly_average_stats = {}
+        for week in range(1, 7):
+            week_insights = yamurai_insights.filter(week=week)
+            if week_insights.exists():
+                weekly_average_stats[f"week {week}"] = {
+                    "average_aes": round(week_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+                    "average_resolved_queries": round(week_insights.values("resolved_queries").aggregate(Avg("resolved_queries"))["resolved_queries__avg"], 2),
+                    "average_csat": round(week_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
+                    "average_overall_score": round(week_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+                }
+
+            else:
+                weekly_average_stats[f"week {week}"] = None
+
+        all_yamurai_insights_stats = {
+            "Year": year,
+            "Month": month,
+            "agent_type": agent_type,
+            "total_male_agents": male_agents,
+            "total_female_agents": female_agents,
+            "total_agents": total_agents,
+            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
+            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
+            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
+            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
+            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "average_stats": {
+                "average_aes": round(yamurai_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+                "average_resolved_queries": round(yamurai_insights.values("resolved_queries").aggregate(Avg("resolved_queries"))["resolved_queries__avg"], 2),
+                "average_csat": round(yamurai_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
+                "average_overall_score": round(yamurai_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+            },
+            "weekily_average_stats": weekly_average_stats,
+        }
+
+        return Response(all_yamurai_insights_stats, status=status.HTTP_200_OK)
+
+class NewGetAllYamuraiInsightsStatisticsWithMonthView(GenericAPIView):
+    permission_classes = []
+    serializer_class = YamuraiInsightsRetrieveSerializer
+    queryset = YamuraiInsights.objects.all()
+
+    def get(self, request, organisation_id, year, agent_type, *args, **kwargs):
+        try:
+            organisation = Organisation.objects.get(pk=organisation_id)
+        except Organisation.DoesNotExist:
+            return Response(
+                {"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        yamurai_insights = self.queryset.filter(
+            user__organisation=organisation,
+            agent_type=agent_type,
+            year=year,
+        )
+
+        if not yamurai_insights.exists():
+            return Response(
+                {"message": "No yamurai insights data found for the given organisation"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        grade_counts = yamurai_insights.values("grade").annotate(count=Count("grade"))
+        total_agents = yamurai_insights.values("user_id").annotate(count=Count("user_id")).count()
+
+        male_agents = User.objects.filter(
+            organisation=organisation,
+            gender="MALE",
+            id__in=yamurai_insights.values_list("user_id", flat=True)
+        ).count()
+        female_agents = User.objects.filter(
+            organisation=organisation,
+            gender="FEMALE",
+            id__in=yamurai_insights.values_list("user_id", flat=True)
+        ).count()
+
+        monthly_average_stats = {}
+        for month in ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]:
+            month_insights = yamurai_insights.filter(month=month)
+            if month_insights.exists():
+                monthly_average_stats[month] = {
+                    "average_aes": round(month_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+                    "average_resolved_queries": round(month_insights.values("resolved_queries").aggregate(Avg("resolved_queries"))["resolved_queries__avg"], 2),
+                    "average_csat": round(month_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
+                    "average_overall_score": round(month_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+                }
+
+            else:
+                monthly_average_stats[month] = None
+
+        all_yamurai_insights_stats = {
+            "Year": year,
+            "agent_type": agent_type,
+            "total_male_agents": male_agents,
+            "total_female_agents": female_agents,
+            "total_agents": total_agents,
+            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
+            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
+            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
+            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
+            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "average_stats": {
+                "average_aes": round(yamurai_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+                "average_resolved_queries": round(yamurai_insights.values("resolved_queries").aggregate(Avg("resolved_queries"))["resolved_queries__avg"], 2),
+                "average_csat": round(yamurai_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
+                "average_overall_score": round(yamurai_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+            },
+            "monthly_average_stats": monthly_average_stats,
+        }
+
+        return Response(all_yamurai_insights_stats, status=status.HTTP_200_OK)
+

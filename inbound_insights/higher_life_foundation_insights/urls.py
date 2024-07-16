@@ -60,4 +60,15 @@ urlpatterns = [
         "get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/agent_type/<str:agent_type>/",
         views.GetAllHigherLifeFoundationInsightsStatisticsWithoutMonthAndWeekView.as_view(),
     ),
+    
+    ##########################
+
+    path(
+        "new-get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/month/<str:month>/agent_type/<str:agent_type>/",
+        views.NewGetAllHlfInsightsStatisticsWithWeekView.as_view(),
+    ),
+    path(
+        "new-get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/agent_type/<str:agent_type>/",
+        views.NewGetAllHlfInsightsStatisticsWithMonthView.as_view(),
+    ),
 ]
