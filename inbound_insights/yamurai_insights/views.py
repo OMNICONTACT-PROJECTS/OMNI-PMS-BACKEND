@@ -392,7 +392,6 @@ class GetAllAverageYamuraiInsightsStatisticsView(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
         
-        year= round(yamurai_insights.values("year").aggregate(Avg("year"))["year__avg"], 2),
         grade_counts = yamurai_insights.values("grade").annotate(count=Count("grade"))
         total_agents = yamurai_insights.values("user_id").annotate(count=Count("user_id")).count()
         
@@ -408,9 +407,9 @@ class GetAllAverageYamuraiInsightsStatisticsView(GenericAPIView):
         ).count()
 
         average_stats = {
-            "average_aes": round(yamurai_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
-            "average_resolved_queries": round(yamurai_insights.values("weighted_resolved_queries").aggregate(Avg("weighted_resolved_queries"))["weighted_resolved_queries__avg"], 2),
-            "average_csat": round(yamurai_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_aes": round(yamurai_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+            "average_resolved_queries": round(yamurai_insights.values("resolved_queries").aggregate(Avg("resolved_queries"))["resolved_queries__avg"], 2),
+            "average_csat": round(yamurai_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
             "average_overall_score": round(yamurai_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
         }
 
@@ -471,9 +470,9 @@ class GetAllYamuraiInsightsStatisticsView(GenericAPIView):
         ).count()
 
         average_stats = {
-            "average_aes": round(yamurai_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
-            "average_resolved_queries": round(yamurai_insights.values("weighted_resolved_queries").aggregate(Avg("weighted_resolved_queries"))["weighted_resolved_queries__avg"], 2),
-            "average_csat": round(yamurai_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_aes": round(yamurai_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+            "average_resolved_queries": round(yamurai_insights.values("resolved_queries").aggregate(Avg("resolved_queries"))["resolved_queries__avg"], 2),
+            "average_csat": round(yamurai_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
             "average_overall_score": round(yamurai_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
         }
 
@@ -537,9 +536,9 @@ class GetAllYamuraiInsightsStatisticsWithoutWeekView(GenericAPIView):
         ).count()
 
         average_stats = {
-            "average_aes": round(yamurai_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
-            "average_resolved_queries": round(yamurai_insights.values("weighted_resolved_queries").aggregate(Avg("weighted_resolved_queries"))["weighted_resolved_queries__avg"], 2),
-            "average_csat": round(yamurai_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_aes": round(yamurai_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+            "average_resolved_queries": round(yamurai_insights.values("resolved_queries").aggregate(Avg("resolved_queries"))["resolved_queries__avg"], 2),
+            "average_csat": round(yamurai_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
             "average_overall_score": round(yamurai_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
         }
 
@@ -601,9 +600,9 @@ class GetAllYamuraiInsightsStatisticsWithoutMonthAndWeekView(GenericAPIView):
         ).count()
 
         average_stats = {
-            "average_aes": round(yamurai_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
-            "average_resolved_queries": round(yamurai_insights.values("weighted_resolved_queries").aggregate(Avg("weighted_resolved_queries"))["weighted_resolved_queries__avg"], 2),
-            "average_csat": round(yamurai_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_aes": round(yamurai_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+            "average_resolved_queries": round(yamurai_insights.values("resolved_queries").aggregate(Avg("resolved_queries"))["resolved_queries__avg"], 2),
+            "average_csat": round(yamurai_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
             "average_overall_score": round(yamurai_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
         }
 

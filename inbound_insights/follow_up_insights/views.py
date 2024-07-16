@@ -407,9 +407,9 @@ class GetAllAverageFollowUpInsightsStatisticsView(GenericAPIView):
         ).count()
 
         average_stats = {
-            "average_aes": round(follow_up_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
-            "average_outbound": round(follow_up_insights.values("weighted_outbound").aggregate(Avg("weighted_outbound"))["weighted_outbound__avg"], 2),
-            "average_csat": round(follow_up_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_aes": round(follow_up_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+            "average_outbound": round(follow_up_insights.values("outbound").aggregate(Avg("outbound"))["outbound__avg"], 2),
+            "average_csat": round(follow_up_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
             "average_overall_score": round(follow_up_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
         }
 
@@ -470,9 +470,9 @@ class GetAllFollowUpInsightsStatisticsView(GenericAPIView):
         ).count()
 
         average_stats = {
-            "average_aes": round(follow_up_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
-            "average_outbound": round(follow_up_insights.values("weighted_outbound").aggregate(Avg("weighted_outbound"))["weighted_outbound__avg"], 2),
-            "average_csat": round(follow_up_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_aes": round(follow_up_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+            "average_outbound": round(follow_up_insights.values("outbound").aggregate(Avg("outbound"))["outbound__avg"], 2),
+            "average_csat": round(follow_up_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
             "average_overall_score": round(follow_up_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
         }
 
@@ -536,9 +536,9 @@ class GetAllFollowUpInsightsStatisticsWithoutWeekView(GenericAPIView):
         ).count()
 
         average_stats = {
-            "average_aes": round(follow_up_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
-            "average_outbound": round(follow_up_insights.values("weighted_outbound").aggregate(Avg("weighted_outbound"))["weighted_outbound__avg"], 2),
-            "average_csat": round(follow_up_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_aes": round(follow_up_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+            "average_outbound": round(follow_up_insights.values("outbound").aggregate(Avg("outbound"))["outbound__avg"], 2),
+            "average_csat": round(follow_up_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
             "average_overall_score": round(follow_up_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
         }
 
@@ -600,9 +600,9 @@ class GetAllFollowUpInsightsStatisticsWithoutMonthAndWeekView(GenericAPIView):
         ).count()
 
         average_stats = {
-            "average_aes": round(follow_up_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
-            "average_outbound": round(follow_up_insights.values("weighted_outbound").aggregate(Avg("weighted_outbound"))["weighted_outbound__avg"], 2),
-            "average_csat": round(follow_up_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_aes": round(follow_up_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+            "average_outbound": round(follow_up_insights.values("outbound").aggregate(Avg("outbound"))["outbound__avg"], 2),
+            "average_csat": round(follow_up_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
             "average_overall_score": round(follow_up_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
         }
 

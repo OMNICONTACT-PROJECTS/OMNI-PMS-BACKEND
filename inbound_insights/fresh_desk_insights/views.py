@@ -363,8 +363,8 @@ class GetFreshDeskInsightsBulkUploadTemplate(GenericAPIView):
             serializer = self.serializer_class(fresh_desk_insights_files, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         
-# Averages
 
+####################Averages stats###############################################
 
 class GetAllAverageFreshDeskInsightsStatisticsView(GenericAPIView):
     permission_classes = []
@@ -391,7 +391,6 @@ class GetAllAverageFreshDeskInsightsStatisticsView(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
         
-        year= round(fresh_desk_insights.values("year").aggregate(Avg("year"))["year__avg"], 2),
         grade_counts = fresh_desk_insights.values("grade").annotate(count=Count("grade"))
         total_agents = fresh_desk_insights.values("user_id").annotate(count=Count("user_id")).count()
         
@@ -407,10 +406,10 @@ class GetAllAverageFreshDeskInsightsStatisticsView(GenericAPIView):
         ).count()
 
         average_stats = {
-            "average_aes": round(fresh_desk_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
-            "average_resolved_count": round(fresh_desk_insights.values("weighted_resolved_count").aggregate(Avg("weighted_resolved_count"))["weighted_resolved_count__avg"], 2),
-            "average_complaints": round(fresh_desk_insights.values("weighted_complaints").aggregate(Avg("weighted_complaints"))["weighted_complaints__avg"], 2),
-            "average_csat": round(fresh_desk_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_aes": round(fresh_desk_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+            "average_resolved_count": round(fresh_desk_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
+            "average_complaints": round(fresh_desk_insights.values("complaints").aggregate(Avg("complaints"))["complaints__avg"], 2),
+            "average_csat": round(fresh_desk_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
             "average_overall_score": round(fresh_desk_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
         }
 
@@ -471,10 +470,10 @@ class GetAllFreshDeskInsightsStatisticsView(GenericAPIView):
         ).count()
 
         average_stats = {
-            "average_aes": round(fresh_desk_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
-            "average_resolved_count": round(fresh_desk_insights.values("weighted_resolved_count").aggregate(Avg("weighted_resolved_count"))["weighted_resolved_count__avg"], 2),
-            "average_complaints": round(fresh_desk_insights.values("weighted_complaints").aggregate(Avg("weighted_complaints"))["weighted_complaints__avg"], 2),
-            "average_csat": round(fresh_desk_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_aes": round(fresh_desk_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+            "average_resolved_count": round(fresh_desk_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
+            "average_complaints": round(fresh_desk_insights.values("complaints").aggregate(Avg("complaints"))["complaints__avg"], 2),
+            "average_csat": round(fresh_desk_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
             "average_overall_score": round(fresh_desk_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
         }
 
@@ -538,10 +537,10 @@ class GetAllFreshDeskInsightsStatisticsWithoutWeekView(GenericAPIView):
         ).count()
 
         average_stats = {
-            "average_aes": round(fresh_desk_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
-            "average_resolved_count": round(fresh_desk_insights.values("weighted_resolved_count").aggregate(Avg("weighted_resolved_count"))["weighted_resolved_count__avg"], 2),
-            "average_complaints": round(fresh_desk_insights.values("weighted_complaints").aggregate(Avg("weighted_complaints"))["weighted_complaints__avg"], 2),
-            "average_csat": round(fresh_desk_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_aes": round(fresh_desk_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+            "average_resolved_count": round(fresh_desk_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
+            "average_complaints": round(fresh_desk_insights.values("complaints").aggregate(Avg("complaints"))["complaints__avg"], 2),
+            "average_csat": round(fresh_desk_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
             "average_overall_score": round(fresh_desk_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
         }
 
@@ -603,10 +602,10 @@ class GetAllFreshDeskInsightsStatisticsWithoutMonthAndWeekView(GenericAPIView):
         ).count()
 
         average_stats = {
-            "average_aes": round(fresh_desk_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
-            "average_resolved_count": round(fresh_desk_insights.values("weighted_resolved_count").aggregate(Avg("weighted_resolved_count"))["weighted_resolved_count__avg"], 2),
-            "average_complaints": round(fresh_desk_insights.values("weighted_complaints").aggregate(Avg("weighted_complaints"))["weighted_complaints__avg"], 2),
-            "average_csat": round(fresh_desk_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_aes": round(fresh_desk_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+            "average_resolved_count": round(fresh_desk_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
+            "average_complaints": round(fresh_desk_insights.values("complaints").aggregate(Avg("complaints"))["complaints__avg"], 2),
+            "average_csat": round(fresh_desk_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
             "average_overall_score": round(fresh_desk_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
         }
 

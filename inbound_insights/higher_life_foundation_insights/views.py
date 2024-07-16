@@ -390,7 +390,6 @@ class GetAllAverageHigherLifeFoundationInsightsStatisticsView(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
         
-        year= round(higher_life_foundation_insights.values("year").aggregate(Avg("year"))["year__avg"], 2),
         grade_counts = higher_life_foundation_insights.values("grade").annotate(count=Count("grade"))
         total_agents = higher_life_foundation_insights.values("user_id").annotate(count=Count("user_id")).count()
         
@@ -406,10 +405,10 @@ class GetAllAverageHigherLifeFoundationInsightsStatisticsView(GenericAPIView):
         ).count()
 
         average_stats = {
-            "average_aes": round(higher_life_foundation_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
+            "average_aes": round(higher_life_foundation_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
             "average_resolved_count": round(higher_life_foundation_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
             "average_service_level": round(higher_life_foundation_insights.values("service_level").aggregate(Avg("service_level"))["service_level__avg"], 2),
-            "average_csat": round(higher_life_foundation_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_csat": round(higher_life_foundation_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
             "average_overall_score": round(higher_life_foundation_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
         }
 
@@ -470,10 +469,10 @@ class GetAllHigherLifeFoundationInsightsStatisticsView(GenericAPIView):
         ).count()
 
         average_stats = {
-            "average_aes": round(higher_life_foundation_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
+            "average_aes": round(higher_life_foundation_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
             "average_resolved_count": round(higher_life_foundation_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
             "average_service_level": round(higher_life_foundation_insights.values("service_level").aggregate(Avg("service_level"))["service_level__avg"], 2),
-            "average_csat": round(higher_life_foundation_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_csat": round(higher_life_foundation_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
             "average_overall_score": round(higher_life_foundation_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
         }
 
@@ -537,10 +536,10 @@ class GetAllHigherLifeFoundationInsightsStatisticsWithoutWeekView(GenericAPIView
         ).count()
 
         average_stats = {
-            "average_aes": round(higher_life_foundation_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
+            "average_aes": round(higher_life_foundation_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
             "average_resolved_count": round(higher_life_foundation_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
             "average_service_level": round(higher_life_foundation_insights.values("service_level").aggregate(Avg("service_level"))["service_level__avg"], 2),
-            "average_csat": round(higher_life_foundation_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_csat": round(higher_life_foundation_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
             "average_overall_score": round(higher_life_foundation_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
         }
 
@@ -602,10 +601,10 @@ class GetAllHigherLifeFoundationInsightsStatisticsWithoutMonthAndWeekView(Generi
         ).count()
 
         average_stats = {
-            "average_aes": round(higher_life_foundation_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
+            "average_aes": round(higher_life_foundation_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
             "average_resolved_count": round(higher_life_foundation_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
             "average_service_level": round(higher_life_foundation_insights.values("service_level").aggregate(Avg("service_level"))["service_level__avg"], 2),
-            "average_csat": round(higher_life_foundation_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_csat": round(higher_life_foundation_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
             "average_overall_score": round(higher_life_foundation_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
         }
 

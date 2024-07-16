@@ -365,7 +365,7 @@ class GetFreshChatInsightsBulkUploadTemplate(GenericAPIView):
         
     
 
-# averages
+################################averages####################################################
 
 class GetAllAverageFreshChatInsightsStatisticsView(GenericAPIView):
     permission_classes = []
@@ -392,7 +392,6 @@ class GetAllAverageFreshChatInsightsStatisticsView(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
         
-        year= round(fresh_chat_insights.values("year").aggregate(Avg("year"))["year__avg"], 2),
         grade_counts = fresh_chat_insights.values("grade").annotate(count=Count("grade"))
         total_agents = fresh_chat_insights.values("user_id").annotate(count=Count("user_id")).count()
         
@@ -408,10 +407,10 @@ class GetAllAverageFreshChatInsightsStatisticsView(GenericAPIView):
         ).count()
 
         average_stats = {
-            "average_aes": round(fresh_chat_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
-            "average_interations": round(fresh_chat_insights.values("weighted_actual_interactions").aggregate(Avg("weighted_actual_interactions"))["weighted_actual_interactions__avg"], 2),
-            "average_handling_time": round(fresh_chat_insights.values("weighted_handling_time").aggregate(Avg("weighted_handling_time"))["weighted_handling_time__avg"], 2),
-            "average_csat": round(fresh_chat_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_aes": round(fresh_chat_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+            "average_interations": round(fresh_chat_insights.values("actual_interactions").aggregate(Avg("actual_interactions"))["actual_interactions__avg"], 2),
+            "average_handling_time": round(fresh_chat_insights.values("handling_time").aggregate(Avg("handling_time"))["handling_time__avg"], 2),
+            "average_csat": round(fresh_chat_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
             "average_overall_score": round(fresh_chat_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
         }
 
@@ -472,10 +471,10 @@ class GetAllFreshChatInsightsStatisticsView(GenericAPIView):
         ).count()
 
         average_stats = {
-            "average_aes": round(fresh_chat_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
-            "average_interations": round(fresh_chat_insights.values("weighted_actual_interactions").aggregate(Avg("weighted_actual_interactions"))["weighted_actual_interactions__avg"], 2),
-            "average_handling_time": round(fresh_chat_insights.values("weighted_handling_time").aggregate(Avg("weighted_handling_time"))["weighted_handling_time__avg"], 2),
-            "average_csat": round(fresh_chat_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_aes": round(fresh_chat_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+            "average_interations": round(fresh_chat_insights.values("actual_interactions").aggregate(Avg("actual_interactions"))["actual_interactions__avg"], 2),
+            "average_handling_time": round(fresh_chat_insights.values("handling_time").aggregate(Avg("handling_time"))["handling_time__avg"], 2),
+            "average_csat": round(fresh_chat_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
             "average_overall_score": round(fresh_chat_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
         }
 
@@ -539,10 +538,10 @@ class GetAllFreshChatInsightsStatisticsWithoutWeekView(GenericAPIView):
         ).count()
 
         average_stats = {
-            "average_aes": round(fresh_chat_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
-            "average_interations": round(fresh_chat_insights.values("weighted_actual_interactions").aggregate(Avg("weighted_actual_interactions"))["weighted_actual_interactions__avg"], 2),
-            "average_handling_time": round(fresh_chat_insights.values("weighted_handling_time").aggregate(Avg("weighted_handling_time"))["weighted_handling_time__avg"], 2),
-            "average_csat": round(fresh_chat_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_aes": round(fresh_chat_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+            "average_interations": round(fresh_chat_insights.values("actual_interactions").aggregate(Avg("actual_interactions"))["actual_interactions__avg"], 2),
+            "average_handling_time": round(fresh_chat_insights.values("handling_time").aggregate(Avg("handling_time"))["handling_time__avg"], 2),
+            "average_csat": round(fresh_chat_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
             "average_overall_score": round(fresh_chat_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
         }
 
@@ -604,10 +603,10 @@ class GetAllFreshChatInsightsStatisticsWithoutMonthAndWeekView(GenericAPIView):
         ).count()
 
         average_stats = {
-            "average_aes": round(fresh_chat_insights.values("weighted_aes").aggregate(Avg("weighted_aes"))["weighted_aes__avg"], 2),
-            "average_interations": round(fresh_chat_insights.values("weighted_actual_interactions").aggregate(Avg("weighted_actual_interactions"))["weighted_actual_interactions__avg"], 2),
-            "average_handling_time": round(fresh_chat_insights.values("weighted_handling_time").aggregate(Avg("weighted_handling_time"))["weighted_handling_time__avg"], 2),
-            "average_csat": round(fresh_chat_insights.values("weighted_csat").aggregate(Avg("weighted_csat"))["weighted_csat__avg"], 2),
+            "average_aes": round(fresh_chat_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+            "average_interations": round(fresh_chat_insights.values("actual_interactions").aggregate(Avg("actual_interactions"))["actual_interactions__avg"], 2),
+            "average_handling_time": round(fresh_chat_insights.values("handling_time").aggregate(Avg("handling_time"))["handling_time__avg"], 2),
+            "average_csat": round(fresh_chat_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
             "average_overall_score": round(fresh_chat_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
         }
 
