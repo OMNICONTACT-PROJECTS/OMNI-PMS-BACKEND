@@ -1,8 +1,13 @@
+<<<<<<< HEAD:subscribers/views.py
 import pandas as pd
 from organisations.models import Organisation
 from subscribers.resources import SubscriberResource
 from .serializers import SubscriberFileSerializer, SubscriberSerializer, SubscriberRetrieveSerializer
 from .models import Subscriber
+=======
+from .serializers import AgentSerializer, AgentRetrieveSerializer
+from .models import Agent
+>>>>>>> 4554fa613482b9478d4c44efc35b9a1d863dae26:agents/views.py
 from rest_framework.response import Response
 from rest_framework.generics import (
     CreateAPIView,
@@ -20,10 +25,10 @@ from tablib import Dataset
 # Create your views here.
 
 
-class CreateSubscriberView(CreateAPIView):
+class CreateAgentView(CreateAPIView):
     permission_classes = []
-    serializer_class = SubscriberSerializer
-    queryset = Subscriber.objects.all()
+    serializer_class = AgentSerializer
+    queryset = Agent.objects.all()
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -33,7 +38,7 @@ class CreateSubscriberView(CreateAPIView):
             if serializer.is_valid():
                 self.perform_create(serializer)
                 data = {
-                    "message": "Subscriber created successfully",
+                    "message": "Agent created successfully",
                     "data": serializer.data,
                 }
 
@@ -42,13 +47,13 @@ class CreateSubscriberView(CreateAPIView):
                 # username = serializer.validated_data['user']['username']
                 email = serializer.validated_data["user"]["email"]
                 full_name = f"{first_name } { last_name}"
-                password = "omni-subscriber-123"
+                password = "omni-Agent-123"
 
                 this_instance = User.objects.get(pk=serializer.data["user"]["id"])
                 username = this_instance.username
                 role = this_instance.role
 
-                email_subject = f"Welcome to the OMNI PMS SYSTEM, Your SUBSCRIBER Account has been Created Successfully"
+                email_subject = f"Welcome to the OMNI PMS SYSTEM, Your Agent Account has been Created Successfully"
                 email_to = email
                 email_from = settings.EMAIL_HOST_USER
                 email_body = (
@@ -77,7 +82,7 @@ class CreateSubscriberView(CreateAPIView):
 
             return Response(
                 {
-                    "message": "Failed to create subscriber, Validation error occurred.",
+                    "message": "Failed to create agent, Validation error occurred.",
                     "error": serializer.errors,
                 },
                 status=status.HTTP_400_BAD_REQUEST,
@@ -86,21 +91,22 @@ class CreateSubscriberView(CreateAPIView):
         except Exception as e:
             return Response(
                 {
-                    "message": "Failed to create subscriber. Exception error occurred",
+                    "message": "Failed to create agent. Exception error occurred",
                     "error": str(e),
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
 
-class GetAllSubscribers(ListAPIView):
+class GetAllAgents(ListAPIView):
     permission_classes = []
-    serializer_class = SubscriberRetrieveSerializer
-    queryset = Subscriber.objects.all()
+    serializer_class = AgentRetrieveSerializer
+    queryset = Agent.objects.all()
 
 
-class SubscriberReadUpdateDestroyView(RetrieveUpdateDestroyAPIView):
+class AgentReadUpdateDestroyView(RetrieveUpdateDestroyAPIView):
     permission_classes = []
+<<<<<<< HEAD:subscribers/views.py
     serializer_class = SubscriberRetrieveSerializer
     queryset = Subscriber.objects.all()
 
@@ -239,3 +245,7 @@ class GetAllSubscriberByOrganisationId(GenericAPIView):
             subscriber_info_by_organisation = self.queryset.filter(user__organisation_id=organisation_id)
             serializer = self.serializer_class(subscriber_info_by_organisation, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
+=======
+    serializer_class = AgentRetrieveSerializer
+    queryset = Agent.objects.all()
+>>>>>>> 4554fa613482b9478d4c44efc35b9a1d863dae26:agents/views.py
