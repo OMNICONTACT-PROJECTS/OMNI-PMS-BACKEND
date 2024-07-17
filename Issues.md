@@ -15,14 +15,23 @@
 # Voice insights bulky uploads (DONE)
 # get-all endpoints should include organisation_id (NOT STARTED)
 # Validation url on educational qualification(NOT STARTED) 
+<<<<<<< HEAD
+# Follow ups Insights(DONE)
+=======
 # Follow ups Insights(PENDING)
+>>>>>>> 4554fa613482b9478d4c44efc35b9a1d863dae26
 # higher_life_foundation Insights (DONE)
 # sassai Insights(DONE)
 # freshdesk Insights (DONE)
 # freshchat Insights (DONE)
 # yamurai Insights (DONE)
+<<<<<<< HEAD
+# Average metrics of all kpi on all campaign (NOT STARTED)
+=======
 # Average metrics of all kpi on all campaign (DONE)
+>>>>>>> 4554fa613482b9478d4c44efc35b9a1d863dae26
 # Assign agent to a campaign(NOT STARTED)
 # add more on agent type (NOT STARTED)
+# get inbound campaigns with their respective managers (NOT STARTED)
 
 

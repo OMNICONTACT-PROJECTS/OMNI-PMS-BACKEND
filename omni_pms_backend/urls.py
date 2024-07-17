@@ -74,6 +74,9 @@ urlpatterns = [
         "api/v1/yamurai-insights/inbound/",
         include("inbound_insights.yamurai_insights.urls"),
     ),
+    path(
+        "api/v1/pdp/",include("personal_development_plans.urls"),
+    ),
 ]
 
 if settings.DEBUG:

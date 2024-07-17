@@ -5,4 +5,8 @@ urlpatterns = [
     path("", views.CreateDevView.as_view(), name="create_dev"),
     path("<int:pk>/", views.DevReadUpdateDestroyView.as_view()),
     path("get-all/", views.GetAllDevs.as_view()),
+    path(
+        "get-all-by-organisation-id/<int:organisation_id>/",
+        views.GetAllDevByOrganisationId.as_view(),
+    ),
 ]

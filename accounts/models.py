@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from organisations.models import Organisation
+from departments.models import Department
 
 
 class User(AbstractUser):
@@ -53,7 +54,7 @@ class User(AbstractUser):
     job_title = models.CharField(max_length=150, blank=True, null=True)
     dob = models.DateField(blank=True, null=True)
     current_location = models.CharField(max_length=155, blank=True, null=True)
-    # department = models.ForeignKey(Department, blank=True, null=True, on_delete=models.CASCADE)
+    department = models.ForeignKey(Department, blank=True, null=True, on_delete=models.CASCADE)
     user_status = models.CharField(
         max_length=150, blank=True, null=True, choices=USER_STATUS
     )

@@ -44,4 +44,31 @@ urlpatterns = [
         "get-by-date/year/<int:year>/month/<str:month>/week/<int:week>/organisation_id/<int:organisation_id>/",
         views.GetFreshDeskInsightsByDateAndOrganisationId.as_view(),
     ),
+    path(
+        "get-all-average-statists-by-organisation-id/<int:organisation_id>/agent-type/<str:agent_type>/",
+        views.GetAllAverageFreshDeskInsightsStatisticsView.as_view(),
+    ),
+    path(
+        "get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/month/<str:month>/week/<int:week>/agent_type/<str:agent_type>/",
+        views.GetAllFreshDeskInsightsStatisticsView.as_view(),
+    ),
+    path(
+        "get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/month/<str:month>/agent_type/<str:agent_type>/",
+        views.GetAllFreshDeskInsightsStatisticsWithoutWeekView.as_view(),
+    ),
+    path(
+        "get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/agent_type/<str:agent_type>/",
+        views.GetAllFreshDeskInsightsStatisticsWithoutMonthAndWeekView.as_view(),
+    ),
+
+    ##########################
+
+    path(
+        "new-get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/month/<str:month>/agent_type/<str:agent_type>/",
+        views.NewGetAllFreshDeskInsightsStatisticsWithWeekView.as_view(),
+    ),
+    path(
+        "new-get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/agent_type/<str:agent_type>/",
+        views.NewGetAllFreshDeskInsightsStatisticsWithMonthView.as_view(),
+    ),
 ]
