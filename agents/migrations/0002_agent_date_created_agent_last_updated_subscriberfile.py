@@ -22,9 +22,6 @@ class Migration(migrations.Migration):
             name='last_updated',
             field=models.DateTimeField(auto_now=True, null=True),
         ),
-        migrations.DeleteModel(
-            name='SubscriberFile',
-        ),
         # migrations.CreateModel(
         #     name='SubscriberFile',
         #     fields=[
