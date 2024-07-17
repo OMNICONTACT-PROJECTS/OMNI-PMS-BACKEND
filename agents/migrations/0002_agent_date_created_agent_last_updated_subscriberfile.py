@@ -22,16 +22,19 @@ class Migration(migrations.Migration):
             name='last_updated',
             field=models.DateTimeField(auto_now=True, null=True),
         ),
-        migrations.CreateModel(
+        migrations.DeleteModel(
             name='SubscriberFile',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('file_type', models.CharField(choices=[('XLSX', 'XLSX'), ('XLS', 'XLS'), ('CSV', 'CSV'), ('JSON', 'JSON')], max_length=50)),
-                ('is_upload_template', models.BooleanField(blank=True, default=False, null=True)),
-                ('file', models.FileField(upload_to='subscriber_files')),
-                ('date_created', models.DateTimeField(auto_now_add=True, null=True)),
-                ('last_updated', models.DateTimeField(auto_now=True, null=True)),
-                ('organisation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='organisations.organisation')),
-            ],
         ),
+        # migrations.CreateModel(
+        #     name='SubscriberFile',
+        #     fields=[
+        #         ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+        #         ('file_type', models.CharField(choices=[('XLSX', 'XLSX'), ('XLS', 'XLS'), ('CSV', 'CSV'), ('JSON', 'JSON')], max_length=50)),
+        #         ('is_upload_template', models.BooleanField(blank=True, default=False, null=True)),
+        #         ('file', models.FileField(upload_to='subscriber_files')),
+        #         ('date_created', models.DateTimeField(auto_now_add=True, null=True)),
+        #         ('last_updated', models.DateTimeField(auto_now=True, null=True)),
+        #         ('organisation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='organisations.organisation')),
+        #     ],
+        # ),
     ]
