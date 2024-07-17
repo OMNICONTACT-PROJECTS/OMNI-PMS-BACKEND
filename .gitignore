@@ -152,6 +152,8 @@ venv.bak/
 ./env/
 ./env
 /env
+.env.render-production
+.env.secrets.render-production
 .env.local
 .env.anoe
 .env.mutepfa
