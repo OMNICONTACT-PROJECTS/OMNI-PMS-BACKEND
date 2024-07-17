@@ -14,10 +14,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RenameModel(
-            old_name='Subscriber',
-            new_name='Agent',
-        ),
+        # migrations.RenameModel(
+        #     old_name='Subscriber',
+        #     new_name='Agent',
+        # ),
         migrations.CreateModel(
             name='SubscriberFile',
             fields=[
