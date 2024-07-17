@@ -1,3 +1,4 @@
+from organisations.models import Organisation
 from .serializers import AgentSerializer, AgentRetrieveSerializer
 from .models import Agent
 from rest_framework.response import Response
@@ -5,11 +6,14 @@ from rest_framework.generics import (
     CreateAPIView,
     RetrieveUpdateDestroyAPIView,
     ListAPIView,
+    GenericAPIView
 )
 from rest_framework import status
 from django.conf import settings
 from accounts.models import User
 from django.core.mail import send_mail
+from rest_framework.parsers import MultiPartParser, FormParser
+from tablib import Dataset
 
 # Create your views here.
 
@@ -97,3 +101,23 @@ class AgentReadUpdateDestroyView(RetrieveUpdateDestroyAPIView):
     permission_classes = []
     serializer_class = AgentRetrieveSerializer
     queryset = Agent.objects.all()
+
+
+class GetAllAgentByOrganisationId(GenericAPIView):
+    permission_classes = []
+    serializer_class = AgentRetrieveSerializer
+    queryset = Agent.objects.all()
+
+    def get(self, request, organisation_id):
+        try:
+            organisation = Organisation.objects.get(pk=organisation_id)
+        except Organisation.DoesNotExist:
+            return Response(
+                data={"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        else:
+            agent_info_by_organisation = self.queryset.filter(user__organisation_id=organisation_id)
+            serializer = self.serializer_class(agent_info_by_organisation, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+

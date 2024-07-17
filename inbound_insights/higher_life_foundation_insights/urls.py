@@ -44,4 +44,31 @@ urlpatterns = [
         "get-by-date/year/<int:year>/month/<str:month>/week/<int:week>/organisation_id/<int:organisation_id>/",
         views.GetHigherLifeFoundationInsightsByDateAndOrganisationId.as_view(),
     ),
+    path(
+        "get-all-average-statists-by-organisation-id/<int:organisation_id>/agent-type/<str:agent_type>/",
+        views.GetAllAverageHigherLifeFoundationInsightsStatisticsView.as_view(),
+    ),
+    path(
+        "get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/month/<str:month>/week/<int:week>/agent_type/<str:agent_type>/",
+        views.GetAllHigherLifeFoundationInsightsStatisticsView.as_view(),
+    ),
+    path(
+        "get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/month/<str:month>/agent_type/<str:agent_type>/",
+        views.GetAllHigherLifeFoundationInsightsStatisticsWithoutWeekView.as_view(),
+    ),
+    path(
+        "get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/agent_type/<str:agent_type>/",
+        views.GetAllHigherLifeFoundationInsightsStatisticsWithoutMonthAndWeekView.as_view(),
+    ),
+    
+    ##########################
+
+    path(
+        "new-get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/month/<str:month>/agent_type/<str:agent_type>/",
+        views.NewGetAllHlfInsightsStatisticsWithWeekView.as_view(),
+    ),
+    path(
+        "new-get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/agent_type/<str:agent_type>/",
+        views.NewGetAllHlfInsightsStatisticsWithMonthView.as_view(),
+    ),
 ]

@@ -23,6 +23,7 @@ from .resources import FreshChatInsightsResource
 from rest_framework.parsers import MultiPartParser, FormParser
 from tablib import Dataset
 import pandas as pd
+from django.db.models import Avg, Count
 
 # Create your views here.
 
@@ -361,3 +362,428 @@ class GetFreshChatInsightsBulkUploadTemplate(GenericAPIView):
             ).order_by("-date_created")
             serializer = self.serializer_class(fresh_chat_insights_files, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
+        
+    
+
+################################averages####################################################
+
+class GetAllAverageFreshChatInsightsStatisticsView(GenericAPIView):
+    permission_classes = []
+    serializer_class = FreshChatInsightsRetrieveSerializer
+    queryset = FreshChatInsights.objects.all()
+
+    def get(self, request, organisation_id, agent_type, *args, **kwargs):
+        try:
+            organisation = Organisation.objects.get(pk=organisation_id)
+        except Organisation.DoesNotExist:
+            return Response(
+                {"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        fresh_chat_insights = self.queryset.filter(
+            user__organisation=organisation,
+            agent_type=agent_type,
+        )
+
+        if not fresh_chat_insights.exists():
+            return Response(
+                {"message": "No fresh chat insights data found for the given organisation"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        
+        grade_counts = fresh_chat_insights.values("grade").annotate(count=Count("grade"))
+        total_agents = fresh_chat_insights.values("user_id").annotate(count=Count("user_id")).count()
+        
+        male_agents = User.objects.filter(
+            organisation=organisation,
+            gender="MALE",
+            id__in=fresh_chat_insights.values_list("user_id", flat=True)
+        ).count()
+        female_agents = User.objects.filter(
+            organisation=organisation,
+            gender="FEMALE",
+            id__in=fresh_chat_insights.values_list("user_id", flat=True)
+        ).count()
+
+        average_stats = {
+            "average_aes": round(fresh_chat_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+            "average_interations": round(fresh_chat_insights.values("actual_interactions").aggregate(Avg("actual_interactions"))["actual_interactions__avg"], 2),
+            "average_handling_time": round(fresh_chat_insights.values("handling_time").aggregate(Avg("handling_time"))["handling_time__avg"], 2),
+            "average_csat": round(fresh_chat_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
+            "average_overall_score": round(fresh_chat_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+        }
+
+        all_fresh_chat_insights_stats = {
+            "total_male_agents": male_agents,
+            "total_female_agents": female_agents,
+            "total_agents": total_agents,
+            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
+            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
+            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
+            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
+            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "average_stats": average_stats,
+        }
+
+        return Response(all_fresh_chat_insights_stats, status=status.HTTP_200_OK)
+    
+class GetAllFreshChatInsightsStatisticsView(GenericAPIView):
+    permission_classes = []
+    serializer_class = FreshChatInsightsRetrieveSerializer
+    queryset = FreshChatInsights.objects.all()
+
+    def get(self, request, organisation_id, year, month, week, agent_type, *args, **kwargs):
+        try:
+            organisation = Organisation.objects.get(pk=organisation_id)
+        except Organisation.DoesNotExist:
+            return Response(
+                {"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        fresh_chat_insights = self.queryset.filter(
+            user__organisation=organisation,
+            agent_type=agent_type,
+            year=year,
+            month=month,
+            week=week,
+        )
+
+        if not fresh_chat_insights.exists():
+            return Response(
+                {"message": "No fresh chat insights data found for the given organisation"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        
+        grade_counts = fresh_chat_insights.values("grade").annotate(count=Count("grade"))
+        total_agents = fresh_chat_insights.values("user_id").annotate(count=Count("user_id")).count()
+        
+        male_agents = User.objects.filter(
+            organisation=organisation,
+            gender="MALE",
+            id__in=fresh_chat_insights.values_list("user_id", flat=True)
+        ).count()
+        female_agents = User.objects.filter(
+            organisation=organisation,
+            gender="FEMALE",
+            id__in=fresh_chat_insights.values_list("user_id", flat=True)
+        ).count()
+
+        average_stats = {
+            "average_aes": round(fresh_chat_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+            "average_interations": round(fresh_chat_insights.values("actual_interactions").aggregate(Avg("actual_interactions"))["actual_interactions__avg"], 2),
+            "average_handling_time": round(fresh_chat_insights.values("handling_time").aggregate(Avg("handling_time"))["handling_time__avg"], 2),
+            "average_csat": round(fresh_chat_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
+            "average_overall_score": round(fresh_chat_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+        }
+
+        all_fresh_chat_insights_stats = {
+            "Year": year,
+            "Month": month,
+            "week": week,
+            "agent_type": agent_type,
+            "total_male_agents": male_agents,
+            "total_female_agents": female_agents,
+            "total_agents": total_agents,
+            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
+            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
+            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
+            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
+            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "average_stats": average_stats,
+        }
+
+        return Response(all_fresh_chat_insights_stats, status=status.HTTP_200_OK)
+    
+class GetAllFreshChatInsightsStatisticsWithoutWeekView(GenericAPIView):
+    permission_classes = []
+    serializer_class = FreshChatInsightsRetrieveSerializer
+    queryset = FreshChatInsights.objects.all()
+
+    def get(self, request, organisation_id, year, month, agent_type, *args, **kwargs):
+        try:
+            organisation = Organisation.objects.get(pk=organisation_id)
+        except Organisation.DoesNotExist:
+            return Response(
+                {"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        fresh_chat_insights = self.queryset.filter(
+            user__organisation=organisation,
+            agent_type=agent_type,
+            year=year,
+            month=month,
+        )
+
+        if not fresh_chat_insights.exists():
+            return Response(
+                {"message": "No fresh chat insights data found for the given organisation"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        
+        grade_counts = fresh_chat_insights.values("grade").annotate(count=Count("grade"))
+        total_agents = fresh_chat_insights.values("user_id").annotate(count=Count("user_id")).count()
+        
+        male_agents = User.objects.filter(
+            organisation=organisation,
+            gender="MALE",
+            id__in=fresh_chat_insights.values_list("user_id", flat=True)
+        ).count()
+        female_agents = User.objects.filter(
+            organisation=organisation,
+            gender="FEMALE",
+            id__in=fresh_chat_insights.values_list("user_id", flat=True)
+        ).count()
+
+        average_stats = {
+            "average_aes": round(fresh_chat_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+            "average_interations": round(fresh_chat_insights.values("actual_interactions").aggregate(Avg("actual_interactions"))["actual_interactions__avg"], 2),
+            "average_handling_time": round(fresh_chat_insights.values("handling_time").aggregate(Avg("handling_time"))["handling_time__avg"], 2),
+            "average_csat": round(fresh_chat_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
+            "average_overall_score": round(fresh_chat_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+        }
+
+        all_fresh_chat_insights_stats = {
+            "Year": year,
+            "Month": month,
+            "agent_type": agent_type,
+            "total_male_agents": male_agents,
+            "total_female_agents": female_agents,
+            "total_agents": total_agents,
+            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
+            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
+            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
+            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
+            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "average_stats": average_stats,
+        }
+
+        return Response(all_fresh_chat_insights_stats, status=status.HTTP_200_OK)
+    
+class GetAllFreshChatInsightsStatisticsWithoutMonthAndWeekView(GenericAPIView):
+    permission_classes = []
+    serializer_class = FreshChatInsightsRetrieveSerializer
+    queryset = FreshChatInsights.objects.all()
+
+    def get(self, request, organisation_id, year, agent_type, *args, **kwargs):
+        try:
+            organisation = Organisation.objects.get(pk=organisation_id)
+        except Organisation.DoesNotExist:
+            return Response(
+                {"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        fresh_chat_insights = self.queryset.filter(
+            user__organisation=organisation,
+            agent_type=agent_type,
+            year=year,
+        )
+
+        if not fresh_chat_insights.exists():
+            return Response(
+                {"message": "No fresh chat insights data found for the given organisation"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        
+        grade_counts = fresh_chat_insights.values("grade").annotate(count=Count("grade"))
+        total_agents = fresh_chat_insights.values("user_id").annotate(count=Count("user_id")).count()
+        
+        male_agents = User.objects.filter(
+            organisation=organisation,
+            gender="MALE",
+            id__in=fresh_chat_insights.values_list("user_id", flat=True)
+        ).count()
+        female_agents = User.objects.filter(
+            organisation=organisation,
+            gender="FEMALE",
+            id__in=fresh_chat_insights.values_list("user_id", flat=True)
+        ).count()
+
+        average_stats = {
+            "average_aes": round(fresh_chat_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+            "average_interations": round(fresh_chat_insights.values("actual_interactions").aggregate(Avg("actual_interactions"))["actual_interactions__avg"], 2),
+            "average_handling_time": round(fresh_chat_insights.values("handling_time").aggregate(Avg("handling_time"))["handling_time__avg"], 2),
+            "average_csat": round(fresh_chat_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
+            "average_overall_score": round(fresh_chat_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+        }
+
+        all_fresh_chat_insights_stats = {
+            "Year": year,
+            "agent_type": agent_type,
+            "total_male_agents": male_agents,
+            "total_female_agents": female_agents,
+            "total_agents": total_agents,
+            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
+            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
+            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
+            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
+            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "average_stats": average_stats,
+        }
+
+        return Response(all_fresh_chat_insights_stats, status=status.HTTP_200_OK)
+
+
+
+####################################################
+class NewGetAllFreshChatInsightsStatisticsWithWeekView(GenericAPIView):
+    permission_classes = []
+    serializer_class = FreshChatInsightsRetrieveSerializer
+    queryset = FreshChatInsights.objects.all()
+
+    def get(self, request, organisation_id, year, month, agent_type, *args, **kwargs):
+        try:
+            organisation = Organisation.objects.get(pk=organisation_id)
+        except Organisation.DoesNotExist:
+            return Response(
+                {"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        fresh_chat_insights = self.queryset.filter(
+            user__organisation=organisation,
+            agent_type=agent_type,
+            year=year,
+            month=month,
+        )
+
+        if not fresh_chat_insights.exists():
+            return Response(
+                {"message": "No fresh_chat insights data found for the given organisation"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        grade_counts = fresh_chat_insights.values("grade").annotate(count=Count("grade"))
+        total_agents = fresh_chat_insights.values("user_id").annotate(count=Count("user_id")).count()
+
+        male_agents = User.objects.filter(
+            organisation=organisation,
+            gender="MALE",
+            id__in=fresh_chat_insights.values_list("user_id", flat=True)
+        ).count()
+        female_agents = User.objects.filter(
+            organisation=organisation,
+            gender="FEMALE",
+            id__in=fresh_chat_insights.values_list("user_id", flat=True)
+        ).count()
+
+        weekly_average_stats = {}
+        for week in range(1, 7):
+            week_insights = fresh_chat_insights.filter(week=week)
+            if week_insights.exists():
+                weekly_average_stats[f"week {week}"] = {
+                    "average_aes": round(week_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+                    "average_resolved_count": round(week_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
+                    "average_complaints": round(week_insights.values("complaints").aggregate(Avg("complaints"))["complaints__avg"], 2),
+                    "average_csat": round(week_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
+                    "average_overall_score": round(week_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+                }
+
+            else:
+                weekly_average_stats[f"week {week}"] = None
+
+        all_fresh_chat_insights_stats = {
+            "Year": year,
+            "Month": month,
+            "agent_type": agent_type,
+            "total_male_agents": male_agents,
+            "total_female_agents": female_agents,
+            "total_agents": total_agents,
+            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
+            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
+            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
+            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
+            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "average_stats": {
+                "average_aes": round(fresh_chat_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+                "average_resolved_count": round(fresh_chat_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
+                "average_complaints": round(fresh_chat_insights.values("complaints").aggregate(Avg("complaints"))["complaints__avg"], 2),
+                "average_csat": round(fresh_chat_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
+                "average_overall_score": round(fresh_chat_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+            },
+            "weekily_average_stats": weekly_average_stats,
+        }
+
+        return Response(all_fresh_chat_insights_stats, status=status.HTTP_200_OK)
+
+class NewGetAllFreshChatInsightsStatisticsWithMonthView(GenericAPIView):
+    permission_classes = []
+    serializer_class = FreshChatInsightsRetrieveSerializer
+    queryset = FreshChatInsights.objects.all()
+
+    def get(self, request, organisation_id, year, agent_type, *args, **kwargs):
+        try:
+            organisation = Organisation.objects.get(pk=organisation_id)
+        except Organisation.DoesNotExist:
+            return Response(
+                {"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        fresh_chat_insights = self.queryset.filter(
+            user__organisation=organisation,
+            agent_type=agent_type,
+            year=year,
+        )
+
+        if not fresh_chat_insights.exists():
+            return Response(
+                {"message": "No fresh_chat insights data found for the given organisation"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        grade_counts = fresh_chat_insights.values("grade").annotate(count=Count("grade"))
+        total_agents = fresh_chat_insights.values("user_id").annotate(count=Count("user_id")).count()
+
+        male_agents = User.objects.filter(
+            organisation=organisation,
+            gender="MALE",
+            id__in=fresh_chat_insights.values_list("user_id", flat=True)
+        ).count()
+        female_agents = User.objects.filter(
+            organisation=organisation,
+            gender="FEMALE",
+            id__in=fresh_chat_insights.values_list("user_id", flat=True)
+        ).count()
+
+        monthly_average_stats = {}
+        for month in ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]:
+            month_insights = fresh_chat_insights.filter(month=month)
+            if month_insights.exists():
+                monthly_average_stats[month] = {
+                "average_aes": round(month_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+                "average_resolved_count": round(month_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
+                "average_complaints": round(month_insights.values("complaints").aggregate(Avg("complaints"))["complaints__avg"], 2),
+                "average_csat": round(month_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
+                "average_overall_score": round(month_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+            }
+
+            else:
+                monthly_average_stats[month] = None
+
+        all_fresh_chat_insights_stats = {
+            "Year": year,
+            "agent_type": agent_type,
+            "total_male_agents": male_agents,
+            "total_female_agents": female_agents,
+            "total_agents": total_agents,
+            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
+            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
+            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
+            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
+            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "average_stats": {
+                "average_aes": round(fresh_chat_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
+                "average_resolved_count": round(fresh_chat_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
+                "average_complaints": round(fresh_chat_insights.values("complaints").aggregate(Avg("complaints"))["complaints__avg"], 2),
+                "average_csat": round(fresh_chat_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
+                "average_overall_score": round(fresh_chat_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+            },
+            "monthly_average_stats": monthly_average_stats,
+        }
+
+        return Response(all_fresh_chat_insights_stats, status=status.HTTP_200_OK)
+

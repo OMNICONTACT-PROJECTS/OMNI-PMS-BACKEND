@@ -22,6 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 ##################### SETTINGS FOR RENDER PRODUCTION DEPLOYMENT ####################
+
 load_dotenv(BASE_DIR / ".env.render-production")
 SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG", "0").lower() in ["true", "t", "1"]
@@ -63,6 +64,7 @@ INSTALLED_APPS = [
     "departments.apps.DepartmentsConfig",
     "inbound_insights.apps.InboundInsightsConfig",
     "import_export",
+    "personal_development_plans.apps.PersonalDevelopmentPlansConfig",
 ]
 
 MIDDLEWARE = [
