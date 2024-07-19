@@ -20,4 +20,15 @@ class DepartmentRetrieveSerializer(ModelSerializer):
     class Meta:
         model= Department
         fields = '__all__'
+
+
+class MinimizedDepartmentSerializer(ModelSerializer):
+    organisation = MinimizedOrganisationSerializer()
+
+    class Meta:
+        model = Department
+        fields = ["id", "name",  "organisation"]
+
+        
+
         

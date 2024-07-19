@@ -28,8 +28,8 @@
 
 
 # For pdp
-# include get-all-by organisation-id endpoint (NOT STARTED)
-# use a minimized retrieve serializer of department on all retrievals (NOT STARTED)
-# post pdpReviewer endpoint needs the trailing slash (NOT STARTED)
+# include get-all-by organisation-id endpoint (DONE)
+# use a minimized retrieve serializer of department on all retrievals (DONE)
+# post pdpReviewer endpoint needs the trailing slash (DONE)
 
 
