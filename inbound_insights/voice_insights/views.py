@@ -150,7 +150,7 @@ class GetVoiceInsightsByGradeAndOrganisationId(GenericAPIView):
     serializer_class = VoiceInsightsRetrieveSerializer
     queryset = VoiceInsights.objects.all()
 
-    def get(self, request, grade, organisation_id, *args, **kwargs):
+    def get(self, request, grade, organisation_id, agent_type, *args, **kwargs):
         try:
             Organisation.objects.get(pk=organisation_id)
         except Organisation.DoesNotExist:
@@ -160,7 +160,9 @@ class GetVoiceInsightsByGradeAndOrganisationId(GenericAPIView):
             )
         else:
             voice_insights = self.queryset.filter(
-                user__organisation_id=organisation_id, grade=grade
+                user__organisation_id=organisation_id,
+                grade=grade,
+                agent_type=agent_type,
             ).order_by("-date_created")
             serializer = self.serializer_class(voice_insights, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
@@ -171,7 +173,9 @@ class GetVoiceInsightsByDateAndOrganisationId(GenericAPIView):
     serializer_class = VoiceInsightsRetrieveSerializer
     queryset = VoiceInsights.objects.all()
 
-    def get(self, request, year, month, week, organisation_id, *args, **kwargs):
+    def get(
+        self, request, year, month, week, organisation_id, agent_type, *args, **kwargs
+    ):
         try:
             Organisation.objects.get(pk=organisation_id)
         except Organisation.DoesNotExist:
@@ -181,7 +185,11 @@ class GetVoiceInsightsByDateAndOrganisationId(GenericAPIView):
             )
         else:
             voice_insights = self.queryset.filter(
-                user__organisation_id=organisation_id, year=year, month=month, week=week
+                user__organisation_id=organisation_id,
+                year=year,
+                month=month,
+                week=week,
+                agent_type=agent_type,
             ).order_by("-date_created")
             serializer = self.serializer_class(voice_insights, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
@@ -359,6 +367,7 @@ class GetVoiceInsightsBulkUploadTemplate(GenericAPIView):
             serializer = self.serializer_class(voice_insights_files, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class GetAllAverageVoiceInsightsStatisticsView(GenericAPIView):
     permission_classes = []
     serializer_class = VoiceInsightsRetrieveSerializer
@@ -383,51 +392,92 @@ class GetAllAverageVoiceInsightsStatisticsView(GenericAPIView):
                 {"message": "No voice insights data found for the given organisation"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        
-        year= round(voice_insights.values("year").aggregate(Avg("year"))["year__avg"], 2),
+
+        year = (
+            round(voice_insights.values("year").aggregate(Avg("year"))["year__avg"], 2),
+        )
         grade_counts = voice_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = voice_insights.values("user_id").annotate(count=Count("user_id")).count()
-        
+        total_agents = (
+            voice_insights.values("user_id").annotate(count=Count("user_id")).count()
+        )
+
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=voice_insights.values_list("user_id", flat=True)
+            id__in=voice_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=voice_insights.values_list("user_id", flat=True)
+            id__in=voice_insights.values_list("user_id", flat=True),
         ).count()
 
         average_stats = {
-            "average_aes": round(voice_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-            "average_outbound": round(voice_insights.values("actual_outbound_calls").aggregate(Avg("actual_outbound_calls"))["actual_outbound_calls__avg"], 2),
-            "average_talktime": round(voice_insights.values("actual_talktime").aggregate(Avg("actual_talktime"))["actual_talktime__avg"], 2),
-            "average_inbound_calls": round(voice_insights.values("actual_inbound_calls").aggregate(Avg("actual_inbound_calls"))["actual_inbound_calls__avg"], 2),
-            "average_csat": round(voice_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-            "average_overall_score": round(voice_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+            "average_aes": round(
+                voice_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+            ),
+            "average_outbound": round(
+                voice_insights.values("actual_outbound_calls").aggregate(
+                    Avg("actual_outbound_calls")
+                )["actual_outbound_calls__avg"],
+                2,
+            ),
+            "average_talktime": round(
+                voice_insights.values("actual_talktime").aggregate(
+                    Avg("actual_talktime")
+                )["actual_talktime__avg"],
+                2,
+            ),
+            "average_inbound_calls": round(
+                voice_insights.values("actual_inbound_calls").aggregate(
+                    Avg("actual_inbound_calls")
+                )["actual_inbound_calls__avg"],
+                2,
+            ),
+            "average_csat": round(
+                voice_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2
+            ),
+            "average_overall_score": round(
+                voice_insights.values("overall_score").aggregate(Avg("overall_score"))[
+                    "overall_score__avg"
+                ],
+                2,
+            ),
         }
 
         all_voice_insights_stats = {
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": average_stats,
         }
 
         return Response(all_voice_insights_stats, status=status.HTTP_200_OK)
-    
+
+
 class GetAllVoiceInsightsStatisticsView(GenericAPIView):
     permission_classes = []
     serializer_class = VoiceInsightsRetrieveSerializer
     queryset = VoiceInsights.objects.all()
 
-    def get(self, request, organisation_id, year, month, week, agent_type, *args, **kwargs):
+    def get(
+        self, request, organisation_id, year, month, week, agent_type, *args, **kwargs
+    ):
         try:
             organisation = Organisation.objects.get(pk=organisation_id)
         except Organisation.DoesNotExist:
@@ -449,27 +499,53 @@ class GetAllVoiceInsightsStatisticsView(GenericAPIView):
                 {"message": "No voice insights data found for the given organisation"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        
+
         grade_counts = voice_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = voice_insights.values("user_id").annotate(count=Count("user_id")).count()
-        
+        total_agents = (
+            voice_insights.values("user_id").annotate(count=Count("user_id")).count()
+        )
+
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=voice_insights.values_list("user_id", flat=True)
+            id__in=voice_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=voice_insights.values_list("user_id", flat=True)
+            id__in=voice_insights.values_list("user_id", flat=True),
         ).count()
         average_stats = {
-            "average_aes": round(voice_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-            "average_outbound": round(voice_insights.values("actual_outbound_calls").aggregate(Avg("actual_outbound_calls"))["actual_outbound_calls__avg"], 2),
-            "average_talktime": round(voice_insights.values("actual_talktime").aggregate(Avg("actual_talktime"))["actual_talktime__avg"], 2),
-            "average_inbound_calls": round(voice_insights.values("actual_inbound_calls").aggregate(Avg("actual_inbound_calls"))["actual_inbound_calls__avg"], 2),
-            "average_csat": round(voice_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-            "average_overall_score": round(voice_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+            "average_aes": round(
+                voice_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+            ),
+            "average_outbound": round(
+                voice_insights.values("actual_outbound_calls").aggregate(
+                    Avg("actual_outbound_calls")
+                )["actual_outbound_calls__avg"],
+                2,
+            ),
+            "average_talktime": round(
+                voice_insights.values("actual_talktime").aggregate(
+                    Avg("actual_talktime")
+                )["actual_talktime__avg"],
+                2,
+            ),
+            "average_inbound_calls": round(
+                voice_insights.values("actual_inbound_calls").aggregate(
+                    Avg("actual_inbound_calls")
+                )["actual_inbound_calls__avg"],
+                2,
+            ),
+            "average_csat": round(
+                voice_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2
+            ),
+            "average_overall_score": round(
+                voice_insights.values("overall_score").aggregate(Avg("overall_score"))[
+                    "overall_score__avg"
+                ],
+                2,
+            ),
         }
 
         all_voice_insights_stats = {
@@ -480,16 +556,27 @@ class GetAllVoiceInsightsStatisticsView(GenericAPIView):
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": average_stats,
         }
 
         return Response(all_voice_insights_stats, status=status.HTTP_200_OK)
-    
+
+
 class GetAllVoiceInsightsStatisticsWithoutWeekView(GenericAPIView):
     permission_classes = []
     serializer_class = VoiceInsightsRetrieveSerializer
@@ -516,28 +603,54 @@ class GetAllVoiceInsightsStatisticsWithoutWeekView(GenericAPIView):
                 {"message": "No voice insights data found for the given organisation"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        
+
         grade_counts = voice_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = voice_insights.values("user_id").annotate(count=Count("user_id")).count()
-        
+        total_agents = (
+            voice_insights.values("user_id").annotate(count=Count("user_id")).count()
+        )
+
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=voice_insights.values_list("user_id", flat=True)
+            id__in=voice_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=voice_insights.values_list("user_id", flat=True)
+            id__in=voice_insights.values_list("user_id", flat=True),
         ).count()
 
         average_stats = {
-            "average_aes": round(voice_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-            "average_outbound": round(voice_insights.values("actual_outbound_calls").aggregate(Avg("actual_outbound_calls"))["actual_outbound_calls__avg"], 2),
-            "average_talktime": round(voice_insights.values("actual_talktime").aggregate(Avg("actual_talktime"))["actual_talktime__avg"], 2),
-            "average_inbound_calls": round(voice_insights.values("actual_inbound_calls").aggregate(Avg("actual_inbound_calls"))["actual_inbound_calls__avg"], 2),
-            "average_csat": round(voice_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-            "average_overall_score": round(voice_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+            "average_aes": round(
+                voice_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+            ),
+            "average_outbound": round(
+                voice_insights.values("actual_outbound_calls").aggregate(
+                    Avg("actual_outbound_calls")
+                )["actual_outbound_calls__avg"],
+                2,
+            ),
+            "average_talktime": round(
+                voice_insights.values("actual_talktime").aggregate(
+                    Avg("actual_talktime")
+                )["actual_talktime__avg"],
+                2,
+            ),
+            "average_inbound_calls": round(
+                voice_insights.values("actual_inbound_calls").aggregate(
+                    Avg("actual_inbound_calls")
+                )["actual_inbound_calls__avg"],
+                2,
+            ),
+            "average_csat": round(
+                voice_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2
+            ),
+            "average_overall_score": round(
+                voice_insights.values("overall_score").aggregate(Avg("overall_score"))[
+                    "overall_score__avg"
+                ],
+                2,
+            ),
         }
 
         all_voice_insights_stats = {
@@ -547,16 +660,27 @@ class GetAllVoiceInsightsStatisticsWithoutWeekView(GenericAPIView):
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": average_stats,
         }
 
         return Response(all_voice_insights_stats, status=status.HTTP_200_OK)
-    
+
+
 class GetAllVoiceInsightsStatisticsWithoutMonthAndWeekView(GenericAPIView):
     permission_classes = []
     serializer_class = VoiceInsightsRetrieveSerializer
@@ -582,28 +706,54 @@ class GetAllVoiceInsightsStatisticsWithoutMonthAndWeekView(GenericAPIView):
                 {"message": "No voice insights data found for the given organisation"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        
+
         grade_counts = voice_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = voice_insights.values("user_id").annotate(count=Count("user_id")).count()
-        
+        total_agents = (
+            voice_insights.values("user_id").annotate(count=Count("user_id")).count()
+        )
+
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=voice_insights.values_list("user_id", flat=True)
+            id__in=voice_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=voice_insights.values_list("user_id", flat=True)
+            id__in=voice_insights.values_list("user_id", flat=True),
         ).count()
 
         average_stats = {
-            "average_aes": round(voice_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-            "average_outbound": round(voice_insights.values("actual_outbound_calls").aggregate(Avg("actual_outbound_calls"))["actual_outbound_calls__avg"], 2),
-            "average_talktime": round(voice_insights.values("actual_talktime").aggregate(Avg("actual_talktime"))["actual_talktime__avg"], 2),
-            "average_inbound_calls": round(voice_insights.values("actual_inbound_calls").aggregate(Avg("actual_inbound_calls"))["actual_inbound_calls__avg"], 2),
-            "average_csat": round(voice_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-            "average_overall_score": round(voice_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+            "average_aes": round(
+                voice_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+            ),
+            "average_outbound": round(
+                voice_insights.values("actual_outbound_calls").aggregate(
+                    Avg("actual_outbound_calls")
+                )["actual_outbound_calls__avg"],
+                2,
+            ),
+            "average_talktime": round(
+                voice_insights.values("actual_talktime").aggregate(
+                    Avg("actual_talktime")
+                )["actual_talktime__avg"],
+                2,
+            ),
+            "average_inbound_calls": round(
+                voice_insights.values("actual_inbound_calls").aggregate(
+                    Avg("actual_inbound_calls")
+                )["actual_inbound_calls__avg"],
+                2,
+            ),
+            "average_csat": round(
+                voice_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2
+            ),
+            "average_overall_score": round(
+                voice_insights.values("overall_score").aggregate(Avg("overall_score"))[
+                    "overall_score__avg"
+                ],
+                2,
+            ),
         }
 
         all_voice_insights_stats = {
@@ -612,16 +762,25 @@ class GetAllVoiceInsightsStatisticsWithoutMonthAndWeekView(GenericAPIView):
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": average_stats,
         }
 
         return Response(all_voice_insights_stats, status=status.HTTP_200_OK)
-
 
 
 ####################################################
@@ -653,17 +812,19 @@ class NewGetAllVoiceInsightsStatisticsWithWeekView(GenericAPIView):
             )
 
         grade_counts = voice_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = voice_insights.values("user_id").annotate(count=Count("user_id")).count()
+        total_agents = (
+            voice_insights.values("user_id").annotate(count=Count("user_id")).count()
+        )
 
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=voice_insights.values_list("user_id", flat=True)
+            id__in=voice_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=voice_insights.values_list("user_id", flat=True)
+            id__in=voice_insights.values_list("user_id", flat=True),
         ).count()
 
         weekly_average_stats = {}
@@ -671,12 +832,39 @@ class NewGetAllVoiceInsightsStatisticsWithWeekView(GenericAPIView):
             week_insights = voice_insights.filter(week=week)
             if week_insights.exists():
                 weekly_average_stats[f"week {week}"] = {
-                    "average_aes": round(week_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-                    "average_outbound": round(week_insights.values("actual_outbound_calls").aggregate(Avg("actual_outbound_calls"))["actual_outbound_calls__avg"], 2),
-                    "average_talktime": round(week_insights.values("actual_talktime").aggregate(Avg("actual_talktime"))["actual_talktime__avg"], 2),
-                    "average_inbound_calls": round(week_insights.values("actual_inbound_calls").aggregate(Avg("actual_inbound_calls"))["actual_inbound_calls__avg"], 2),
-                    "average_csat": round(week_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-                    "average_overall_score": round(week_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+                    "average_aes": round(
+                        week_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+                    ),
+                    "average_outbound": round(
+                        week_insights.values("actual_outbound_calls").aggregate(
+                            Avg("actual_outbound_calls")
+                        )["actual_outbound_calls__avg"],
+                        2,
+                    ),
+                    "average_talktime": round(
+                        week_insights.values("actual_talktime").aggregate(
+                            Avg("actual_talktime")
+                        )["actual_talktime__avg"],
+                        2,
+                    ),
+                    "average_inbound_calls": round(
+                        week_insights.values("actual_inbound_calls").aggregate(
+                            Avg("actual_inbound_calls")
+                        )["actual_inbound_calls__avg"],
+                        2,
+                    ),
+                    "average_csat": round(
+                        week_insights.values("csat").aggregate(Avg("csat"))[
+                            "csat__avg"
+                        ],
+                        2,
+                    ),
+                    "average_overall_score": round(
+                        week_insights.values("overall_score").aggregate(
+                            Avg("overall_score")
+                        )["overall_score__avg"],
+                        2,
+                    ),
                 }
 
             else:
@@ -689,23 +877,58 @@ class NewGetAllVoiceInsightsStatisticsWithWeekView(GenericAPIView):
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": {
-                "average_aes": round(voice_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-                "average_outbound": round(voice_insights.values("actual_outbound_calls").aggregate(Avg("actual_outbound_calls"))["actual_outbound_calls__avg"], 2),
-                "average_talktime": round(voice_insights.values("actual_talktime").aggregate(Avg("actual_talktime"))["actual_talktime__avg"], 2),
-                "average_inbound_calls": round(voice_insights.values("actual_inbound_calls").aggregate(Avg("actual_inbound_calls"))["actual_inbound_calls__avg"], 2),
-                "average_csat": round(voice_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-                "average_overall_score": round(voice_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+                "average_aes": round(
+                    voice_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+                ),
+                "average_outbound": round(
+                    voice_insights.values("actual_outbound_calls").aggregate(
+                        Avg("actual_outbound_calls")
+                    )["actual_outbound_calls__avg"],
+                    2,
+                ),
+                "average_talktime": round(
+                    voice_insights.values("actual_talktime").aggregate(
+                        Avg("actual_talktime")
+                    )["actual_talktime__avg"],
+                    2,
+                ),
+                "average_inbound_calls": round(
+                    voice_insights.values("actual_inbound_calls").aggregate(
+                        Avg("actual_inbound_calls")
+                    )["actual_inbound_calls__avg"],
+                    2,
+                ),
+                "average_csat": round(
+                    voice_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2
+                ),
+                "average_overall_score": round(
+                    voice_insights.values("overall_score").aggregate(
+                        Avg("overall_score")
+                    )["overall_score__avg"],
+                    2,
+                ),
             },
             "weekily_average_stats": weekly_average_stats,
         }
 
         return Response(all_voice_insights_stats, status=status.HTTP_200_OK)
+
 
 class NewGetAllVoiceInsightsStatisticsWithMonthView(GenericAPIView):
     permission_classes = []
@@ -734,30 +957,73 @@ class NewGetAllVoiceInsightsStatisticsWithMonthView(GenericAPIView):
             )
 
         grade_counts = voice_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = voice_insights.values("user_id").annotate(count=Count("user_id")).count()
+        total_agents = (
+            voice_insights.values("user_id").annotate(count=Count("user_id")).count()
+        )
 
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=voice_insights.values_list("user_id", flat=True)
+            id__in=voice_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=voice_insights.values_list("user_id", flat=True)
+            id__in=voice_insights.values_list("user_id", flat=True),
         ).count()
 
         monthly_average_stats = {}
-        for month in ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]:
+        for month in [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+        ]:
             month_insights = voice_insights.filter(month=month)
             if month_insights.exists():
                 monthly_average_stats[month] = {
-                    "average_aes": round(month_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-                    "average_outbound": round(month_insights.values("actual_outbound_calls").aggregate(Avg("actual_outbound_calls"))["actual_outbound_calls__avg"], 2),
-                    "average_talktime": round(month_insights.values("actual_talktime").aggregate(Avg("actual_talktime"))["actual_talktime__avg"], 2),
-                    "average_inbound_calls": round(month_insights.values("actual_inbound_calls").aggregate(Avg("actual_inbound_calls"))["actual_inbound_calls__avg"], 2),
-                    "average_csat": round(month_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-                    "average_overall_score": round(month_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+                    "average_aes": round(
+                        month_insights.values("aes").aggregate(Avg("aes"))["aes__avg"],
+                        2,
+                    ),
+                    "average_outbound": round(
+                        month_insights.values("actual_outbound_calls").aggregate(
+                            Avg("actual_outbound_calls")
+                        )["actual_outbound_calls__avg"],
+                        2,
+                    ),
+                    "average_talktime": round(
+                        month_insights.values("actual_talktime").aggregate(
+                            Avg("actual_talktime")
+                        )["actual_talktime__avg"],
+                        2,
+                    ),
+                    "average_inbound_calls": round(
+                        month_insights.values("actual_inbound_calls").aggregate(
+                            Avg("actual_inbound_calls")
+                        )["actual_inbound_calls__avg"],
+                        2,
+                    ),
+                    "average_csat": round(
+                        month_insights.values("csat").aggregate(Avg("csat"))[
+                            "csat__avg"
+                        ],
+                        2,
+                    ),
+                    "average_overall_score": round(
+                        month_insights.values("overall_score").aggregate(
+                            Avg("overall_score")
+                        )["overall_score__avg"],
+                        2,
+                    ),
                 }
 
             else:
@@ -769,21 +1035,54 @@ class NewGetAllVoiceInsightsStatisticsWithMonthView(GenericAPIView):
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": {
-                "average_aes": round(voice_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-                "average_outbound": round(voice_insights.values("actual_outbound_calls").aggregate(Avg("actual_outbound_calls"))["actual_outbound_calls__avg"], 2),
-                "average_talktime": round(voice_insights.values("actual_talktime").aggregate(Avg("actual_talktime"))["actual_talktime__avg"], 2),
-                "average_inbound_calls": round(voice_insights.values("actual_inbound_calls").aggregate(Avg("actual_inbound_calls"))["actual_inbound_calls__avg"], 2),
-                "average_csat": round(voice_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-                "average_overall_score": round(voice_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+                "average_aes": round(
+                    voice_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+                ),
+                "average_outbound": round(
+                    voice_insights.values("actual_outbound_calls").aggregate(
+                        Avg("actual_outbound_calls")
+                    )["actual_outbound_calls__avg"],
+                    2,
+                ),
+                "average_talktime": round(
+                    voice_insights.values("actual_talktime").aggregate(
+                        Avg("actual_talktime")
+                    )["actual_talktime__avg"],
+                    2,
+                ),
+                "average_inbound_calls": round(
+                    voice_insights.values("actual_inbound_calls").aggregate(
+                        Avg("actual_inbound_calls")
+                    )["actual_inbound_calls__avg"],
+                    2,
+                ),
+                "average_csat": round(
+                    voice_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2
+                ),
+                "average_overall_score": round(
+                    voice_insights.values("overall_score").aggregate(
+                        Avg("overall_score")
+                    )["overall_score__avg"],
+                    2,
+                ),
             },
             "monthly_average_stats": monthly_average_stats,
         }
 
         return Response(all_voice_insights_stats, status=status.HTTP_200_OK)
-
