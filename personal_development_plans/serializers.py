@@ -1,5 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 from accounts.serializers import MinimizedUserSerializer
+from departments.serializers import MinimizedDepartmentSerializer
 from personal_development_plans.models import Pdp, PdpReviewer
 
 
@@ -26,6 +27,7 @@ class PdpSerializer(ModelSerializer):
 
 class PdpRetrieveSerializer(ModelSerializer):
     user = MinimizedUserSerializer()
+    department = MinimizedDepartmentSerializer()
 
     class Meta:
         model = Pdp
@@ -55,6 +57,7 @@ class PdpReviewerSerializer(ModelSerializer):
 
 class PdpReviewerRetrieveSerializer(ModelSerializer):
     user = MinimizedUserSerializer()
+   
     pdp = PdpSerializer()
 
     class Meta:
