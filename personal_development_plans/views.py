@@ -9,6 +9,7 @@ from rest_framework.generics import (
 )
 
 from accounts.models import User
+from organisations.models import Organisation
 from personal_development_plans.models import Pdp, PdpReviewer
 from personal_development_plans.serializers import PdpRetrieveSerializer, PdpReviewerRetrieveSerializer, PdpReviewerSerializer, PdpReviewerUpdateSerializer, PdpSerializer, PdpUpdateSerializer
 from rest_framework import status
@@ -89,6 +90,25 @@ class GetPdpByUserId(GenericAPIView):
             serializer = self.serializer_class(personal_development_plan, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
         
+class GetAllPdpByOrganisationId(GenericAPIView):
+    permission_classes = []
+    serializer_class = PdpRetrieveSerializer
+    queryset = Pdp.objects.all()
+
+    def get(self, request, organisation_id):
+        try:
+            organisation = Organisation.objects.get(pk=organisation_id)
+        except Organisation.DoesNotExist:
+            return Response(
+                data={"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        else:
+            pdp_info_by_organisation = self.queryset.filter(user__organisation_id=organisation_id)
+            serializer = self.serializer_class(pdp_info_by_organisation, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        
 
 # PdpReviewer
 
@@ -165,3 +185,23 @@ class GetPdpReviewerByUserId(GenericAPIView):
             )
             serializer = self.serializer_class(personal_development_plan_review, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
+        
+
+
+class GetAllPdpReviewerByOrganisationId(GenericAPIView):
+    permission_classes = []
+    serializer_class = PdpReviewerSerializer
+    queryset = PdpReviewer.objects.all()
+
+    def get(self, request, organisation_id):
+        try:
+            organisation = Organisation.objects.get(pk=organisation_id)
+        except Organisation.DoesNotExist:
+            return Response(
+                data={"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        else:
+            pdp_reviewer_info_by_organisation = self.queryset.filter(user__organisation_id=organisation_id)
+            serializer = self.serializer_class(pdp_reviewer_info_by_organisation, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)

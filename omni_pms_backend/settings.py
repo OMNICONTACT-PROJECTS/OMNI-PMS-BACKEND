@@ -40,7 +40,7 @@ DEBUG = os.getenv("DEBUG", "0").lower() in ["true", "t", "1"]
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
 
-ALLOWED_HOSTS = ["omni-pms-backend.onrender.com"]
+ALLOWED_HOSTS = ["127.0.0.1"]
 
 # Application definition
 
@@ -113,7 +113,7 @@ WSGI_APPLICATION = "omni_pms_backend.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
+        "ENGINE": "django.db.backends.mysql",
         "NAME": os.getenv("DATABASE_NAME"),
         "USER": os.getenv("DATABASE_USER"),
         "PASSWORD": os.getenv("DATABASE_PASSWORD"),
