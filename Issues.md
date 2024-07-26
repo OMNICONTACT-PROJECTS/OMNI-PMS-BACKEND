@@ -10,28 +10,26 @@
 # Personal docs (Done)
 # Educational Qualifications (Done)
 # Work on User bulky uploads (Not Started)
-# Work on Insights (Pending)
+# Work on Inbound Insights (DONE)
 # Work on voice insights bulky uploads (DONE)
 # Voice insights bulky uploads (DONE)
-# get-all endpoints should include organisation_id (NOT STARTED)
+# get-all endpoints should include organisation_id (DONE)
 # Validation url on educational qualification(NOT STARTED) 
-<<<<<<< HEAD
 # Follow ups Insights(DONE)
-=======
-# Follow ups Insights(PENDING)
->>>>>>> 4554fa613482b9478d4c44efc35b9a1d863dae26
 # higher_life_foundation Insights (DONE)
 # sassai Insights(DONE)
 # freshdesk Insights (DONE)
 # freshchat Insights (DONE)
 # yamurai Insights (DONE)
-<<<<<<< HEAD
-# Average metrics of all kpi on all campaign (NOT STARTED)
-=======
 # Average metrics of all kpi on all campaign (DONE)
->>>>>>> 4554fa613482b9478d4c44efc35b9a1d863dae26
 # Assign agent to a campaign(NOT STARTED)
-# add more on agent type (NOT STARTED)
+# add more on agent type (DONE)
 # get inbound campaigns with their respective managers (NOT STARTED)
+
+
+# For pdp
+# include get-all-by organisation-id endpoint (DONE)
+# use a minimized retrieve serializer of department on all retrievals (DONE)
+# post pdpReviewer endpoint needs the trailing slash (DONE)
 
 
