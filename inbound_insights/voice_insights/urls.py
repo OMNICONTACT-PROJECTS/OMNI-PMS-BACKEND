@@ -35,11 +35,11 @@ urlpatterns = [
         views.GetVoiceInsightsForHVCAgentsByOrganisationId.as_view(),
     ),
     path(
-        "get-by-grade/<str:grade>/organisation_id/<int:organisation_id>/",
+        "get-by-grade/<str:grade>/organisation_id/<int:organisation_id>/agent-type/<str:agent_type>/",
         views.GetVoiceInsightsByGradeAndOrganisationId.as_view(),
     ),
     path(
-        "get-by-date/year/<int:year>/month/<str:month>/week/<int:week>/organisation_id/<int:organisation_id>/",
+        "get-by-date/year/<int:year>/month/<str:month>/week/<int:week>/organisation_id/<int:organisation_id>/agent-type/<str:agent_type>/",
         views.GetVoiceInsightsByDateAndOrganisationId.as_view(),
     ),
     path(
