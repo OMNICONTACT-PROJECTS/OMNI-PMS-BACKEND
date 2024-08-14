@@ -103,7 +103,7 @@ class GetFreshDeskInsightsByUserId(GenericAPIView):
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
-class GetFreshDeskInsightsForHVCAgentsByOrganisationId(GenericAPIView):
+class GetFreshDeskInsightsgentsByOrganisationId(GenericAPIView):
     permission_classes = []
     serializer_class = FreshDeskInsightsRetrieveSerializer
     queryset = FreshDeskInsights.objects.all()
@@ -117,32 +117,14 @@ class GetFreshDeskInsightsForHVCAgentsByOrganisationId(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
         else:
-            fresh_desk_insights = self.queryset.filter(agent_type="HVC").order_by(
+            fresh_desk_insights = self.queryset.order_by(
                 "-date_created"
             )
             serializer = self.serializer_class(fresh_desk_insights, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
-class GetFreshDeskInsightsForLVCAgentsByOrganisationId(GenericAPIView):
-    permission_classes = []
-    serializer_class = FreshDeskInsightsRetrieveSerializer
-    queryset = FreshDeskInsights.objects.all()
 
-    def get(self, request, organisation_id, *args, **kwargs):
-        try:
-            Organisation.objects.get(pk=organisation_id)
-        except Organisation.DoesNotExist:
-            return Response(
-                {"message": "Organisation does not exist"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        else:
-            fresh_desk_insights = self.queryset.filter(agent_type="LVC").order_by(
-                "-date_created"
-            )
-            serializer = self.serializer_class(fresh_desk_insights, many=True)
-            return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 class GetFreshDeskInsightsByGradeAndOrganisationId(GenericAPIView):

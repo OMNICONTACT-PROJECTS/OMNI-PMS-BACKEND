@@ -103,7 +103,7 @@ class GetHigherLifeFoundationInsightsByUserId(GenericAPIView):
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
-class GetHigherLifeFoundationInsightsForHVCAgentsByOrganisationId(GenericAPIView):
+class GetHigherLifeFoundationInsightsAgentsByOrganisationId(GenericAPIView):
     permission_classes = []
     serializer_class = HigherLifeFoundationInsightsRetrieveSerializer
     queryset = HigherLifeFoundationInsights.objects.all()
@@ -117,14 +117,14 @@ class GetHigherLifeFoundationInsightsForHVCAgentsByOrganisationId(GenericAPIView
                 status=status.HTTP_404_NOT_FOUND,
             )
         else:
-            higher_life_foundation_insights = self.queryset.filter(agent_type="HVC").order_by(
+            higher_life_foundation_insights = self.queryset.order_by(
                 "-date_created"
             )
             serializer = self.serializer_class(higher_life_foundation_insights, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
-class GetHigherLifeFoundationInsightsForLVCAgentsByOrganisationId(GenericAPIView):
+
     permission_classes = []
     serializer_class = HigherLifeFoundationInsightsRetrieveSerializer
     queryset = HigherLifeFoundationInsights.objects.all()

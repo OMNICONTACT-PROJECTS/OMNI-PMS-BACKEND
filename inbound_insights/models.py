@@ -44,93 +44,93 @@ class VoiceInsights(models.Model):
     week = models.PositiveIntegerField(
         null=False, blank=False, help_text="week should be a number"
     )
-    aes = models.PositiveIntegerField(
+    aes = models.FloatField(
         null=False,
         blank=False,
         help_text="Average Evaluation Score (AES)",
     )
-    speed_to_answer = models.PositiveIntegerField(
+    speed_to_answer = models.FloatField(
         null=True,
         blank=True,
         help_text="Speed to answer should be in seconds",
     )
-    targeted_inbound_calls = models.PositiveIntegerField(
+    targeted_inbound_calls = models.FloatField(
         null=True,
         blank=True,
         help_text="This is Weekly Targeted inbound calls",
     )
-    actual_inbound_calls = models.PositiveIntegerField(
+    actual_inbound_calls = models.FloatField(
         null=True,
         blank=True,
         help_text="This is Weekly inbound calls achieved by the agent",
     )
-    targeted_talktime = models.PositiveIntegerField(blank=True, null=True)
-    actual_talktime = models.PositiveIntegerField(blank=True, null=True)
-    outbound_target_calls = models.PositiveIntegerField(
+    targeted_talktime = models.FloatField(blank=True, null=True)
+    actual_talktime = models.FloatField(blank=True, null=True)
+    outbound_target_calls = models.FloatField(
         null=True,
         blank=True,
         help_text="This is the Weekly Outbound target calls",
     )
-    actual_outbound_calls = models.PositiveIntegerField(
+    actual_outbound_calls = models.FloatField(
         null=True,
         blank=True,
         help_text="This is the Weekly Outbound calls achieved by the agent",
     )
-    after_call_work = models.PositiveIntegerField(
+    after_call_work = models.FloatField(
         null=True,
         blank=True,
         help_text="This is the weekly after call work",
     )
-    customer_complaint = models.PositiveIntegerField(null=True, blank=True)
+    customer_complaint = models.FloatField(null=True, blank=True)
     csat = models.PositiveIntegerField(
         null=True, blank=True, help_text="This is the weekly csat"
     )
-    calc_aes = models.PositiveIntegerField(
+    calc_aes = models.FloatField(
         null=False,
         blank=False,
         help_text="This is the weekly calculated aes",
     )
-    calc_speed_to_answer = models.PositiveIntegerField(null=True, blank=True)
-    calc_targeted_inbound_calls = models.PositiveIntegerField(
+    calc_speed_to_answer = models.FloatField(null=True, blank=True)
+    calc_targeted_inbound_calls = models.FloatField(
         null=False,
         blank=False,
         help_text="This is the weekly calculated targeted inbound calls",
     )
-    calc_actual_inbound_calls = models.PositiveIntegerField(
+    calc_actual_inbound_calls = models.FloatField(
         null=False,
         blank=False,
         help_text="This is the weekly calculated inbound calls achieved by the agent",
     )
-    calc_targeted_talktime = models.PositiveBigIntegerField(
+    calc_targeted_talktime = models.FloatField(
         null=True,
         blank=True,
         help_text="This is the weekly calculated calculated targeted talktime",
     )
-    calc_outbound_target = models.PositiveIntegerField(null=True, blank=True)
-    actual_calc_outbound_calls = models.PositiveIntegerField(
+    calc_outbound_target = models.FloatField(null=True, blank=True)
+    actual_calc_outbound_calls = models.FloatField(
         null=True,
         blank=True,
         help_text="This is the Weekly calculated Outbound calls achieved by the agent",
     )
-    calc_after_call_work = models.PositiveIntegerField(null=True, blank=True)
-    calc_customer_complaint = models.PositiveIntegerField(
+    calc_after_call_work = models.FloatField(null=True, blank=True)
+    calc_customer_complaint = models.FloatField(
         null=True,
         blank=True,
     )
-    calc_csat = models.PositiveIntegerField(null=True, blank=True)
+    calc_csat = models.FloatField(null=True, blank=True)
 
-    weighted_aes = models.PositiveIntegerField(null=False, blank=False)
-    weighted_speed_to_answer = models.PositiveIntegerField(null=True, blank=True)
-    weighted_targeted_inbound_calls = models.PositiveIntegerField(null=True, blank=True)
-    weighted_actual_inbound_calls = models.PositiveIntegerField(null=True, blank=True)
-    weighted_targeted_talktime = models.PositiveIntegerField(null=True, blank=True)
-    weighted_actual_talktime = models.PositiveIntegerField(null=True, blank=True)
-    weighted_targeted_outbound = models.PositiveIntegerField(null=True, blank=True)
-    weighted_actual_outbound = models.PositiveIntegerField(null=True, blank=True)
-    weighted_after_call_work = models.PositiveIntegerField(null=True, blank=True)
-    weighted_customer_complaint = models.PositiveIntegerField(null=True, blank=True)
-    weighted_csat = models.PositiveIntegerField(null=True, blank=True)
-    overall_score = models.PositiveIntegerField(null=True, blank=True)
+    weighted_aes = models.FloatField(null=False, blank=False)
+    weighted_speed_to_answer = models.FloatField(null=True, blank=True)
+    weighted_targeted_inbound_calls = models.FloatField(null=True, blank=True)
+    weighted_actual_inbound_calls = models.FloatField(null=True, blank=True)
+    weighted_targeted_talktime = models.FloatField(null=True, blank=True)
+    weighted_actual_talktime = models.FloatField(null=True, blank=True)
+    weighted_targeted_outbound = models.FloatField(null=True, blank=True)
+    weighted_actual_outbound = models.FloatField(null=True, blank=True)
+    weighted_after_call_work = models.FloatField(null=True, blank=True)
+    weighted_customer_complaint = models.FloatField(null=True, blank=True)
+    weighted_csat = models.FloatField(null=True, blank=True)
+    overall_score = models.FloatField(null=True, blank=True)
     grade = models.CharField(max_length=20, choices=GRADE)
 
     date_created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
@@ -202,34 +202,34 @@ class FollowUpInsights(models.Model):
     week = models.PositiveIntegerField(
         null=False, blank=False, help_text="week should be a number"
     )
-    aes = models.PositiveIntegerField(
+    aes = models.FloatField(
         null=False,
         blank=False,
         help_text="Average Evaluation Score (AES)",
     )
-    outbound = models.PositiveIntegerField(
+    outbound = models.FloatField(
         null=True,
         blank=True,
         help_text="This is the Weekly Outbound calls achieved by the agent",
     )
-    csat = models.PositiveIntegerField(
+    csat = models.FloatField(
         null=True, blank=True, help_text="This is the weekly csat"
     )
-    calc_aes = models.PositiveIntegerField(
+    calc_aes = models.FloatField(
         null=False,
         blank=False,
         help_text="This is the weekly calculated aes",
     )
-    calc_outbound = models.PositiveIntegerField(
+    calc_outbound = models.FloatField(
         null=True,
         blank=True,
         help_text="This is the Weekly calculated Outbound calls achieved by the agent",
     )
-    calc_csat = models.PositiveIntegerField(null=True, blank=True)
-    weighted_aes = models.PositiveIntegerField(null=False, blank=False)
-    weighted_outbound = models.PositiveIntegerField(null=True, blank=True)
-    weighted_csat = models.PositiveIntegerField(null=True, blank=True)
-    overall_score = models.PositiveIntegerField(null=True, blank=True)
+    calc_csat = models.FloatField(null=True, blank=True)
+    weighted_aes = models.FloatField(null=False, blank=False)
+    weighted_outbound = models.FloatField(null=True, blank=True)
+    weighted_csat = models.FloatField(null=True, blank=True)
+    overall_score = models.FloatField(null=True, blank=True)
     grade = models.CharField(max_length=20, choices=GRADE)
 
     date_created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
@@ -279,28 +279,28 @@ class HigherLifeFoundationInsights(models.Model):
     week = models.PositiveIntegerField(
         null=False, blank=False, help_text="week should be a number"
     )
-    aes = models.PositiveIntegerField(
+    aes = models.FloatField(
         null=False,
         blank=False,
         help_text="Average Evaluation Score (AES)",
     )
    
-    csat = models.PositiveIntegerField(
+    csat = models.FloatField(
         null=True, blank=True, help_text="This is the weekly csat"
     )
 
-    resolved_count = models.PositiveIntegerField(
+    resolved_count = models.FloatField(
         null=False,
         blank=False,
         help_text="",
     )
-    service_level = models.PositiveIntegerField(
+    service_level = models.FloatField(
         null=False,
         blank=False,
         help_text="",
     )
 
-    overall_score = models.PositiveIntegerField(null=True, blank=True)
+    overall_score = models.FloatField(null=True, blank=True)
     grade = models.CharField(max_length=20, choices=GRADE)
 
     date_created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
@@ -349,28 +349,28 @@ class SasaiInsights(models.Model):
     week = models.PositiveIntegerField(
         null=False, blank=False, help_text="week should be a number"
     )
-    aes = models.PositiveIntegerField(
+    aes = models.FloatField(
         null=False,
         blank=False,
         help_text="Average Evaluation Score (AES)",
     )
    
-    csat = models.PositiveIntegerField(
+    csat = models.FloatField(
         null=True, blank=True, help_text="This is the weekly csat"
     )
 
-    resolved_count = models.PositiveIntegerField(
+    resolved_count = models.FloatField(
         null=False,
         blank=False,
         help_text="",
     )
-    service_level = models.PositiveIntegerField(
+    service_level = models.FloatField(
         null=False,
         blank=False,
         help_text="",
     )
 
-    overall_score = models.PositiveIntegerField(null=True, blank=True)
+    overall_score = models.FloatField(null=True, blank=True)
     grade = models.CharField(max_length=20, choices=GRADE)
 
     date_created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
@@ -419,49 +419,49 @@ class FreshDeskInsights(models.Model):
     week = models.PositiveIntegerField(
         null=False, blank=False, help_text="week should be a number"
     )
-    aes = models.PositiveIntegerField(
+    aes = models.FloatField(
         null=False,
         blank=False,
         help_text="Average Evaluation Score (AES)",
     )
-    resolved_count = models.PositiveIntegerField(
+    resolved_count = models.FloatField(
         null=False,
         blank=False,
         help_text="",
     )
-    complaints = models.PositiveIntegerField(
+    complaints = models.FloatField(
         null=False,
         blank=False,
         help_text="",
     )
   
-    csat = models.PositiveIntegerField(
+    csat = models.FloatField(
         null=True, blank=True, help_text="This is the weekly csat"
     )
 
     
-    calc_aes = models.PositiveIntegerField(
+    calc_aes = models.FloatField(
         null=False,
         blank=False,
         help_text="This is the weekly calculated aes",
     )
-    calc_resolved_count = models.PositiveIntegerField(
+    calc_resolved_count = models.FloatField(
         null=False,
         blank=False,
         help_text="This is the weekly calculated resolve count",
     )
-    calc_complaints = models.PositiveIntegerField(
+    calc_complaints = models.FloatField(
         null=False,
         blank=False,
         help_text="This is the weekly calculated complaints",
     )
-    calc_csat = models.PositiveIntegerField(null=True, blank=True)
+    calc_csat = models.FloatField(null=True, blank=True)
 
-    weighted_aes = models.PositiveIntegerField(null=False, blank=False)
-    weighted_resolved_count = models.PositiveIntegerField(null=True, blank=True)
-    weighted_complaints = models.PositiveIntegerField(null=True, blank=True)
-    weighted_csat = models.PositiveIntegerField(null=True, blank=True)
-    overall_score = models.PositiveIntegerField(null=True, blank=True)
+    weighted_aes = models.FloatField(null=False, blank=False)
+    weighted_resolved_count = models.FloatField(null=True, blank=True)
+    weighted_complaints = models.FloatField(null=True, blank=True)
+    weighted_csat = models.FloatField(null=True, blank=True)
+    overall_score = models.FloatField(null=True, blank=True)
     grade = models.CharField(max_length=20, choices=GRADE)
 
     date_created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
@@ -510,82 +510,82 @@ class FreshChatInsights(models.Model):
     week = models.PositiveIntegerField(
         null=False, blank=False, help_text="week should be a number"
     )
-    aes = models.PositiveIntegerField(
+    aes = models.FloatField(
         null=False,
         blank=False,
         help_text="Average Evaluation Score (AES)",
     )
-    targeted_interactions = models.PositiveIntegerField(
+    targeted_interactions = models.FloatField(
         null=False,
         blank=False,
         help_text="",
     )
-    actual_interactions = models.PositiveIntegerField(
+    actual_interactions = models.FloatField(
         null=False,
         blank=False,
         help_text="",
     )
-    login_time_variance = models.PositiveIntegerField(
+    login_time_variance = models.FloatField(
         null=False,
         blank=False,
         help_text="",
     )
-    handling_time = models.PositiveIntegerField(
+    handling_time = models.FloatField(
         null=False,
         blank=False,
         help_text="",
     )
-    customer_complaint = models.PositiveIntegerField(
+    customer_complaint = models.FloatField(
         null=False,
         blank=False,
         help_text="",
     )
   
-    csat = models.PositiveIntegerField(
+    csat = models.FloatField(
         null=True, blank=True, help_text="This is the weekly csat"
     )
 
     
-    calc_aes = models.PositiveIntegerField(
+    calc_aes = models.FloatField(
         null=False,
         blank=False,
         help_text="This is the weekly calculated aes",
     )
-    calc_targeted_interactions = models.PositiveIntegerField(
+    calc_targeted_interactions = models.FloatField(
         null=False,
         blank=False,
         help_text="This is the weekly calculated targeted interactions",
     )
-    calc_actual_interactions = models.PositiveIntegerField(
+    calc_actual_interactions = models.FloatField(
         null=False,
         blank=False,
         help_text="This is the weekly calculated actual interactions",
     )
-    calc_login_time_variance = models.PositiveIntegerField(
+    calc_login_time_variance = models.FloatField(
         null=False,
         blank=False,
         help_text="This is the weekly calculated login time variance",
     )
-    calc_handling_time = models.PositiveIntegerField(
+    calc_handling_time = models.FloatField(
         null=False,
         blank=False,
         help_text="This is the weekly calculated handling time",
     )
-    calc_customer_complaint = models.PositiveIntegerField(
+    calc_customer_complaint = models.FloatField(
         null=False,
         blank=False,
         help_text="This is the weekly calculated customer complaint",
     )
-    calc_csat = models.PositiveIntegerField(null=True, blank=True)
+    calc_csat = models.FloatField(null=True, blank=True)
 
-    weighted_aes = models.PositiveIntegerField(null=False, blank=False)
-    weighted_targeted_interactions = models.PositiveIntegerField(null=True, blank=True)
-    weighted_actual_interactions = models.PositiveIntegerField(null=True, blank=True)
-    weighted_login_time_variance = models.PositiveIntegerField(null=True, blank=True)
-    weighted_handling_time = models.PositiveIntegerField(null=True, blank=True)
-    weighted_customer_complaint = models.PositiveIntegerField(null=True, blank=True)
-    weighted_csat = models.PositiveIntegerField(null=True, blank=True)
-    overall_score = models.PositiveIntegerField(null=True, blank=True)
+    weighted_aes = models.FloatField(null=False, blank=False)
+    weighted_targeted_interactions = models.FloatField(null=True, blank=True)
+    weighted_actual_interactions = models.FloatField(null=True, blank=True)
+    weighted_login_time_variance = models.FloatField(null=True, blank=True)
+    weighted_handling_time = models.FloatField(null=True, blank=True)
+    weighted_customer_complaint = models.FloatField(null=True, blank=True)
+    weighted_csat = models.FloatField(null=True, blank=True)
+    overall_score = models.FloatField(null=True, blank=True)
     grade = models.CharField(max_length=20, choices=GRADE)
 
     date_created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
@@ -633,54 +633,54 @@ class YamuraiInsights(models.Model):
     week = models.PositiveIntegerField(
         null=False, blank=False, help_text="week should be a number"
     )
-    aes = models.PositiveIntegerField(
+    aes = models.FloatField(
         null=False,
         blank=False,
         help_text="Average Evaluation Score (AES)",
     )
    
-    csat = models.PositiveIntegerField(
+    csat = models.FloatField(
         null=True, blank=True, help_text="This is the weekly csat"
     )
 
-    resolved_queries = models.PositiveIntegerField(
+    resolved_queries = models.FloatField(
         null=False,
         blank=False,
         help_text="",
     )
-    calc_aes = models.PositiveIntegerField(
+    calc_aes = models.FloatField(
         null=False,
         blank=False,
         help_text="",
     )
-    calc_resolved_queries = models.PositiveIntegerField(
+    calc_resolved_queries = models.FloatField(
         null=False,
         blank=False,
         help_text="",
     )
-    calc_csat = models.PositiveIntegerField(
+    calc_csat = models.FloatField(
         null=False,
         blank=False,
         help_text="",
     )
-    weighted_aes = models.PositiveIntegerField(
+    weighted_aes = models.FloatField(
         null=False,
         blank=False,
         help_text="",
     )
-    weighted_resolved_queries = models.PositiveIntegerField(
+    weighted_resolved_queries = models.FloatField(
         null=False,
         blank=False,
         help_text="",
     )
-    weighted_csat = models.PositiveIntegerField(
+    weighted_csat = models.FloatField(
         null=False,
         blank=False,
         help_text="",
     )
    
 
-    overall_score = models.PositiveIntegerField(null=True, blank=True)
+    overall_score = models.FloatField(null=True, blank=True)
     grade = models.CharField(max_length=20, choices=GRADE)
 
     date_created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
