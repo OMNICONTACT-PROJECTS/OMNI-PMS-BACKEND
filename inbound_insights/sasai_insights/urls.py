@@ -28,13 +28,10 @@ urlpatterns = [
     path("update/<int:pk>/", views.SasaiInsightsUpdateView.as_view()),
     path("get-all/", views.GetAllSasaiInsights.as_view()),
     path("get-by-user-id/<int:user_id>/", views.GetSasaiInsightsByUserId.as_view()),
+   
     path(
-        "for-lvc-agents-by-organisation_id/<int:organisation_id>/",
-        views.GetSasaiInsightsForLVCAgentsByOrganisationId.as_view(),
-    ),
-    path(
-        "for-hvc-agents-by-organisation_id/<int:organisation_id>/",
-        views.GetSasaiInsightsForHVCAgentsByOrganisationId.as_view(),
+        "get-agents-by-organisation_id/<int:organisation_id>/",
+        views.GetSasaiInsightsAgentsByOrganisationId.as_view(),
     ),
     path(
         "get-by-grade/<str:grade>/organisation_id/<int:organisation_id>/",

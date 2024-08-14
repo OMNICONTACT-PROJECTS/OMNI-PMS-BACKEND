@@ -28,13 +28,10 @@ urlpatterns = [
     path("update/<int:pk>/", views.FollowUpInsightsUpdateView.as_view()),
     path("get-all/", views.GetAllFollowUpInsights.as_view()),
     path("get-by-user-id/<int:user_id>/", views.GetFollowUpInsightsByUserId.as_view()),
+    
     path(
-        "for-lvc-agents-by-organisation_id/<int:organisation_id>/",
-        views.GetFollowUpInsightsForLVCAgentsByOrganisationId.as_view(),
-    ),
-    path(
-        "for-hvc-agents-by-organisation_id/<int:organisation_id>/",
-        views.GetFollowUpInsightsForHVCAgentsByOrganisationId.as_view(),
+        "get-agents-by-organisation_id/<int:organisation_id>/",
+        views.GetFollowUpInsightsAgentsByOrganisationId.as_view(),
     ),
     path(
         "get-by-grade/<str:grade>/organisation_id/<int:organisation_id>/",

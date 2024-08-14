@@ -103,7 +103,7 @@ class GetYamuraiInsightsByUserId(GenericAPIView):
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
-class GetYamuraiInsightsForHVCAgentsByOrganisationId(GenericAPIView):
+class GetYamuraiInsightsAgentsByOrganisationId(GenericAPIView):
     permission_classes = []
     serializer_class = YamuraiInsightsRetrieveSerializer
     queryset = YamuraiInsights.objects.all()
@@ -117,32 +117,14 @@ class GetYamuraiInsightsForHVCAgentsByOrganisationId(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
         else:
-            yamurai_insights = self.queryset.filter(agent_type="HVC").order_by(
+            yamurai_insights = self.queryset.order_by(
                 "-date_created"
             )
             serializer = self.serializer_class(yamurai_insights, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
-class GetYamuraiInsightsForLVCAgentsByOrganisationId(GenericAPIView):
-    permission_classes = []
-    serializer_class = YamuraiInsightsRetrieveSerializer
-    queryset = YamuraiInsights.objects.all()
 
-    def get(self, request, organisation_id, *args, **kwargs):
-        try:
-            Organisation.objects.get(pk=organisation_id)
-        except Organisation.DoesNotExist:
-            return Response(
-                {"message": "Organisation does not exist"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        else:
-            yamurai_insights = self.queryset.filter(agent_type="LVC").order_by(
-                "-date_created"
-            )
-            serializer = self.serializer_class(yamurai_insights, many=True)
-            return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 class GetYamuraiInsightsByGradeAndOrganisationId(GenericAPIView):
