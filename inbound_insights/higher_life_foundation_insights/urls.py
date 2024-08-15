@@ -28,13 +28,10 @@ urlpatterns = [
     path("update/<int:pk>/", views.HigherLifeFoundationInsightsUpdateView.as_view()),
     path("get-all/", views.GetAllHigherLifeFoundationInsights.as_view()),
     path("get-by-user-id/<int:user_id>/", views.GetHigherLifeFoundationInsightsByUserId.as_view()),
+   
     path(
-        "for-lvc-agents-by-organisation_id/<int:organisation_id>/",
-        views.GetHigherLifeFoundationInsightsForLVCAgentsByOrganisationId.as_view(),
-    ),
-    path(
-        "for-hvc-agents-by-organisation_id/<int:organisation_id>/",
-        views.GetHigherLifeFoundationInsightsForHVCAgentsByOrganisationId.as_view(),
+        "get-agents-by-organisation_id/<int:organisation_id>/",
+        views.GetHigherLifeFoundationInsightsAgentsByOrganisationId.as_view(),
     ),
     path(
         "get-by-grade/<str:grade>/organisation_id/<int:organisation_id>/",

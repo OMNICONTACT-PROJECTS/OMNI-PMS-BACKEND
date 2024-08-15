@@ -28,13 +28,10 @@ urlpatterns = [
     path("update/<int:pk>/", views.FreshDeskInsightsUpdateView.as_view()),
     path("get-all/", views.GetAllFreshDeskInsights.as_view()),
     path("get-by-user-id/<int:user_id>/", views.GetFreshDeskInsightsByUserId.as_view()),
+   
     path(
-        "for-lvc-agents-by-organisation_id/<int:organisation_id>/",
-        views.GetFreshDeskInsightsForLVCAgentsByOrganisationId.as_view(),
-    ),
-    path(
-        "for-hvc-agents-by-organisation_id/<int:organisation_id>/",
-        views.GetFreshDeskInsightsForHVCAgentsByOrganisationId.as_view(),
+        "get-agents-by-organisation_id/<int:organisation_id>/",
+        views.GetFreshDeskInsightsgentsByOrganisationId.as_view(),
     ),
     path(
         "get-by-grade/<str:grade>/organisation_id/<int:organisation_id>/",
