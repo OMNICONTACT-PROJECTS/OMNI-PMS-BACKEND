@@ -103,7 +103,7 @@ class GetFollowUpInsightsByUserId(GenericAPIView):
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
-class GetFollowUpInsightsForHVCAgentsByOrganisationId(GenericAPIView):
+class GetFollowUpInsightsAgentsByOrganisationId(GenericAPIView):
     permission_classes = []
     serializer_class = FollowUpInsightsRetrieveSerializer
     queryset = FollowUpInsights.objects.all()
@@ -117,14 +117,14 @@ class GetFollowUpInsightsForHVCAgentsByOrganisationId(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
         else:
-            follow_up_insights = self.queryset.filter(agent_type="HVC").order_by(
+            follow_up_insights = self.queryset.order_by(
                 "-date_created"
             )
             serializer = self.serializer_class(follow_up_insights, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
-class GetFollowUpInsightsForLVCAgentsByOrganisationId(GenericAPIView):
+
     permission_classes = []
     serializer_class = FollowUpInsightsRetrieveSerializer
     queryset = FollowUpInsights.objects.all()
