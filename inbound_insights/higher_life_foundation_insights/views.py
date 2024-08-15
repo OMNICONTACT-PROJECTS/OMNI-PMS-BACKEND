@@ -96,10 +96,12 @@ class GetHigherLifeFoundationInsightsByUserId(GenericAPIView):
                 {"message": "User does not exist"}, status=status.HTTP_404_NOT_FOUND
             )
         else:
-            higher_life_foundation_insights = self.queryset.filter(user_id=user_id).order_by(
-                "-date_created"
+            higher_life_foundation_insights = self.queryset.filter(
+                user_id=user_id
+            ).order_by("-date_created")
+            serializer = self.serializer_class(
+                higher_life_foundation_insights, many=True
             )
-            serializer = self.serializer_class(higher_life_foundation_insights, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
@@ -117,13 +119,11 @@ class GetHigherLifeFoundationInsightsAgentsByOrganisationId(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
         else:
-            higher_life_foundation_insights = self.queryset.order_by(
-                "-date_created"
+            higher_life_foundation_insights = self.queryset.order_by("-date_created")
+            serializer = self.serializer_class(
+                higher_life_foundation_insights, many=True
             )
-            serializer = self.serializer_class(higher_life_foundation_insights, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
-
-
 
     permission_classes = []
     serializer_class = HigherLifeFoundationInsightsRetrieveSerializer
@@ -138,10 +138,12 @@ class GetHigherLifeFoundationInsightsAgentsByOrganisationId(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
         else:
-            higher_life_foundation_insights = self.queryset.filter(agent_type="LVC").order_by(
-                "-date_created"
+            higher_life_foundation_insights = self.queryset.filter(
+                agent_type="LVC"
+            ).order_by("-date_created")
+            serializer = self.serializer_class(
+                higher_life_foundation_insights, many=True
             )
-            serializer = self.serializer_class(higher_life_foundation_insights, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
@@ -162,7 +164,9 @@ class GetHigherLifeFoundationInsightsByGradeAndOrganisationId(GenericAPIView):
             higher_life_foundation_insights = self.queryset.filter(
                 user__organisation_id=organisation_id, grade=grade
             ).order_by("-date_created")
-            serializer = self.serializer_class(higher_life_foundation_insights, many=True)
+            serializer = self.serializer_class(
+                higher_life_foundation_insights, many=True
+            )
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
@@ -183,7 +187,9 @@ class GetHigherLifeFoundationInsightsByDateAndOrganisationId(GenericAPIView):
             higher_life_foundation_insights = self.queryset.filter(
                 user__organisation_id=organisation_id, year=year, month=month, week=week
             ).order_by("-date_created")
-            serializer = self.serializer_class(higher_life_foundation_insights, many=True)
+            serializer = self.serializer_class(
+                higher_life_foundation_insights, many=True
+            )
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
@@ -211,7 +217,9 @@ class BulkUploadHigherLifeFoundationInsightsDataView(GenericAPIView):
                         status=status.HTTP_400_BAD_REQUEST,
                     )
 
-                higher_life_foundation_insights_resource = HigherLifeFoundationInsightsResource()
+                higher_life_foundation_insights_resource = (
+                    HigherLifeFoundationInsightsResource()
+                )
                 df = None
 
                 if file_type == "CSV":
@@ -270,17 +278,23 @@ class BulkUploadHigherLifeFoundationInsightsDataView(GenericAPIView):
                     )
 
                 if not result.has_errors():
-                    higher_life_foundation_insights_resource.import_data(dataset, dry_run=False)
+                    higher_life_foundation_insights_resource.import_data(
+                        dataset, dry_run=False
+                    )
                     try:
                         serializer = self.serializer_class(data=request.data)
                         if serializer.is_valid():
                             saved_instance = serializer.save()
-                            saved_instance.campaign_name = "Higher Life Foundation Campaign"
+                            saved_instance.campaign_name = (
+                                "Higher Life Foundation Campaign"
+                            )
                             saved_instance.save()
                     except Exception as e:
                         pass
                     return Response(
-                        {"message": "Higher Life Foundation Insights Data Uploaded Successfully."},
+                        {
+                            "message": "Higher Life Foundation Insights Data Uploaded Successfully."
+                        },
                         status=status.HTTP_201_CREATED,
                     )
                 else:
@@ -315,7 +329,9 @@ class GetHigherLifeFoundationInsightsUploadedFilesView(GenericAPIView):
             higher_life_foundation_insights_files = self.queryset.filter(
                 organisation_id=organisation_id, campaign_name=campaign_name
             ).order_by("-date_created")
-            serializer = self.serializer_class(higher_life_foundation_insights_files, many=True)
+            serializer = self.serializer_class(
+                higher_life_foundation_insights_files, many=True
+            )
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -360,10 +376,14 @@ class GetHigherLifeFoundationInsightsBulkUploadTemplate(GenericAPIView):
                 campaign_name=campaign_name,
                 is_upload_template=True,
             ).order_by("-date_created")
-            serializer = self.serializer_class(higher_life_foundation_insights_files, many=True)
+            serializer = self.serializer_class(
+                higher_life_foundation_insights_files, many=True
+            )
             return Response(serializer.data, status=status.HTTP_200_OK)
-        
+
+
 # Averages
+
 
 class GetAllAverageHigherLifeFoundationInsightsStatisticsView(GenericAPIView):
     permission_classes = []
@@ -386,52 +406,102 @@ class GetAllAverageHigherLifeFoundationInsightsStatisticsView(GenericAPIView):
 
         if not higher_life_foundation_insights.exists():
             return Response(
-                {"message": "No higher life foundation insights data found for the given organisation"},
+                {
+                    "message": "No higher life foundation insights data found for the given organisation"
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
-        
-        grade_counts = higher_life_foundation_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = higher_life_foundation_insights.values("user_id").annotate(count=Count("user_id")).count()
-        
+
+        managed_by = higher_life_foundation_insights.first().managed_by
+        grade_counts = higher_life_foundation_insights.values("grade").annotate(
+            count=Count("grade")
+        )
+        total_agents = (
+            higher_life_foundation_insights.values("user_id")
+            .annotate(count=Count("user_id"))
+            .count()
+        )
+
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=higher_life_foundation_insights.values_list("user_id", flat=True)
+            id__in=higher_life_foundation_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=higher_life_foundation_insights.values_list("user_id", flat=True)
+            id__in=higher_life_foundation_insights.values_list("user_id", flat=True),
         ).count()
 
         average_stats = {
-            "average_aes": round(higher_life_foundation_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-            "average_resolved_count": round(higher_life_foundation_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-            "average_service_level": round(higher_life_foundation_insights.values("service_level").aggregate(Avg("service_level"))["service_level__avg"], 2),
-            "average_csat": round(higher_life_foundation_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-            "average_overall_score": round(higher_life_foundation_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+            "average_aes": round(
+                higher_life_foundation_insights.values("aes").aggregate(Avg("aes"))[
+                    "aes__avg"
+                ],
+                2,
+            ),
+            "average_resolved_count": round(
+                higher_life_foundation_insights.values("resolved_count").aggregate(
+                    Avg("resolved_count")
+                )["resolved_count__avg"],
+                2,
+            ),
+            "average_service_level": round(
+                higher_life_foundation_insights.values("service_level").aggregate(
+                    Avg("service_level")
+                )["service_level__avg"],
+                2,
+            ),
+            "average_csat": round(
+                higher_life_foundation_insights.values("csat").aggregate(Avg("csat"))[
+                    "csat__avg"
+                ],
+                2,
+            ),
+            "average_overall_score": round(
+                higher_life_foundation_insights.values("overall_score").aggregate(
+                    Avg("overall_score")
+                )["overall_score__avg"],
+                2,
+            ),
         }
 
         all_higher_life_foundation_insights_stats = {
+            "managed_by": managed_by,
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": average_stats,
         }
 
-        return Response(all_higher_life_foundation_insights_stats, status=status.HTTP_200_OK)
-    
+        return Response(
+            all_higher_life_foundation_insights_stats, status=status.HTTP_200_OK
+        )
+
+
 class GetAllHigherLifeFoundationInsightsStatisticsView(GenericAPIView):
     permission_classes = []
     serializer_class = HigherLifeFoundationInsightsRetrieveSerializer
     queryset = HigherLifeFoundationInsights.objects.all()
 
-    def get(self, request, organisation_id, year, month, week, agent_type, *args, **kwargs):
+    def get(
+        self, request, organisation_id, year, month, week, agent_type, *args, **kwargs
+    ):
         try:
             organisation = Organisation.objects.get(pk=organisation_id)
         except Organisation.DoesNotExist:
@@ -450,50 +520,97 @@ class GetAllHigherLifeFoundationInsightsStatisticsView(GenericAPIView):
 
         if not higher_life_foundation_insights.exists():
             return Response(
-                {"message": "No higher life foundation insights data found for the given organisation"},
+                {
+                    "message": "No higher life foundation insights data found for the given organisation"
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
-        
-        grade_counts = higher_life_foundation_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = higher_life_foundation_insights.values("user_id").annotate(count=Count("user_id")).count()
-        
+        managed_by = higher_life_foundation_insights.first().managed_by
+        grade_counts = higher_life_foundation_insights.values("grade").annotate(
+            count=Count("grade")
+        )
+        total_agents = (
+            higher_life_foundation_insights.values("user_id")
+            .annotate(count=Count("user_id"))
+            .count()
+        )
+
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=higher_life_foundation_insights.values_list("user_id", flat=True)
+            id__in=higher_life_foundation_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=higher_life_foundation_insights.values_list("user_id", flat=True)
+            id__in=higher_life_foundation_insights.values_list("user_id", flat=True),
         ).count()
 
         average_stats = {
-            "average_aes": round(higher_life_foundation_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-            "average_resolved_count": round(higher_life_foundation_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-            "average_service_level": round(higher_life_foundation_insights.values("service_level").aggregate(Avg("service_level"))["service_level__avg"], 2),
-            "average_csat": round(higher_life_foundation_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-            "average_overall_score": round(higher_life_foundation_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+            "average_aes": round(
+                higher_life_foundation_insights.values("aes").aggregate(Avg("aes"))[
+                    "aes__avg"
+                ],
+                2,
+            ),
+            "average_resolved_count": round(
+                higher_life_foundation_insights.values("resolved_count").aggregate(
+                    Avg("resolved_count")
+                )["resolved_count__avg"],
+                2,
+            ),
+            "average_service_level": round(
+                higher_life_foundation_insights.values("service_level").aggregate(
+                    Avg("service_level")
+                )["service_level__avg"],
+                2,
+            ),
+            "average_csat": round(
+                higher_life_foundation_insights.values("csat").aggregate(Avg("csat"))[
+                    "csat__avg"
+                ],
+                2,
+            ),
+            "average_overall_score": round(
+                higher_life_foundation_insights.values("overall_score").aggregate(
+                    Avg("overall_score")
+                )["overall_score__avg"],
+                2,
+            ),
         }
 
         all_higher_life_foundation_insights_stats = {
             "Year": year,
+            "managed_by": managed_by,
             "Month": month,
             "week": week,
             "agent_type": agent_type,
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": average_stats,
         }
 
-        return Response(all_higher_life_foundation_insights_stats, status=status.HTTP_200_OK)
-    
+        return Response(
+            all_higher_life_foundation_insights_stats, status=status.HTTP_200_OK
+        )
+
+
 class GetAllHigherLifeFoundationInsightsStatisticsWithoutWeekView(GenericAPIView):
     permission_classes = []
     serializer_class = HigherLifeFoundationInsightsRetrieveSerializer
@@ -517,50 +634,100 @@ class GetAllHigherLifeFoundationInsightsStatisticsWithoutWeekView(GenericAPIView
 
         if not higher_life_foundation_insights.exists():
             return Response(
-                {"message": "No higher life foundation insights data found for the given organisation"},
+                {
+                    "message": "No higher life foundation insights data found for the given organisation"
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
-        
-        grade_counts = higher_life_foundation_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = higher_life_foundation_insights.values("user_id").annotate(count=Count("user_id")).count()
-        
+
+        managed_by = higher_life_foundation_insights.first().managed_by
+        grade_counts = higher_life_foundation_insights.values("grade").annotate(
+            count=Count("grade")
+        )
+        total_agents = (
+            higher_life_foundation_insights.values("user_id")
+            .annotate(count=Count("user_id"))
+            .count()
+        )
+
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=higher_life_foundation_insights.values_list("user_id", flat=True)
+            id__in=higher_life_foundation_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=higher_life_foundation_insights.values_list("user_id", flat=True)
+            id__in=higher_life_foundation_insights.values_list("user_id", flat=True),
         ).count()
 
         average_stats = {
-            "average_aes": round(higher_life_foundation_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-            "average_resolved_count": round(higher_life_foundation_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-            "average_service_level": round(higher_life_foundation_insights.values("service_level").aggregate(Avg("service_level"))["service_level__avg"], 2),
-            "average_csat": round(higher_life_foundation_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-            "average_overall_score": round(higher_life_foundation_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+            "average_aes": round(
+                higher_life_foundation_insights.values("aes").aggregate(Avg("aes"))[
+                    "aes__avg"
+                ],
+                2,
+            ),
+            "average_resolved_count": round(
+                higher_life_foundation_insights.values("resolved_count").aggregate(
+                    Avg("resolved_count")
+                )["resolved_count__avg"],
+                2,
+            ),
+            "average_service_level": round(
+                higher_life_foundation_insights.values("service_level").aggregate(
+                    Avg("service_level")
+                )["service_level__avg"],
+                2,
+            ),
+            "average_csat": round(
+                higher_life_foundation_insights.values("csat").aggregate(Avg("csat"))[
+                    "csat__avg"
+                ],
+                2,
+            ),
+            "average_overall_score": round(
+                higher_life_foundation_insights.values("overall_score").aggregate(
+                    Avg("overall_score")
+                )["overall_score__avg"],
+                2,
+            ),
         }
 
         all_higher_life_foundation_insights_stats = {
             "Year": year,
+            "managed_by": managed_by,
             "Month": month,
             "agent_type": agent_type,
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": average_stats,
         }
 
-        return Response(all_higher_life_foundation_insights_stats, status=status.HTTP_200_OK)
-    
-class GetAllHigherLifeFoundationInsightsStatisticsWithoutMonthAndWeekView(GenericAPIView):
+        return Response(
+            all_higher_life_foundation_insights_stats, status=status.HTTP_200_OK
+        )
+
+
+class GetAllHigherLifeFoundationInsightsStatisticsWithoutMonthAndWeekView(
+    GenericAPIView
+):
     permission_classes = []
     serializer_class = HigherLifeFoundationInsightsRetrieveSerializer
     queryset = HigherLifeFoundationInsights.objects.all()
@@ -582,48 +749,95 @@ class GetAllHigherLifeFoundationInsightsStatisticsWithoutMonthAndWeekView(Generi
 
         if not higher_life_foundation_insights.exists():
             return Response(
-                {"message": "No higher life foundation insights data found for the given organisation"},
+                {
+                    "message": "No higher life foundation insights data found for the given organisation"
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
-        
-        grade_counts = higher_life_foundation_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = higher_life_foundation_insights.values("user_id").annotate(count=Count("user_id")).count()
-        
+
+        managed_by = hlf_insights.first().managed_by
+        grade_counts = higher_life_foundation_insights.values("grade").annotate(
+            count=Count("grade")
+        )
+        total_agents = (
+            higher_life_foundation_insights.values("user_id")
+            .annotate(count=Count("user_id"))
+            .count()
+        )
+
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=higher_life_foundation_insights.values_list("user_id", flat=True)
+            id__in=higher_life_foundation_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=higher_life_foundation_insights.values_list("user_id", flat=True)
+            id__in=higher_life_foundation_insights.values_list("user_id", flat=True),
         ).count()
 
         average_stats = {
-            "average_aes": round(higher_life_foundation_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-            "average_resolved_count": round(higher_life_foundation_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-            "average_service_level": round(higher_life_foundation_insights.values("service_level").aggregate(Avg("service_level"))["service_level__avg"], 2),
-            "average_csat": round(higher_life_foundation_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-            "average_overall_score": round(higher_life_foundation_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+            "average_aes": round(
+                higher_life_foundation_insights.values("aes").aggregate(Avg("aes"))[
+                    "aes__avg"
+                ],
+                2,
+            ),
+            "average_resolved_count": round(
+                higher_life_foundation_insights.values("resolved_count").aggregate(
+                    Avg("resolved_count")
+                )["resolved_count__avg"],
+                2,
+            ),
+            "average_service_level": round(
+                higher_life_foundation_insights.values("service_level").aggregate(
+                    Avg("service_level")
+                )["service_level__avg"],
+                2,
+            ),
+            "average_csat": round(
+                higher_life_foundation_insights.values("csat").aggregate(Avg("csat"))[
+                    "csat__avg"
+                ],
+                2,
+            ),
+            "average_overall_score": round(
+                higher_life_foundation_insights.values("overall_score").aggregate(
+                    Avg("overall_score")
+                )["overall_score__avg"],
+                2,
+            ),
         }
 
         all_higher_life_foundation_insights_stats = {
             "Year": year,
+            "managed_by": managed_by,
             "agent_type": agent_type,
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": average_stats,
         }
 
-        return Response(all_higher_life_foundation_insights_stats, status=status.HTTP_200_OK)
-    
+        return Response(
+            all_higher_life_foundation_insights_stats, status=status.HTTP_200_OK
+        )
+
 
 ####################################################
 class NewGetAllHlfInsightsStatisticsWithWeekView(GenericAPIView):
@@ -653,18 +867,21 @@ class NewGetAllHlfInsightsStatisticsWithWeekView(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        managed_by = hlf_insights.first().managed_by
         grade_counts = hlf_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = hlf_insights.values("user_id").annotate(count=Count("user_id")).count()
+        total_agents = (
+            hlf_insights.values("user_id").annotate(count=Count("user_id")).count()
+        )
 
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=hlf_insights.values_list("user_id", flat=True)
+            id__in=hlf_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=hlf_insights.values_list("user_id", flat=True)
+            id__in=hlf_insights.values_list("user_id", flat=True),
         ).count()
 
         weekly_average_stats = {}
@@ -672,11 +889,33 @@ class NewGetAllHlfInsightsStatisticsWithWeekView(GenericAPIView):
             week_insights = hlf_insights.filter(week=week)
             if week_insights.exists():
                 weekly_average_stats[f"week {week}"] = {
-                    "average_aes": round(week_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-                    "average_resolved_count": round(week_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-                    "average_service_level": round(week_insights.values("service_level").aggregate(Avg("service_level"))["service_level__avg"], 2),
-                    "average_csat": round(week_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-                    "average_overall_score": round(week_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+                    "average_aes": round(
+                        week_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+                    ),
+                    "average_resolved_count": round(
+                        week_insights.values("resolved_count").aggregate(
+                            Avg("resolved_count")
+                        )["resolved_count__avg"],
+                        2,
+                    ),
+                    "average_service_level": round(
+                        week_insights.values("service_level").aggregate(
+                            Avg("service_level")
+                        )["service_level__avg"],
+                        2,
+                    ),
+                    "average_csat": round(
+                        week_insights.values("csat").aggregate(Avg("csat"))[
+                            "csat__avg"
+                        ],
+                        2,
+                    ),
+                    "average_overall_score": round(
+                        week_insights.values("overall_score").aggregate(
+                            Avg("overall_score")
+                        )["overall_score__avg"],
+                        2,
+                    ),
                 }
 
             else:
@@ -684,27 +923,58 @@ class NewGetAllHlfInsightsStatisticsWithWeekView(GenericAPIView):
 
         all_hlf_insights_stats = {
             "Year": year,
+            "managed_by": managed_by,
             "Month": month,
             "agent_type": agent_type,
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": {
-                "average_aes": round(hlf_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-                "average_resolved_count": round(hlf_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-                "average_service_level": round(hlf_insights.values("service_level").aggregate(Avg("service_level"))["service_level__avg"], 2),
-                "average_csat": round(hlf_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-                "average_overall_score": round(hlf_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+                "average_aes": round(
+                    hlf_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+                ),
+                "average_resolved_count": round(
+                    hlf_insights.values("resolved_count").aggregate(
+                        Avg("resolved_count")
+                    )["resolved_count__avg"],
+                    2,
+                ),
+                "average_service_level": round(
+                    hlf_insights.values("service_level").aggregate(
+                        Avg("service_level")
+                    )["service_level__avg"],
+                    2,
+                ),
+                "average_csat": round(
+                    hlf_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2
+                ),
+                "average_overall_score": round(
+                    hlf_insights.values("overall_score").aggregate(
+                        Avg("overall_score")
+                    )["overall_score__avg"],
+                    2,
+                ),
             },
             "weekily_average_stats": weekly_average_stats,
         }
 
         return Response(all_hlf_insights_stats, status=status.HTTP_200_OK)
+
 
 class NewGetAllHlfInsightsStatisticsWithMonthView(GenericAPIView):
     permission_classes = []
@@ -732,30 +1002,69 @@ class NewGetAllHlfInsightsStatisticsWithMonthView(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        managed_by = hlf_insights.first().managed_by
         grade_counts = hlf_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = hlf_insights.values("user_id").annotate(count=Count("user_id")).count()
+        total_agents = (
+            hlf_insights.values("user_id").annotate(count=Count("user_id")).count()
+        )
 
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=hlf_insights.values_list("user_id", flat=True)
+            id__in=hlf_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=hlf_insights.values_list("user_id", flat=True)
+            id__in=hlf_insights.values_list("user_id", flat=True),
         ).count()
 
         monthly_average_stats = {}
-        for month in ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]:
+        for month in [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+        ]:
             month_insights = hlf_insights.filter(month=month)
             if month_insights.exists():
                 monthly_average_stats[month] = {
-                    "average_aes": round(month_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-                    "average_resolved_count": round(month_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-                    "average_service_level": round(month_insights.values("service_level").aggregate(Avg("service_level"))["service_level__avg"], 2),
-                    "average_csat": round(month_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-                    "average_overall_score": round(month_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+                    "average_aes": round(
+                        month_insights.values("aes").aggregate(Avg("aes"))["aes__avg"],
+                        2,
+                    ),
+                    "average_resolved_count": round(
+                        month_insights.values("resolved_count").aggregate(
+                            Avg("resolved_count")
+                        )["resolved_count__avg"],
+                        2,
+                    ),
+                    "average_service_level": round(
+                        month_insights.values("service_level").aggregate(
+                            Avg("service_level")
+                        )["service_level__avg"],
+                        2,
+                    ),
+                    "average_csat": round(
+                        month_insights.values("csat").aggregate(Avg("csat"))[
+                            "csat__avg"
+                        ],
+                        2,
+                    ),
+                    "average_overall_score": round(
+                        month_insights.values("overall_score").aggregate(
+                            Avg("overall_score")
+                        )["overall_score__avg"],
+                        2,
+                    ),
                 }
 
             else:
@@ -763,24 +1072,53 @@ class NewGetAllHlfInsightsStatisticsWithMonthView(GenericAPIView):
 
         all_hlf_insights_stats = {
             "Year": year,
+            "managed_by": managed_by,
             "agent_type": agent_type,
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": {
-                "average_aes": round(hlf_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-                "average_resolved_count": round(hlf_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-                "average_service_level": round(hlf_insights.values("service_level").aggregate(Avg("service_level"))["service_level__avg"], 2),
-                "average_csat": round(hlf_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-                "average_overall_score": round(hlf_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+                "average_aes": round(
+                    hlf_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+                ),
+                "average_resolved_count": round(
+                    hlf_insights.values("resolved_count").aggregate(
+                        Avg("resolved_count")
+                    )["resolved_count__avg"],
+                    2,
+                ),
+                "average_service_level": round(
+                    hlf_insights.values("service_level").aggregate(
+                        Avg("service_level")
+                    )["service_level__avg"],
+                    2,
+                ),
+                "average_csat": round(
+                    hlf_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2
+                ),
+                "average_overall_score": round(
+                    hlf_insights.values("overall_score").aggregate(
+                        Avg("overall_score")
+                    )["overall_score__avg"],
+                    2,
+                ),
             },
             "monthly_average_stats": monthly_average_stats,
         }
 
         return Response(all_hlf_insights_stats, status=status.HTTP_200_OK)
-
