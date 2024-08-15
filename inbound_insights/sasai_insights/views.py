@@ -103,7 +103,7 @@ class GetSasaiInsightsByUserId(GenericAPIView):
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
-class GetSasaiInsightsForHVCAgentsByOrganisationId(GenericAPIView):
+class GetSasaiInsightsAgentsByOrganisationId(GenericAPIView):
     permission_classes = []
     serializer_class = SasaiInsightsRetrieveSerializer
     queryset = SasaiInsights.objects.all()
@@ -117,32 +117,14 @@ class GetSasaiInsightsForHVCAgentsByOrganisationId(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
         else:
-            sasai_insights = self.queryset.filter(agent_type="HVC").order_by(
+            sasai_insights = self.queryset.order_by(
                 "-date_created"
             )
             serializer = self.serializer_class(sasai_insights, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
-class GetSasaiInsightsForLVCAgentsByOrganisationId(GenericAPIView):
-    permission_classes = []
-    serializer_class = SasaiInsightsRetrieveSerializer
-    queryset = SasaiInsights.objects.all()
 
-    def get(self, request, organisation_id, *args, **kwargs):
-        try:
-            Organisation.objects.get(pk=organisation_id)
-        except Organisation.DoesNotExist:
-            return Response(
-                {"message": "Organisation does not exist"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        else:
-            sasai_insights = self.queryset.filter(agent_type="LVC").order_by(
-                "-date_created"
-            )
-            serializer = self.serializer_class(sasai_insights, many=True)
-            return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 class GetSasaiInsightsByGradeAndOrganisationId(GenericAPIView):
