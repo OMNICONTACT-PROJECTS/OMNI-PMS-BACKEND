@@ -39,6 +39,7 @@ class VoiceInsights(models.Model):
         null=False,
         choices=AGENT_TYPE,
     )
+    managed_by = models.CharField(max_length=150, blank=False, null=False)
     year = models.PositiveIntegerField(null=False, blank=False)
     month = models.CharField(max_length=50, null=False, blank=False)
     week = models.PositiveIntegerField(
@@ -197,6 +198,7 @@ class FollowUpInsights(models.Model):
         null=False,
         choices=AGENT_TYPE,
     )
+    managed_by = models.CharField(max_length=150, blank=False, null=False)
     year = models.PositiveIntegerField(null=False, blank=False)
     month = models.CharField(max_length=50, null=False, blank=False)
     week = models.PositiveIntegerField(
@@ -212,9 +214,7 @@ class FollowUpInsights(models.Model):
         blank=True,
         help_text="This is the Weekly Outbound calls achieved by the agent",
     )
-    csat = models.FloatField(
-        null=True, blank=True, help_text="This is the weekly csat"
-    )
+    csat = models.FloatField(null=True, blank=True, help_text="This is the weekly csat")
     calc_aes = models.FloatField(
         null=False,
         blank=False,
@@ -237,7 +237,6 @@ class FollowUpInsights(models.Model):
 
     def __str__(self):
         return f"{self.user.first_name} ({self.user.last_name}"
-
 
 
 class HigherLifeFoundationInsights(models.Model):
@@ -274,6 +273,7 @@ class HigherLifeFoundationInsights(models.Model):
         null=False,
         choices=AGENT_TYPE,
     )
+    managed_by = models.CharField(max_length=150, blank=False, null=False)
     year = models.PositiveIntegerField(null=False, blank=False)
     month = models.CharField(max_length=50, null=False, blank=False)
     week = models.PositiveIntegerField(
@@ -284,10 +284,8 @@ class HigherLifeFoundationInsights(models.Model):
         blank=False,
         help_text="Average Evaluation Score (AES)",
     )
-   
-    csat = models.FloatField(
-        null=True, blank=True, help_text="This is the weekly csat"
-    )
+
+    csat = models.FloatField(null=True, blank=True, help_text="This is the weekly csat")
 
     resolved_count = models.FloatField(
         null=False,
@@ -308,7 +306,7 @@ class HigherLifeFoundationInsights(models.Model):
 
     def __str__(self):
         return f"{self.user.first_name} ({self.user.last_name}"
-    
+
 
 class SasaiInsights(models.Model):
     AGENT_TYPE = (
@@ -344,6 +342,7 @@ class SasaiInsights(models.Model):
         null=False,
         choices=AGENT_TYPE,
     )
+    managed_by = models.CharField(max_length=150, blank=False, null=False)
     year = models.PositiveIntegerField(null=False, blank=False)
     month = models.CharField(max_length=50, null=False, blank=False)
     week = models.PositiveIntegerField(
@@ -354,10 +353,8 @@ class SasaiInsights(models.Model):
         blank=False,
         help_text="Average Evaluation Score (AES)",
     )
-   
-    csat = models.FloatField(
-        null=True, blank=True, help_text="This is the weekly csat"
-    )
+
+    csat = models.FloatField(null=True, blank=True, help_text="This is the weekly csat")
 
     resolved_count = models.FloatField(
         null=False,
@@ -378,7 +375,7 @@ class SasaiInsights(models.Model):
 
     def __str__(self):
         return f"{self.user.first_name} ({self.user.last_name}"
-    
+
 
 class FreshDeskInsights(models.Model):
     AGENT_TYPE = (
@@ -414,6 +411,7 @@ class FreshDeskInsights(models.Model):
         null=False,
         choices=AGENT_TYPE,
     )
+    managed_by = models.CharField(max_length=150, blank=False, null=False)
     year = models.PositiveIntegerField(null=False, blank=False)
     month = models.CharField(max_length=50, null=False, blank=False)
     week = models.PositiveIntegerField(
@@ -434,12 +432,9 @@ class FreshDeskInsights(models.Model):
         blank=False,
         help_text="",
     )
-  
-    csat = models.FloatField(
-        null=True, blank=True, help_text="This is the weekly csat"
-    )
 
-    
+    csat = models.FloatField(null=True, blank=True, help_text="This is the weekly csat")
+
     calc_aes = models.FloatField(
         null=False,
         blank=False,
@@ -469,7 +464,7 @@ class FreshDeskInsights(models.Model):
 
     def __str__(self):
         return f"{self.user.first_name} ({self.user.last_name}"
-    
+
 
 class FreshChatInsights(models.Model):
     AGENT_TYPE = (
@@ -505,6 +500,7 @@ class FreshChatInsights(models.Model):
         null=False,
         choices=AGENT_TYPE,
     )
+    managed_by = models.CharField(max_length=150, blank=False, null=False)
     year = models.PositiveIntegerField(null=False, blank=False)
     month = models.CharField(max_length=50, null=False, blank=False)
     week = models.PositiveIntegerField(
@@ -540,12 +536,9 @@ class FreshChatInsights(models.Model):
         blank=False,
         help_text="",
     )
-  
-    csat = models.FloatField(
-        null=True, blank=True, help_text="This is the weekly csat"
-    )
 
-    
+    csat = models.FloatField(null=True, blank=True, help_text="This is the weekly csat")
+
     calc_aes = models.FloatField(
         null=False,
         blank=False,
@@ -593,7 +586,8 @@ class FreshChatInsights(models.Model):
 
     def __str__(self):
         return f"{self.user.first_name} ({self.user.last_name}"
-    
+
+
 class YamuraiInsights(models.Model):
     AGENT_TYPE = (
         ("LVC", "LVC"),
@@ -628,6 +622,7 @@ class YamuraiInsights(models.Model):
         null=False,
         choices=AGENT_TYPE,
     )
+    managed_by = models.CharField(max_length=150, blank=False, null=False)
     year = models.PositiveIntegerField(null=False, blank=False)
     month = models.CharField(max_length=50, null=False, blank=False)
     week = models.PositiveIntegerField(
@@ -638,10 +633,8 @@ class YamuraiInsights(models.Model):
         blank=False,
         help_text="Average Evaluation Score (AES)",
     )
-   
-    csat = models.FloatField(
-        null=True, blank=True, help_text="This is the weekly csat"
-    )
+
+    csat = models.FloatField(null=True, blank=True, help_text="This is the weekly csat")
 
     resolved_queries = models.FloatField(
         null=False,
@@ -678,7 +671,6 @@ class YamuraiInsights(models.Model):
         blank=False,
         help_text="",
     )
-   
 
     overall_score = models.FloatField(null=True, blank=True)
     grade = models.CharField(max_length=20, choices=GRADE)
