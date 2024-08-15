@@ -117,14 +117,9 @@ class GetFreshDeskInsightsgentsByOrganisationId(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
         else:
-            fresh_desk_insights = self.queryset.order_by(
-                "-date_created"
-            )
+            fresh_desk_insights = self.queryset.order_by("-date_created")
             serializer = self.serializer_class(fresh_desk_insights, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
-
-
-
 
 
 class GetFreshDeskInsightsByGradeAndOrganisationId(GenericAPIView):
@@ -344,9 +339,10 @@ class GetFreshDeskInsightsBulkUploadTemplate(GenericAPIView):
             ).order_by("-date_created")
             serializer = self.serializer_class(fresh_desk_insights_files, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        
+
 
 ####################Averages stats###############################################
+
 
 class GetAllAverageFreshDeskInsightsStatisticsView(GenericAPIView):
     permission_classes = []
@@ -369,52 +365,95 @@ class GetAllAverageFreshDeskInsightsStatisticsView(GenericAPIView):
 
         if not fresh_desk_insights.exists():
             return Response(
-                {"message": "No fresh desk insights data found for the given organisation"},
+                {
+                    "message": "No fresh desk insights data found for the given organisation"
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
-        
-        grade_counts = fresh_desk_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = fresh_desk_insights.values("user_id").annotate(count=Count("user_id")).count()
-        
+
+        managed_by = fresh_desk_insights.first().managed_by
+        grade_counts = fresh_desk_insights.values("grade").annotate(
+            count=Count("grade")
+        )
+        total_agents = (
+            fresh_desk_insights.values("user_id")
+            .annotate(count=Count("user_id"))
+            .count()
+        )
+
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=fresh_desk_insights.values_list("user_id", flat=True)
+            id__in=fresh_desk_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=fresh_desk_insights.values_list("user_id", flat=True)
+            id__in=fresh_desk_insights.values_list("user_id", flat=True),
         ).count()
 
         average_stats = {
-            "average_aes": round(fresh_desk_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-            "average_resolved_count": round(fresh_desk_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-            "average_complaints": round(fresh_desk_insights.values("complaints").aggregate(Avg("complaints"))["complaints__avg"], 2),
-            "average_csat": round(fresh_desk_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-            "average_overall_score": round(fresh_desk_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+            "average_aes": round(
+                fresh_desk_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+            ),
+            "average_resolved_count": round(
+                fresh_desk_insights.values("resolved_count").aggregate(
+                    Avg("resolved_count")
+                )["resolved_count__avg"],
+                2,
+            ),
+            "average_complaints": round(
+                fresh_desk_insights.values("complaints").aggregate(Avg("complaints"))[
+                    "complaints__avg"
+                ],
+                2,
+            ),
+            "average_csat": round(
+                fresh_desk_insights.values("csat").aggregate(Avg("csat"))["csat__avg"],
+                2,
+            ),
+            "average_overall_score": round(
+                fresh_desk_insights.values("overall_score").aggregate(
+                    Avg("overall_score")
+                )["overall_score__avg"],
+                2,
+            ),
         }
 
         all_fresh_desk_insights_stats = {
+            "managed_by": managed_by,
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": average_stats,
         }
 
         return Response(all_fresh_desk_insights_stats, status=status.HTTP_200_OK)
-    
+
+
 class GetAllFreshDeskInsightsStatisticsView(GenericAPIView):
     permission_classes = []
     serializer_class = FreshDeskInsightsRetrieveSerializer
     queryset = FreshDeskInsights.objects.all()
 
-    def get(self, request, organisation_id, year, month, week, agent_type, *args, **kwargs):
+    def get(
+        self, request, organisation_id, year, month, week, agent_type, *args, **kwargs
+    ):
         try:
             organisation = Organisation.objects.get(pk=organisation_id)
         except Organisation.DoesNotExist:
@@ -433,50 +472,91 @@ class GetAllFreshDeskInsightsStatisticsView(GenericAPIView):
 
         if not fresh_desk_insights.exists():
             return Response(
-                {"message": "No fresh desk insights data found for the given organisation"},
+                {
+                    "message": "No fresh desk insights data found for the given organisation"
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
-        
-        grade_counts = fresh_desk_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = fresh_desk_insights.values("user_id").annotate(count=Count("user_id")).count()
-        
+
+        managed_by = fresh_desk_insights.first().managed_by
+        grade_counts = fresh_desk_insights.values("grade").annotate(
+            count=Count("grade")
+        )
+        total_agents = (
+            fresh_desk_insights.values("user_id")
+            .annotate(count=Count("user_id"))
+            .count()
+        )
+
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=fresh_desk_insights.values_list("user_id", flat=True)
+            id__in=fresh_desk_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=fresh_desk_insights.values_list("user_id", flat=True)
+            id__in=fresh_desk_insights.values_list("user_id", flat=True),
         ).count()
 
         average_stats = {
-            "average_aes": round(fresh_desk_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-            "average_resolved_count": round(fresh_desk_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-            "average_complaints": round(fresh_desk_insights.values("complaints").aggregate(Avg("complaints"))["complaints__avg"], 2),
-            "average_csat": round(fresh_desk_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-            "average_overall_score": round(fresh_desk_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+            "average_aes": round(
+                fresh_desk_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+            ),
+            "average_resolved_count": round(
+                fresh_desk_insights.values("resolved_count").aggregate(
+                    Avg("resolved_count")
+                )["resolved_count__avg"],
+                2,
+            ),
+            "average_complaints": round(
+                fresh_desk_insights.values("complaints").aggregate(Avg("complaints"))[
+                    "complaints__avg"
+                ],
+                2,
+            ),
+            "average_csat": round(
+                fresh_desk_insights.values("csat").aggregate(Avg("csat"))["csat__avg"],
+                2,
+            ),
+            "average_overall_score": round(
+                fresh_desk_insights.values("overall_score").aggregate(
+                    Avg("overall_score")
+                )["overall_score__avg"],
+                2,
+            ),
         }
 
         all_fresh_desk_insights_stats = {
             "Year": year,
+            "managed_by": managed_by,
             "Month": month,
             "week": week,
             "agent_type": agent_type,
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": average_stats,
         }
 
         return Response(all_fresh_desk_insights_stats, status=status.HTTP_200_OK)
-    
+
+
 class GetAllFreshDeskInsightsStatisticsWithoutWeekView(GenericAPIView):
     permission_classes = []
     serializer_class = FreshDeskInsightsRetrieveSerializer
@@ -500,49 +580,90 @@ class GetAllFreshDeskInsightsStatisticsWithoutWeekView(GenericAPIView):
 
         if not fresh_desk_insights.exists():
             return Response(
-                {"message": "No fresh desk insights data found for the given organisation"},
+                {
+                    "message": "No fresh desk insights data found for the given organisation"
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
-        
-        grade_counts = fresh_desk_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = fresh_desk_insights.values("user_id").annotate(count=Count("user_id")).count()
-        
+
+        managed_by = fresh_desk_insights.first().managed_by
+        grade_counts = fresh_desk_insights.values("grade").annotate(
+            count=Count("grade")
+        )
+        total_agents = (
+            fresh_desk_insights.values("user_id")
+            .annotate(count=Count("user_id"))
+            .count()
+        )
+
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=fresh_desk_insights.values_list("user_id", flat=True)
+            id__in=fresh_desk_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=fresh_desk_insights.values_list("user_id", flat=True)
+            id__in=fresh_desk_insights.values_list("user_id", flat=True),
         ).count()
 
         average_stats = {
-            "average_aes": round(fresh_desk_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-            "average_resolved_count": round(fresh_desk_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-            "average_complaints": round(fresh_desk_insights.values("complaints").aggregate(Avg("complaints"))["complaints__avg"], 2),
-            "average_csat": round(fresh_desk_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-            "average_overall_score": round(fresh_desk_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+            "average_aes": round(
+                fresh_desk_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+            ),
+            "average_resolved_count": round(
+                fresh_desk_insights.values("resolved_count").aggregate(
+                    Avg("resolved_count")
+                )["resolved_count__avg"],
+                2,
+            ),
+            "average_complaints": round(
+                fresh_desk_insights.values("complaints").aggregate(Avg("complaints"))[
+                    "complaints__avg"
+                ],
+                2,
+            ),
+            "average_csat": round(
+                fresh_desk_insights.values("csat").aggregate(Avg("csat"))["csat__avg"],
+                2,
+            ),
+            "average_overall_score": round(
+                fresh_desk_insights.values("overall_score").aggregate(
+                    Avg("overall_score")
+                )["overall_score__avg"],
+                2,
+            ),
         }
 
         all_fresh_desk_insights_stats = {
             "Year": year,
+            "managed_by": managed_by,
             "Month": month,
             "agent_type": agent_type,
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": average_stats,
         }
 
         return Response(all_fresh_desk_insights_stats, status=status.HTTP_200_OK)
-    
+
+
 class GetAllFreshDeskInsightsStatisticsWithoutMonthAndWeekView(GenericAPIView):
     permission_classes = []
     serializer_class = FreshDeskInsightsRetrieveSerializer
@@ -565,43 +686,83 @@ class GetAllFreshDeskInsightsStatisticsWithoutMonthAndWeekView(GenericAPIView):
 
         if not fresh_desk_insights.exists():
             return Response(
-                {"message": "No fresh desk insights data found for the given organisation"},
+                {
+                    "message": "No fresh desk insights data found for the given organisation"
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
-        
-        grade_counts = fresh_desk_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = fresh_desk_insights.values("user_id").annotate(count=Count("user_id")).count()
-        
+
+        managed_by = fresh_desk_insights.first().managed_by
+        grade_counts = fresh_desk_insights.values("grade").annotate(
+            count=Count("grade")
+        )
+        total_agents = (
+            fresh_desk_insights.values("user_id")
+            .annotate(count=Count("user_id"))
+            .count()
+        )
+
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=fresh_desk_insights.values_list("user_id", flat=True)
+            id__in=fresh_desk_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=fresh_desk_insights.values_list("user_id", flat=True)
+            id__in=fresh_desk_insights.values_list("user_id", flat=True),
         ).count()
 
         average_stats = {
-            "average_aes": round(fresh_desk_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-            "average_resolved_count": round(fresh_desk_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-            "average_complaints": round(fresh_desk_insights.values("complaints").aggregate(Avg("complaints"))["complaints__avg"], 2),
-            "average_csat": round(fresh_desk_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-            "average_overall_score": round(fresh_desk_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+            "average_aes": round(
+                fresh_desk_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+            ),
+            "average_resolved_count": round(
+                fresh_desk_insights.values("resolved_count").aggregate(
+                    Avg("resolved_count")
+                )["resolved_count__avg"],
+                2,
+            ),
+            "average_complaints": round(
+                fresh_desk_insights.values("complaints").aggregate(Avg("complaints"))[
+                    "complaints__avg"
+                ],
+                2,
+            ),
+            "average_csat": round(
+                fresh_desk_insights.values("csat").aggregate(Avg("csat"))["csat__avg"],
+                2,
+            ),
+            "average_overall_score": round(
+                fresh_desk_insights.values("overall_score").aggregate(
+                    Avg("overall_score")
+                )["overall_score__avg"],
+                2,
+            ),
         }
 
         all_fresh_desk_insights_stats = {
             "Year": year,
+            "managed_by": managed_by,
             "agent_type": agent_type,
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": average_stats,
         }
 
@@ -632,22 +793,31 @@ class NewGetAllFreshDeskInsightsStatisticsWithWeekView(GenericAPIView):
 
         if not fresh_desk_insights.exists():
             return Response(
-                {"message": "No fresh_desk insights data found for the given organisation"},
+                {
+                    "message": "No fresh_desk insights data found for the given organisation"
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        grade_counts = fresh_desk_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = fresh_desk_insights.values("user_id").annotate(count=Count("user_id")).count()
+        managed_by = fresh_desk_insights.first().managed_by
+        grade_counts = fresh_desk_insights.values("grade").annotate(
+            count=Count("grade")
+        )
+        total_agents = (
+            fresh_desk_insights.values("user_id")
+            .annotate(count=Count("user_id"))
+            .count()
+        )
 
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=fresh_desk_insights.values_list("user_id", flat=True)
+            id__in=fresh_desk_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=fresh_desk_insights.values_list("user_id", flat=True)
+            id__in=fresh_desk_insights.values_list("user_id", flat=True),
         ).count()
 
         weekly_average_stats = {}
@@ -655,11 +825,33 @@ class NewGetAllFreshDeskInsightsStatisticsWithWeekView(GenericAPIView):
             week_insights = fresh_desk_insights.filter(week=week)
             if week_insights.exists():
                 weekly_average_stats[f"week {week}"] = {
-                    "average_aes": round(week_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-                    "average_resolved_count": round(week_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-                    "average_complaints": round(week_insights.values("complaints").aggregate(Avg("complaints"))["complaints__avg"], 2),
-                    "average_csat": round(week_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-                    "average_overall_score": round(week_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+                    "average_aes": round(
+                        week_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+                    ),
+                    "average_resolved_count": round(
+                        week_insights.values("resolved_count").aggregate(
+                            Avg("resolved_count")
+                        )["resolved_count__avg"],
+                        2,
+                    ),
+                    "average_complaints": round(
+                        week_insights.values("complaints").aggregate(Avg("complaints"))[
+                            "complaints__avg"
+                        ],
+                        2,
+                    ),
+                    "average_csat": round(
+                        week_insights.values("csat").aggregate(Avg("csat"))[
+                            "csat__avg"
+                        ],
+                        2,
+                    ),
+                    "average_overall_score": round(
+                        week_insights.values("overall_score").aggregate(
+                            Avg("overall_score")
+                        )["overall_score__avg"],
+                        2,
+                    ),
                 }
 
             else:
@@ -667,27 +859,62 @@ class NewGetAllFreshDeskInsightsStatisticsWithWeekView(GenericAPIView):
 
         all_fresh_desk_insights_stats = {
             "Year": year,
+            "managed_by": managed_by,
             "Month": month,
             "agent_type": agent_type,
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": {
-                "average_aes": round(fresh_desk_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-                "average_resolved_count": round(fresh_desk_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-                "average_complaints": round(fresh_desk_insights.values("complaints").aggregate(Avg("complaints"))["complaints__avg"], 2),
-                "average_csat": round(fresh_desk_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-                "average_overall_score": round(fresh_desk_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+                "average_aes": round(
+                    fresh_desk_insights.values("aes").aggregate(Avg("aes"))["aes__avg"],
+                    2,
+                ),
+                "average_resolved_count": round(
+                    fresh_desk_insights.values("resolved_count").aggregate(
+                        Avg("resolved_count")
+                    )["resolved_count__avg"],
+                    2,
+                ),
+                "average_complaints": round(
+                    fresh_desk_insights.values("complaints").aggregate(
+                        Avg("complaints")
+                    )["complaints__avg"],
+                    2,
+                ),
+                "average_csat": round(
+                    fresh_desk_insights.values("csat").aggregate(Avg("csat"))[
+                        "csat__avg"
+                    ],
+                    2,
+                ),
+                "average_overall_score": round(
+                    fresh_desk_insights.values("overall_score").aggregate(
+                        Avg("overall_score")
+                    )["overall_score__avg"],
+                    2,
+                ),
             },
             "weekily_average_stats": weekly_average_stats,
         }
 
         return Response(all_fresh_desk_insights_stats, status=status.HTTP_200_OK)
+
 
 class NewGetAllFreshDeskInsightsStatisticsWithMonthView(GenericAPIView):
     permission_classes = []
@@ -711,56 +938,135 @@ class NewGetAllFreshDeskInsightsStatisticsWithMonthView(GenericAPIView):
 
         if not fresh_desk_insights.exists():
             return Response(
-                {"message": "No fresh_desk insights data found for the given organisation"},
+                {
+                    "message": "No fresh_desk insights data found for the given organisation"
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        grade_counts = fresh_desk_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = fresh_desk_insights.values("user_id").annotate(count=Count("user_id")).count()
+        managed_by = fresh_desk_insights.first().managed_by
+        grade_counts = fresh_desk_insights.values("grade").annotate(
+            count=Count("grade")
+        )
+        total_agents = (
+            fresh_desk_insights.values("user_id")
+            .annotate(count=Count("user_id"))
+            .count()
+        )
 
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=fresh_desk_insights.values_list("user_id", flat=True)
+            id__in=fresh_desk_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=fresh_desk_insights.values_list("user_id", flat=True)
+            id__in=fresh_desk_insights.values_list("user_id", flat=True),
         ).count()
 
         monthly_average_stats = {}
-        for month in ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]:
+        for month in [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+        ]:
             month_insights = fresh_desk_insights.filter(month=month)
             if month_insights.exists():
                 monthly_average_stats[month] = {
-                "average_aes": round(month_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-                "average_resolved_count": round(month_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-                "average_complaints": round(month_insights.values("complaints").aggregate(Avg("complaints"))["complaints__avg"], 2),
-                "average_csat": round(month_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-                "average_overall_score": round(month_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
-            }
+                    "average_aes": round(
+                        month_insights.values("aes").aggregate(Avg("aes"))["aes__avg"],
+                        2,
+                    ),
+                    "average_resolved_count": round(
+                        month_insights.values("resolved_count").aggregate(
+                            Avg("resolved_count")
+                        )["resolved_count__avg"],
+                        2,
+                    ),
+                    "average_complaints": round(
+                        month_insights.values("complaints").aggregate(
+                            Avg("complaints")
+                        )["complaints__avg"],
+                        2,
+                    ),
+                    "average_csat": round(
+                        month_insights.values("csat").aggregate(Avg("csat"))[
+                            "csat__avg"
+                        ],
+                        2,
+                    ),
+                    "average_overall_score": round(
+                        month_insights.values("overall_score").aggregate(
+                            Avg("overall_score")
+                        )["overall_score__avg"],
+                        2,
+                    ),
+                }
 
             else:
                 monthly_average_stats[month] = None
 
         all_fresh_desk_insights_stats = {
             "Year": year,
+            "managed_by": managed_by,
             "agent_type": agent_type,
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": {
-                "average_aes": round(fresh_desk_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-                "average_resolved_count": round(fresh_desk_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-                "average_complaints": round(fresh_desk_insights.values("complaints").aggregate(Avg("complaints"))["complaints__avg"], 2),
-                "average_csat": round(fresh_desk_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-                "average_overall_score": round(fresh_desk_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+                "average_aes": round(
+                    fresh_desk_insights.values("aes").aggregate(Avg("aes"))["aes__avg"],
+                    2,
+                ),
+                "average_resolved_count": round(
+                    fresh_desk_insights.values("resolved_count").aggregate(
+                        Avg("resolved_count")
+                    )["resolved_count__avg"],
+                    2,
+                ),
+                "average_complaints": round(
+                    fresh_desk_insights.values("complaints").aggregate(
+                        Avg("complaints")
+                    )["complaints__avg"],
+                    2,
+                ),
+                "average_csat": round(
+                    fresh_desk_insights.values("csat").aggregate(Avg("csat"))[
+                        "csat__avg"
+                    ],
+                    2,
+                ),
+                "average_overall_score": round(
+                    fresh_desk_insights.values("overall_score").aggregate(
+                        Avg("overall_score")
+                    )["overall_score__avg"],
+                    2,
+                ),
             },
             "monthly_average_stats": monthly_average_stats,
         }
