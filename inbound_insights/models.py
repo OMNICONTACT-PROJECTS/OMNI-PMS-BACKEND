@@ -39,7 +39,7 @@ class VoiceInsights(models.Model):
         null=False,
         choices=AGENT_TYPE,
     )
-    managed_by = models.CharField(max_length=150, blank=False, null=False)
+    managed_by = models.CharField(max_length=150, blank=True, null=True)
     year = models.PositiveIntegerField(null=False, blank=False)
     month = models.CharField(max_length=50, null=False, blank=False)
     week = models.PositiveIntegerField(
@@ -198,7 +198,7 @@ class FollowUpInsights(models.Model):
         null=False,
         choices=AGENT_TYPE,
     )
-    managed_by = models.CharField(max_length=150, blank=False, null=False)
+    managed_by = models.CharField(max_length=150, blank=True, null=True)
     year = models.PositiveIntegerField(null=False, blank=False)
     month = models.CharField(max_length=50, null=False, blank=False)
     week = models.PositiveIntegerField(
@@ -273,7 +273,7 @@ class HigherLifeFoundationInsights(models.Model):
         null=False,
         choices=AGENT_TYPE,
     )
-    managed_by = models.CharField(max_length=150, blank=False, null=False)
+    managed_by = models.CharField(max_length=150, blank=True, null=True)
     year = models.PositiveIntegerField(null=False, blank=False)
     month = models.CharField(max_length=50, null=False, blank=False)
     week = models.PositiveIntegerField(
@@ -342,7 +342,7 @@ class SasaiInsights(models.Model):
         null=False,
         choices=AGENT_TYPE,
     )
-    managed_by = models.CharField(max_length=150, blank=False, null=False)
+    managed_by = models.CharField(max_length=150, blank=True, null=True)
     year = models.PositiveIntegerField(null=False, blank=False)
     month = models.CharField(max_length=50, null=False, blank=False)
     week = models.PositiveIntegerField(
@@ -411,7 +411,7 @@ class FreshDeskInsights(models.Model):
         null=False,
         choices=AGENT_TYPE,
     )
-    managed_by = models.CharField(max_length=150, blank=False, null=False)
+    managed_by = models.CharField(max_length=150, blank=True, null=True)
     year = models.PositiveIntegerField(null=False, blank=False)
     month = models.CharField(max_length=50, null=False, blank=False)
     week = models.PositiveIntegerField(
@@ -500,7 +500,7 @@ class FreshChatInsights(models.Model):
         null=False,
         choices=AGENT_TYPE,
     )
-    managed_by = models.CharField(max_length=150, blank=False, null=False)
+    managed_by = models.CharField(max_length=150, blank=True, null=True)
     year = models.PositiveIntegerField(null=False, blank=False)
     month = models.CharField(max_length=50, null=False, blank=False)
     week = models.PositiveIntegerField(
@@ -622,7 +622,7 @@ class YamuraiInsights(models.Model):
         null=False,
         choices=AGENT_TYPE,
     )
-    managed_by = models.CharField(max_length=150, blank=False, null=False)
+    managed_by = models.CharField(max_length=150, blank=True, null=True)
     year = models.PositiveIntegerField(null=False, blank=False)
     month = models.CharField(max_length=50, null=False, blank=False)
     week = models.PositiveIntegerField(
