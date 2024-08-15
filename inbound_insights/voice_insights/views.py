@@ -393,6 +393,7 @@ class GetAllAverageVoiceInsightsStatisticsView(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        managed_by = voice_insights.managed_by
         year = (
             round(voice_insights.values("year").aggregate(Avg("year"))["year__avg"], 2),
         )
@@ -446,6 +447,7 @@ class GetAllAverageVoiceInsightsStatisticsView(GenericAPIView):
         }
 
         all_voice_insights_stats = {
+            "managed_by": managed_by,
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
@@ -500,6 +502,7 @@ class GetAllVoiceInsightsStatisticsView(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        managed_by = voice_insights.managed_by
         grade_counts = voice_insights.values("grade").annotate(count=Count("grade"))
         total_agents = (
             voice_insights.values("user_id").annotate(count=Count("user_id")).count()
@@ -550,6 +553,7 @@ class GetAllVoiceInsightsStatisticsView(GenericAPIView):
 
         all_voice_insights_stats = {
             "Year": year,
+            "managed_by": managed_by,
             "Month": month,
             "week": week,
             "agent_type": agent_type,
@@ -604,6 +608,7 @@ class GetAllVoiceInsightsStatisticsWithoutWeekView(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        managed_by = voice_insights.managed_by
         grade_counts = voice_insights.values("grade").annotate(count=Count("grade"))
         total_agents = (
             voice_insights.values("user_id").annotate(count=Count("user_id")).count()
@@ -655,6 +660,7 @@ class GetAllVoiceInsightsStatisticsWithoutWeekView(GenericAPIView):
 
         all_voice_insights_stats = {
             "Year": year,
+            "managed_by": managed_by,
             "Month": month,
             "agent_type": agent_type,
             "total_male_agents": male_agents,
@@ -707,6 +713,7 @@ class GetAllVoiceInsightsStatisticsWithoutMonthAndWeekView(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        managed_by = voice_insights.managed_by
         grade_counts = voice_insights.values("grade").annotate(count=Count("grade"))
         total_agents = (
             voice_insights.values("user_id").annotate(count=Count("user_id")).count()
@@ -758,6 +765,7 @@ class GetAllVoiceInsightsStatisticsWithoutMonthAndWeekView(GenericAPIView):
 
         all_voice_insights_stats = {
             "Year": year,
+            "managed_by": managed_by,
             "agent_type": agent_type,
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
@@ -811,6 +819,7 @@ class NewGetAllVoiceInsightsStatisticsWithWeekView(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        managed_by = voice_insights.managed_by
         grade_counts = voice_insights.values("grade").annotate(count=Count("grade"))
         total_agents = (
             voice_insights.values("user_id").annotate(count=Count("user_id")).count()
@@ -872,6 +881,7 @@ class NewGetAllVoiceInsightsStatisticsWithWeekView(GenericAPIView):
 
         all_voice_insights_stats = {
             "Year": year,
+            "managed_by": managed_by,
             "Month": month,
             "agent_type": agent_type,
             "total_male_agents": male_agents,
@@ -955,7 +965,7 @@ class NewGetAllVoiceInsightsStatisticsWithMonthView(GenericAPIView):
                 {"message": "No voice insights data found for the given organisation"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-
+        managed_by = voice_insights.managed_by
         grade_counts = voice_insights.values("grade").annotate(count=Count("grade"))
         total_agents = (
             voice_insights.values("user_id").annotate(count=Count("user_id")).count()
@@ -1031,6 +1041,7 @@ class NewGetAllVoiceInsightsStatisticsWithMonthView(GenericAPIView):
 
         all_voice_insights_stats = {
             "Year": year,
+            "managed_by": managed_by,
             "agent_type": agent_type,
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
