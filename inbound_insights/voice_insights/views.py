@@ -393,7 +393,7 @@ class GetAllAverageVoiceInsightsStatisticsView(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        managed_by = voice_insights.managed_by
+        managed_by = voice_insights.first().managed_by
         year = (
             round(voice_insights.values("year").aggregate(Avg("year"))["year__avg"], 2),
         )
@@ -502,7 +502,7 @@ class GetAllVoiceInsightsStatisticsView(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        managed_by = voice_insights.managed_by
+        managed_by = voice_insights.first().managed_by
         grade_counts = voice_insights.values("grade").annotate(count=Count("grade"))
         total_agents = (
             voice_insights.values("user_id").annotate(count=Count("user_id")).count()
@@ -608,7 +608,7 @@ class GetAllVoiceInsightsStatisticsWithoutWeekView(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        managed_by = voice_insights.managed_by
+        managed_by = voice_insights.first().managed_by
         grade_counts = voice_insights.values("grade").annotate(count=Count("grade"))
         total_agents = (
             voice_insights.values("user_id").annotate(count=Count("user_id")).count()
@@ -713,7 +713,7 @@ class GetAllVoiceInsightsStatisticsWithoutMonthAndWeekView(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        managed_by = voice_insights.managed_by
+        managed_by = voice_insights.first().managed_by
         grade_counts = voice_insights.values("grade").annotate(count=Count("grade"))
         total_agents = (
             voice_insights.values("user_id").annotate(count=Count("user_id")).count()
@@ -819,7 +819,7 @@ class NewGetAllVoiceInsightsStatisticsWithWeekView(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        managed_by = voice_insights.managed_by
+        managed_by = voice_insights.first().managed_by
         grade_counts = voice_insights.values("grade").annotate(count=Count("grade"))
         total_agents = (
             voice_insights.values("user_id").annotate(count=Count("user_id")).count()
@@ -965,7 +965,7 @@ class NewGetAllVoiceInsightsStatisticsWithMonthView(GenericAPIView):
                 {"message": "No voice insights data found for the given organisation"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        managed_by = voice_insights.managed_by
+        managed_by = voice_insights.first().managed_by
         grade_counts = voice_insights.values("grade").annotate(count=Count("grade"))
         total_agents = (
             voice_insights.values("user_id").annotate(count=Count("user_id")).count()
