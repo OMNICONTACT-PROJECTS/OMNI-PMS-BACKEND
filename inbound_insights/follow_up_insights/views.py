@@ -359,7 +359,8 @@ class GetFollowUpInsightsBulkUploadTemplate(GenericAPIView):
             serializer = self.serializer_class(follow_up_insights_files, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-    # Averages
+
+############################# Averages ##########################################3
 
 
 class GetAllAverageFollowUpInsightsStatisticsView(GenericAPIView):
@@ -1026,6 +1027,158 @@ class NewGetAllFollowUpInsightsStatisticsWithMonthView(GenericAPIView):
                 ),
             },
             "monthly_average_stats": monthly_average_stats,
+        }
+
+        return Response(all_follow_up_insights_stats, status=status.HTTP_200_OK)
+
+
+class GetUserMonthlyInsightsStatisticsView(GenericAPIView):
+    permission_classes = []
+    serializer_class = FollowUpInsightsRetrieveSerializer
+    queryset = FollowUpInsights.objects.all()
+
+    def get(self, request, user_id, year, month, *args, **kwargs):
+        try:
+            User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        follow_up_insights = self.queryset.filter(
+            user_id=user_id,
+            year=year,
+            month=month,
+        )
+
+        if not follow_up_insights.exists():
+            return Response(
+                {"message": "No follow_up insights data found for the given user"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        managed_by = follow_up_insights.first().managed_by
+        grade_counts = follow_up_insights.values("grade").annotate(count=Count("grade"))
+
+        all_follow_up_insights_stats = {
+            "Year": year,
+            "Month": month,
+            "managed_by": managed_by,
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
+            "average_stats": {
+                "average_aes": round(
+                    follow_up_insights.values("aes").aggregate(Avg("aes"))["aes__avg"],
+                    2,
+                ),
+                "average_outbound": round(
+                    follow_up_insights.values("outbound").aggregate(Avg("outbound"))[
+                        "outbound__avg"
+                    ],
+                    2,
+                ),
+                "average_csat": round(
+                    follow_up_insights.values("csat").aggregate(Avg("csat"))[
+                        "csat__avg"
+                    ],
+                    2,
+                ),
+                "average_overall_score": round(
+                    follow_up_insights.values("overall_score").aggregate(
+                        Avg("overall_score")
+                    )["overall_score__avg"],
+                    2,
+                ),
+            },
+        }
+
+        return Response(all_follow_up_insights_stats, status=status.HTTP_200_OK)
+
+
+class GetUserYearlyInsightsStatisticsView(GenericAPIView):
+    permission_classes = []
+    serializer_class = FollowUpInsightsRetrieveSerializer
+    queryset = FollowUpInsights.objects.all()
+
+    def get(self, request, user_id, year, *args, **kwargs):
+        try:
+            User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        follow_up_insights = self.queryset.filter(
+            user_id=user_id,
+            year=year,
+        )
+
+        if not follow_up_insights.exists():
+            return Response(
+                {"message": "No follow_up insights data found for the given user"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        managed_by = follow_up_insights.first().managed_by
+        grade_counts = follow_up_insights.values("grade").annotate(count=Count("grade"))
+
+        all_follow_up_insights_stats = {
+            "Year": year,
+            "managed_by": managed_by,
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
+            "average_stats": {
+                "average_aes": round(
+                    follow_up_insights.values("aes").aggregate(Avg("aes"))["aes__avg"],
+                    2,
+                ),
+                "average_outbound": round(
+                    follow_up_insights.values("outbound").aggregate(Avg("outbound"))[
+                        "outbound__avg"
+                    ],
+                    2,
+                ),
+                "average_csat": round(
+                    follow_up_insights.values("csat").aggregate(Avg("csat"))[
+                        "csat__avg"
+                    ],
+                    2,
+                ),
+                "average_overall_score": round(
+                    follow_up_insights.values("overall_score").aggregate(
+                        Avg("overall_score")
+                    )["overall_score__avg"],
+                    2,
+                ),
+            },
         }
 
         return Response(all_follow_up_insights_stats, status=status.HTTP_200_OK)
