@@ -68,4 +68,12 @@ urlpatterns = [
         "new-get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/agent_type/<str:agent_type>/",
         views.NewGetAllFollowUpInsightsStatisticsWithMonthView.as_view(),
     ),
+    path(
+        "get-user-monthly-statistics-by-user-id/<int:user_id>/year/<int:year>/month/<str:month>/",
+        views.GetUserMonthlyInsightsStatisticsView.as_view(),
+    ),
+    path(
+        "get-user-yearly-statistics-by-user-id/<int:user_id>/year/<int:year>/",
+        views.GetUserYearlyInsightsStatisticsView.as_view(),
+    ),
 ]

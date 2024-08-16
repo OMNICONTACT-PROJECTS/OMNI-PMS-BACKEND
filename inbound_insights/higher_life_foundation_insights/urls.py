@@ -3,7 +3,9 @@ from . import views
 
 urlpatterns = [
     path(
-        "", views.CreateHigherLifeFoundationInsightsView.as_view(), name="create_higherLifeFoundation_insights"
+        "",
+        views.CreateHigherLifeFoundationInsightsView.as_view(),
+        name="create_higherLifeFoundation_insights",
     ),
     path(
         "bulk-upload/",
@@ -27,8 +29,10 @@ urlpatterns = [
     path("<int:pk>/", views.HigherLifeFoundationInsightsReadDestroyView.as_view()),
     path("update/<int:pk>/", views.HigherLifeFoundationInsightsUpdateView.as_view()),
     path("get-all/", views.GetAllHigherLifeFoundationInsights.as_view()),
-    path("get-by-user-id/<int:user_id>/", views.GetHigherLifeFoundationInsightsByUserId.as_view()),
-   
+    path(
+        "get-by-user-id/<int:user_id>/",
+        views.GetHigherLifeFoundationInsightsByUserId.as_view(),
+    ),
     path(
         "get-agents-by-organisation_id/<int:organisation_id>/",
         views.GetHigherLifeFoundationInsightsAgentsByOrganisationId.as_view(),
@@ -57,9 +61,7 @@ urlpatterns = [
         "get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/agent_type/<str:agent_type>/",
         views.GetAllHigherLifeFoundationInsightsStatisticsWithoutMonthAndWeekView.as_view(),
     ),
-    
     ##########################
-
     path(
         "new-get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/month/<str:month>/agent_type/<str:agent_type>/",
         views.NewGetAllHlfInsightsStatisticsWithWeekView.as_view(),
@@ -67,5 +69,13 @@ urlpatterns = [
     path(
         "new-get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/agent_type/<str:agent_type>/",
         views.NewGetAllHlfInsightsStatisticsWithMonthView.as_view(),
+    ),
+    path(
+        "get-user-monthly-statistics-by-user-id/<int:user_id>/year/<int:year>/month/<str:month>/",
+        views.GetUserMonthlyInsightsStatisticsView.as_view(),
+    ),
+    path(
+        "get-user-yearly-statistics-by-user-id/<int:user_id>/year/<int:year>/",
+        views.GetUserYearlyInsightsStatisticsView.as_view(),
     ),
 ]
