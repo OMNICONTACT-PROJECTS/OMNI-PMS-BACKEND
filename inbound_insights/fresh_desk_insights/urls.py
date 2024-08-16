@@ -3,7 +3,9 @@ from . import views
 
 urlpatterns = [
     path(
-        "", views.CreateFreshDeskInsightsView.as_view(), name="create_fresh_desk_insights"
+        "",
+        views.CreateFreshDeskInsightsView.as_view(),
+        name="create_fresh_desk_insights",
     ),
     path(
         "bulk-upload/",
@@ -28,7 +30,6 @@ urlpatterns = [
     path("update/<int:pk>/", views.FreshDeskInsightsUpdateView.as_view()),
     path("get-all/", views.GetAllFreshDeskInsights.as_view()),
     path("get-by-user-id/<int:user_id>/", views.GetFreshDeskInsightsByUserId.as_view()),
-   
     path(
         "get-agents-by-organisation_id/<int:organisation_id>/",
         views.GetFreshDeskInsightsgentsByOrganisationId.as_view(),
@@ -57,9 +58,7 @@ urlpatterns = [
         "get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/agent_type/<str:agent_type>/",
         views.GetAllFreshDeskInsightsStatisticsWithoutMonthAndWeekView.as_view(),
     ),
-
     ##########################
-
     path(
         "new-get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/month/<str:month>/agent_type/<str:agent_type>/",
         views.NewGetAllFreshDeskInsightsStatisticsWithWeekView.as_view(),
@@ -67,5 +66,13 @@ urlpatterns = [
     path(
         "new-get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/agent_type/<str:agent_type>/",
         views.NewGetAllFreshDeskInsightsStatisticsWithMonthView.as_view(),
+    ),
+    path(
+        "get-user-monthly-statistics-by-user-id/<int:user_id>/year/<int:year>/month/<str:month>/",
+        views.GetUserMonthlyInsightsStatisticsView.as_view(),
+    ),
+    path(
+        "get-user-yearly-statistics-by-user-id/<int:user_id>/year/<int:year>/",
+        views.GetUserYearlyInsightsStatisticsView.as_view(),
     ),
 ]
