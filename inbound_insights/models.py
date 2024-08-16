@@ -83,7 +83,7 @@ class VoiceInsights(models.Model):
         help_text="This is the weekly after call work",
     )
     customer_complaint = models.FloatField(null=True, blank=True)
-    csat = models.PositiveIntegerField(
+    csat = models.FloatField(
         null=True, blank=True, help_text="This is the weekly csat"
     )
     calc_aes = models.FloatField(

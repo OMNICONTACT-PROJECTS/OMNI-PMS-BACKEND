@@ -26,7 +26,7 @@ class AgentSerializer(ModelSerializer):
         user.is_superuser = False
         user.is_staff = False
         user.is_active = True
-        new_username = f"{user.username}SUB"
+        new_username = f"{user.username}AG"
         user.username = new_username
         user.set_password("omni-Agent-123")
 
@@ -108,6 +108,3 @@ class AgentRetrieveSerializer(ModelSerializer):
             instance.user.user_permissions.set(permissions)
 
         return super().update(instance, validated_data)
-    
-
-    

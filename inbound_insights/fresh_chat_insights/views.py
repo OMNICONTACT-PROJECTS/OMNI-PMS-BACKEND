@@ -419,7 +419,7 @@ class GetAllAverageFreshChatInsightsStatisticsView(GenericAPIView):
             "average_aes": round(
                 fresh_chat_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
             ),
-            "average_interations": round(
+            "average_interactions": round(
                 fresh_chat_insights.values("actual_interactions").aggregate(
                     Avg("actual_interactions")
                 )["actual_interactions__avg"],
@@ -526,7 +526,7 @@ class GetAllFreshChatInsightsStatisticsView(GenericAPIView):
             "average_aes": round(
                 fresh_chat_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
             ),
-            "average_interations": round(
+            "average_interactions": round(
                 fresh_chat_insights.values("actual_interactions").aggregate(
                     Avg("actual_interactions")
                 )["actual_interactions__avg"],
@@ -634,7 +634,7 @@ class GetAllFreshChatInsightsStatisticsWithoutWeekView(GenericAPIView):
             "average_aes": round(
                 fresh_chat_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
             ),
-            "average_interations": round(
+            "average_interactions": round(
                 fresh_chat_insights.values("actual_interactions").aggregate(
                     Avg("actual_interactions")
                 )["actual_interactions__avg"],
@@ -740,7 +740,7 @@ class GetAllFreshChatInsightsStatisticsWithoutMonthAndWeekView(GenericAPIView):
             "average_aes": round(
                 fresh_chat_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
             ),
-            "average_interations": round(
+            "average_interactions": round(
                 fresh_chat_insights.values("actual_interactions").aggregate(
                     Avg("actual_interactions")
                 )["actual_interactions__avg"],
@@ -849,28 +849,31 @@ class NewGetAllFreshChatInsightsStatisticsWithWeekView(GenericAPIView):
             if week_insights.exists():
                 weekly_average_stats[f"week {week}"] = {
                     "average_aes": round(
-                        week_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
-                    ),
-                    "average_resolved_count": round(
-                        week_insights.values("resolved_count").aggregate(
-                            Avg("resolved_count")
-                        )["resolved_count__avg"],
-                        2,
-                    ),
-                    "average_complaints": round(
-                        week_insights.values("complaints").aggregate(Avg("complaints"))[
-                            "complaints__avg"
+                        fresh_chat_insights.values("aes").aggregate(Avg("aes"))[
+                            "aes__avg"
                         ],
                         2,
                     ),
+                    "average_interactions": round(
+                        fresh_chat_insights.values("actual_interactions").aggregate(
+                            Avg("actual_interactions")
+                        )["actual_interactions__avg"],
+                        2,
+                    ),
+                    "average_handling_time": round(
+                        fresh_chat_insights.values("handling_time").aggregate(
+                            Avg("handling_time")
+                        )["handling_time__avg"],
+                        2,
+                    ),
                     "average_csat": round(
-                        week_insights.values("csat").aggregate(Avg("csat"))[
+                        fresh_chat_insights.values("csat").aggregate(Avg("csat"))[
                             "csat__avg"
                         ],
                         2,
                     ),
                     "average_overall_score": round(
-                        week_insights.values("overall_score").aggregate(
+                        fresh_chat_insights.values("overall_score").aggregate(
                             Avg("overall_score")
                         )["overall_score__avg"],
                         2,
@@ -908,16 +911,16 @@ class NewGetAllFreshChatInsightsStatisticsWithWeekView(GenericAPIView):
                     fresh_chat_insights.values("aes").aggregate(Avg("aes"))["aes__avg"],
                     2,
                 ),
-                "average_resolved_count": round(
-                    fresh_chat_insights.values("resolved_count").aggregate(
-                        Avg("resolved_count")
-                    )["resolved_count__avg"],
+                "average_interactions": round(
+                    fresh_chat_insights.values("actual_interactions").aggregate(
+                        Avg("actual_interactions")
+                    )["actual_interactions__avg"],
                     2,
                 ),
-                "average_complaints": round(
-                    fresh_chat_insights.values("complaints").aggregate(
-                        Avg("complaints")
-                    )["complaints__avg"],
+                "average_handling_time": round(
+                    fresh_chat_insights.values("handling_time").aggregate(
+                        Avg("handling_time")
+                    )["handling_time__avg"],
                     2,
                 ),
                 "average_csat": round(
@@ -1007,29 +1010,31 @@ class NewGetAllFreshChatInsightsStatisticsWithMonthView(GenericAPIView):
             if month_insights.exists():
                 monthly_average_stats[month] = {
                     "average_aes": round(
-                        month_insights.values("aes").aggregate(Avg("aes"))["aes__avg"],
+                        fresh_chat_insights.values("aes").aggregate(Avg("aes"))[
+                            "aes__avg"
+                        ],
                         2,
                     ),
-                    "average_resolved_count": round(
-                        month_insights.values("resolved_count").aggregate(
-                            Avg("resolved_count")
-                        )["resolved_count__avg"],
+                    "average_interactions": round(
+                        fresh_chat_insights.values("actual_interactions").aggregate(
+                            Avg("actual_interactions")
+                        )["actual_interactions__avg"],
                         2,
                     ),
-                    "average_complaints": round(
-                        month_insights.values("complaints").aggregate(
-                            Avg("complaints")
-                        )["complaints__avg"],
+                    "average_handling_time": round(
+                        fresh_chat_insights.values("handling_time").aggregate(
+                            Avg("handling_time")
+                        )["handling_time__avg"],
                         2,
                     ),
                     "average_csat": round(
-                        month_insights.values("csat").aggregate(Avg("csat"))[
+                        fresh_chat_insights.values("csat").aggregate(Avg("csat"))[
                             "csat__avg"
                         ],
                         2,
                     ),
                     "average_overall_score": round(
-                        month_insights.values("overall_score").aggregate(
+                        fresh_chat_insights.values("overall_score").aggregate(
                             Avg("overall_score")
                         )["overall_score__avg"],
                         2,
@@ -1066,16 +1071,16 @@ class NewGetAllFreshChatInsightsStatisticsWithMonthView(GenericAPIView):
                     fresh_chat_insights.values("aes").aggregate(Avg("aes"))["aes__avg"],
                     2,
                 ),
-                "average_resolved_count": round(
-                    fresh_chat_insights.values("resolved_count").aggregate(
-                        Avg("resolved_count")
-                    )["resolved_count__avg"],
+                "average_interactions": round(
+                    fresh_chat_insights.values("actual_interactions").aggregate(
+                        Avg("actual_interactions")
+                    )["actual_interactions__avg"],
                     2,
                 ),
-                "average_complaints": round(
-                    fresh_chat_insights.values("complaints").aggregate(
-                        Avg("complaints")
-                    )["complaints__avg"],
+                "average_handling_time": round(
+                    fresh_chat_insights.values("handling_time").aggregate(
+                        Avg("handling_time")
+                    )["handling_time__avg"],
                     2,
                 ),
                 "average_csat": round(
@@ -1092,6 +1097,174 @@ class NewGetAllFreshChatInsightsStatisticsWithMonthView(GenericAPIView):
                 ),
             },
             "monthly_average_stats": monthly_average_stats,
+        }
+
+        return Response(all_fresh_chat_insights_stats, status=status.HTTP_200_OK)
+
+
+class GetUserMonthlyInsightsStatisticsView(GenericAPIView):
+    permission_classes = []
+    serializer_class = FreshChatInsightsRetrieveSerializer
+    queryset = FreshChatInsights.objects.all()
+
+    def get(self, request, user_id, year, month, *args, **kwargs):
+        try:
+            User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        fresh_chat_insights = self.queryset.filter(
+            user_id=user_id,
+            year=year,
+            month=month,
+        )
+
+        if not fresh_chat_insights.exists():
+            return Response(
+                {"message": "No fresh_chat insights data found for the given user"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        managed_by = fresh_chat_insights.first().managed_by
+        grade_counts = fresh_chat_insights.values("grade").annotate(
+            count=Count("grade")
+        )
+
+        all_fresh_chat_insights_stats = {
+            "Year": year,
+            "Month": month,
+            "managed_by": managed_by,
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
+            "average_stats": {
+                "average_aes": round(
+                    fresh_chat_insights.values("aes").aggregate(Avg("aes"))["aes__avg"],
+                    2,
+                ),
+                "average_interactions": round(
+                    fresh_chat_insights.values("actual_interactions").aggregate(
+                        Avg("actual_interactions")
+                    )["actual_interactions__avg"],
+                    2,
+                ),
+                "average_handling_time": round(
+                    fresh_chat_insights.values("handling_time").aggregate(
+                        Avg("handling_time")
+                    )["handling_time__avg"],
+                    2,
+                ),
+                "average_csat": round(
+                    fresh_chat_insights.values("csat").aggregate(Avg("csat"))[
+                        "csat__avg"
+                    ],
+                    2,
+                ),
+                "average_overall_score": round(
+                    fresh_chat_insights.values("overall_score").aggregate(
+                        Avg("overall_score")
+                    )["overall_score__avg"],
+                    2,
+                ),
+            },
+        }
+
+        return Response(all_fresh_chat_insights_stats, status=status.HTTP_200_OK)
+
+
+class GetUserYearlyInsightsStatisticsView(GenericAPIView):
+    permission_classes = []
+    serializer_class = FreshChatInsightsRetrieveSerializer
+    queryset = FreshChatInsights.objects.all()
+
+    def get(self, request, user_id, year, *args, **kwargs):
+        try:
+            User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        fresh_chat_insights = self.queryset.filter(
+            user_id=user_id,
+            year=year,
+        )
+
+        if not fresh_chat_insights.exists():
+            return Response(
+                {"message": "No fresh_chat insights data found for the given user"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        managed_by = fresh_chat_insights.first().managed_by
+        grade_counts = fresh_chat_insights.values("grade").annotate(
+            count=Count("grade")
+        )
+
+        all_fresh_chat_insights_stats = {
+            "Year": year,
+            "managed_by": managed_by,
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
+            "average_stats": {
+                "average_aes": round(
+                    fresh_chat_insights.values("aes").aggregate(Avg("aes"))["aes__avg"],
+                    2,
+                ),
+                "average_interactions": round(
+                    fresh_chat_insights.values("actual_interactions").aggregate(
+                        Avg("actual_interactions")
+                    )["actual_interactions__avg"],
+                    2,
+                ),
+                "average_handling_time": round(
+                    fresh_chat_insights.values("handling_time").aggregate(
+                        Avg("handling_time")
+                    )["handling_time__avg"],
+                    2,
+                ),
+                "average_csat": round(
+                    fresh_chat_insights.values("csat").aggregate(Avg("csat"))[
+                        "csat__avg"
+                    ],
+                    2,
+                ),
+                "average_overall_score": round(
+                    fresh_chat_insights.values("overall_score").aggregate(
+                        Avg("overall_score")
+                    )["overall_score__avg"],
+                    2,
+                ),
+            },
         }
 
         return Response(all_fresh_chat_insights_stats, status=status.HTTP_200_OK)
