@@ -9,4 +9,8 @@ urlpatterns = [
         "get-all-by-organisation-id/<int:organisation_id>/",
         views.GetAllAgentByOrganisationId.as_view(),
     ),
+    path(
+        "get-all-by-user-id/<int:user_id>/",
+        views.GetAllAgentByUserId.as_view(),
+    ),
 ]
