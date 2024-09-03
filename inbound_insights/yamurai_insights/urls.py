@@ -2,9 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path(
-        "", views.CreateYamuraiInsightsView.as_view(), name="create_yamurai_insights"
-    ),
+    path("", views.CreateYamuraiInsightsView.as_view(), name="create_yamurai_insights"),
     path(
         "bulk-upload/",
         views.BulkUploadYamuraiInsightsDataView.as_view(),
@@ -28,7 +26,6 @@ urlpatterns = [
     path("update/<int:pk>/", views.YamuraiInsightsUpdateView.as_view()),
     path("get-all/", views.GetAllYamuraiInsights.as_view()),
     path("get-by-user-id/<int:user_id>/", views.GetYamuraiInsightsByUserId.as_view()),
-  
     path(
         "get-agents-by-organisation_id/<int:organisation_id>/",
         views.GetYamuraiInsightsAgentsByOrganisationId.as_view(),
@@ -57,9 +54,7 @@ urlpatterns = [
         "get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/agent_type/<str:agent_type>/",
         views.GetAllYamuraiInsightsStatisticsWithoutMonthAndWeekView.as_view(),
     ),
-
     ##########################
-
     path(
         "new-get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/month/<str:month>/agent_type/<str:agent_type>/",
         views.NewGetAllYamuraiInsightsStatisticsWithWeekView.as_view(),
@@ -67,5 +62,13 @@ urlpatterns = [
     path(
         "new-get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/agent_type/<str:agent_type>/",
         views.NewGetAllYamuraiInsightsStatisticsWithMonthView.as_view(),
+    ),
+    path(
+        "get-user-monthly-statistics-by-user-id/<int:user_id>/year/<int:year>/month/<str:month>/",
+        views.GetUserMonthlyInsightsStatisticsView.as_view(),
+    ),
+    path(
+        "get-user-yearly-statistics-by-user-id/<int:user_id>/year/<int:year>/",
+        views.GetUserYearlyInsightsStatisticsView.as_view(),
     ),
 ]

@@ -58,9 +58,7 @@ urlpatterns = [
         "get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/agent_type/<str:agent_type>/",
         views.GetAllVoiceInsightsStatisticsWithoutMonthAndWeekView.as_view(),
     ),
-
     ##########################
-
     path(
         "new-get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/month/<str:month>/agent_type/<str:agent_type>/",
         views.NewGetAllVoiceInsightsStatisticsWithWeekView.as_view(),
@@ -68,5 +66,13 @@ urlpatterns = [
     path(
         "new-get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/agent_type/<str:agent_type>/",
         views.NewGetAllVoiceInsightsStatisticsWithMonthView.as_view(),
+    ),
+    path(
+        "get-user-monthly-statistics-by-user-id/<int:user_id>/year/<int:year>/month/<str:month>/",
+        views.GetUserMonthlyVoiceInsightsStatisticsView.as_view(),
+    ),
+    path(
+        "get-user-yearly-statistics-by-user-id/<int:user_id>/year/<int:year>/",
+        views.GetUserYearlyVoiceInsightsStatisticsView.as_view(),
     ),
 ]

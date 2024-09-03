@@ -121,3 +121,21 @@ class GetAllAgentByOrganisationId(GenericAPIView):
             serializer = self.serializer_class(agent_info_by_organisation, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+class GetAllAgentByUserId(GenericAPIView):
+    permission_classes = []
+    serializer_class = AgentRetrieveSerializer
+    queryset = Agent.objects.all()
+
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                data={"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        else:
+            agent_info_by_user_id = self.queryset.filter(user__id=user_id)
+            serializer = self.serializer_class(agent_info_by_user_id, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)

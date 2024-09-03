@@ -117,14 +117,9 @@ class GetSasaiInsightsAgentsByOrganisationId(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
         else:
-            sasai_insights = self.queryset.order_by(
-                "-date_created"
-            )
+            sasai_insights = self.queryset.order_by("-date_created")
             serializer = self.serializer_class(sasai_insights, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
-
-
-
 
 
 class GetSasaiInsightsByGradeAndOrganisationId(GenericAPIView):
@@ -344,9 +339,10 @@ class GetSasaiInsightsBulkUploadTemplate(GenericAPIView):
             ).order_by("-date_created")
             serializer = self.serializer_class(sasai_insights_files, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        
+
 
 # Averages
+
 
 class GetAllAverageSasaiInsightsStatisticsView(GenericAPIView):
     permission_classes = []
@@ -372,49 +368,85 @@ class GetAllAverageSasaiInsightsStatisticsView(GenericAPIView):
                 {"message": "No sasai insights data found for the given organisation"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        
+
+        managed_by = sasai_insights.first().managed_by
         grade_counts = sasai_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = sasai_insights.values("user_id").annotate(count=Count("user_id")).count()
-        
+        total_agents = (
+            sasai_insights.values("user_id").annotate(count=Count("user_id")).count()
+        )
+
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=sasai_insights.values_list("user_id", flat=True)
+            id__in=sasai_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=sasai_insights.values_list("user_id", flat=True)
+            id__in=sasai_insights.values_list("user_id", flat=True),
         ).count()
 
         average_stats = {
-            "average_aes": round(sasai_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-            "average_resolved_count": round(sasai_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-            "average_service_level": round(sasai_insights.values("service_level").aggregate(Avg("service_level"))["service_level__avg"], 2),
-            "average_csat": round(sasai_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-            "average_overall_score": round(sasai_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+            "average_aes": round(
+                sasai_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+            ),
+            "average_resolved_count": round(
+                sasai_insights.values("resolved_count").aggregate(
+                    Avg("resolved_count")
+                )["resolved_count__avg"],
+                2,
+            ),
+            "average_service_level": round(
+                sasai_insights.values("service_level").aggregate(Avg("service_level"))[
+                    "service_level__avg"
+                ],
+                2,
+            ),
+            "average_csat": round(
+                sasai_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2
+            ),
+            "average_overall_score": round(
+                sasai_insights.values("overall_score").aggregate(Avg("overall_score"))[
+                    "overall_score__avg"
+                ],
+                2,
+            ),
         }
 
         all_sasai_insights_stats = {
+            "managed_by": managed_by,
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": average_stats,
         }
 
         return Response(all_sasai_insights_stats, status=status.HTTP_200_OK)
-    
+
+
 class GetAllSasaiInsightsStatisticsView(GenericAPIView):
     permission_classes = []
     serializer_class = SasaiInsightsRetrieveSerializer
     queryset = SasaiInsights.objects.all()
 
-    def get(self, request, organisation_id, year, month, week, agent_type, *args, **kwargs):
+    def get(
+        self, request, organisation_id, year, month, week, agent_type, *args, **kwargs
+    ):
         try:
             organisation = Organisation.objects.get(pk=organisation_id)
         except Organisation.DoesNotExist:
@@ -436,47 +468,81 @@ class GetAllSasaiInsightsStatisticsView(GenericAPIView):
                 {"message": "No sasai insights data found for the given organisation"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        
+
+        managed_by = sasai_insights.first().managed_by
         grade_counts = sasai_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = sasai_insights.values("user_id").annotate(count=Count("user_id")).count()
-        
+        total_agents = (
+            sasai_insights.values("user_id").annotate(count=Count("user_id")).count()
+        )
+
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=sasai_insights.values_list("user_id", flat=True)
+            id__in=sasai_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=sasai_insights.values_list("user_id", flat=True)
+            id__in=sasai_insights.values_list("user_id", flat=True),
         ).count()
 
         average_stats = {
-            "average_aes": round(sasai_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-            "average_resolved_count": round(sasai_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-            "average_service_level": round(sasai_insights.values("service_level").aggregate(Avg("service_level"))["service_level__avg"], 2),
-            "average_csat": round(sasai_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-            "average_overall_score": round(sasai_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+            "average_aes": round(
+                sasai_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+            ),
+            "average_resolved_count": round(
+                sasai_insights.values("resolved_count").aggregate(
+                    Avg("resolved_count")
+                )["resolved_count__avg"],
+                2,
+            ),
+            "average_service_level": round(
+                sasai_insights.values("service_level").aggregate(Avg("service_level"))[
+                    "service_level__avg"
+                ],
+                2,
+            ),
+            "average_csat": round(
+                sasai_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2
+            ),
+            "average_overall_score": round(
+                sasai_insights.values("overall_score").aggregate(Avg("overall_score"))[
+                    "overall_score__avg"
+                ],
+                2,
+            ),
         }
 
         all_sasai_insights_stats = {
             "Year": year,
+            "managed_by": managed_by,
             "Month": month,
             "week": week,
             "agent_type": agent_type,
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": average_stats,
         }
 
         return Response(all_sasai_insights_stats, status=status.HTTP_200_OK)
-    
+
+
 class GetAllSasaiInsightsStatisticsWithoutWeekView(GenericAPIView):
     permission_classes = []
     serializer_class = SasaiInsightsRetrieveSerializer
@@ -503,46 +569,80 @@ class GetAllSasaiInsightsStatisticsWithoutWeekView(GenericAPIView):
                 {"message": "No sasai insights data found for the given organisation"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        
+
+        managed_by = sasai_insights.first().managed_by
         grade_counts = sasai_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = sasai_insights.values("user_id").annotate(count=Count("user_id")).count()
-        
+        total_agents = (
+            sasai_insights.values("user_id").annotate(count=Count("user_id")).count()
+        )
+
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=sasai_insights.values_list("user_id", flat=True)
+            id__in=sasai_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=sasai_insights.values_list("user_id", flat=True)
+            id__in=sasai_insights.values_list("user_id", flat=True),
         ).count()
 
         average_stats = {
-            "average_aes": round(sasai_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-            "average_resolved_count": round(sasai_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-            "average_service_level": round(sasai_insights.values("service_level").aggregate(Avg("service_level"))["service_level__avg"], 2),
-            "average_csat": round(sasai_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-            "average_overall_score": round(sasai_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+            "average_aes": round(
+                sasai_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+            ),
+            "average_resolved_count": round(
+                sasai_insights.values("resolved_count").aggregate(
+                    Avg("resolved_count")
+                )["resolved_count__avg"],
+                2,
+            ),
+            "average_service_level": round(
+                sasai_insights.values("service_level").aggregate(Avg("service_level"))[
+                    "service_level__avg"
+                ],
+                2,
+            ),
+            "average_csat": round(
+                sasai_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2
+            ),
+            "average_overall_score": round(
+                sasai_insights.values("overall_score").aggregate(Avg("overall_score"))[
+                    "overall_score__avg"
+                ],
+                2,
+            ),
         }
 
         all_sasai_insights_stats = {
             "Year": year,
+            "managed_by": managed_by,
             "Month": month,
             "agent_type": agent_type,
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": average_stats,
         }
 
         return Response(all_sasai_insights_stats, status=status.HTTP_200_OK)
-    
+
+
 class GetAllSasaiInsightsStatisticsWithoutMonthAndWeekView(GenericAPIView):
     permission_classes = []
     serializer_class = SasaiInsightsRetrieveSerializer
@@ -568,40 +668,73 @@ class GetAllSasaiInsightsStatisticsWithoutMonthAndWeekView(GenericAPIView):
                 {"message": "No sasai insights data found for the given organisation"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        
+
+        managed_by = sasai_insights.first().managed_by
         grade_counts = sasai_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = sasai_insights.values("user_id").annotate(count=Count("user_id")).count()
-        
+        total_agents = (
+            sasai_insights.values("user_id").annotate(count=Count("user_id")).count()
+        )
+
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=sasai_insights.values_list("user_id", flat=True)
+            id__in=sasai_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=sasai_insights.values_list("user_id", flat=True)
+            id__in=sasai_insights.values_list("user_id", flat=True),
         ).count()
 
         average_stats = {
-            "average_aes": round(sasai_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-            "average_resolved_count": round(sasai_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-            "average_service_level": round(sasai_insights.values("service_level").aggregate(Avg("service_level"))["service_level__avg"], 2),
-            "average_csat": round(sasai_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-            "average_overall_score": round(sasai_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+            "average_aes": round(
+                sasai_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+            ),
+            "average_resolved_count": round(
+                sasai_insights.values("resolved_count").aggregate(
+                    Avg("resolved_count")
+                )["resolved_count__avg"],
+                2,
+            ),
+            "average_service_level": round(
+                sasai_insights.values("service_level").aggregate(Avg("service_level"))[
+                    "service_level__avg"
+                ],
+                2,
+            ),
+            "average_csat": round(
+                sasai_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2
+            ),
+            "average_overall_score": round(
+                sasai_insights.values("overall_score").aggregate(Avg("overall_score"))[
+                    "overall_score__avg"
+                ],
+                2,
+            ),
         }
 
         all_sasai_insights_stats = {
             "Year": year,
+            "managed_by": managed_by,
             "agent_type": agent_type,
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": average_stats,
         }
 
@@ -636,18 +769,21 @@ class NewGetAllSasaiInsightsStatisticsWithWeekView(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        managed_by = sasai_insights.first().managed_by
         grade_counts = sasai_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = sasai_insights.values("user_id").annotate(count=Count("user_id")).count()
+        total_agents = (
+            sasai_insights.values("user_id").annotate(count=Count("user_id")).count()
+        )
 
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=sasai_insights.values_list("user_id", flat=True)
+            id__in=sasai_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=sasai_insights.values_list("user_id", flat=True)
+            id__in=sasai_insights.values_list("user_id", flat=True),
         ).count()
 
         weekly_average_stats = {}
@@ -655,11 +791,33 @@ class NewGetAllSasaiInsightsStatisticsWithWeekView(GenericAPIView):
             week_insights = sasai_insights.filter(week=week)
             if week_insights.exists():
                 weekly_average_stats[f"week {week}"] = {
-                    "average_aes": round(week_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-                    "average_resolved_count": round(week_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-                    "average_service_level": round(week_insights.values("service_level").aggregate(Avg("service_level"))["service_level__avg"], 2),
-                    "average_csat": round(week_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-                    "average_overall_score": round(week_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+                    "average_aes": round(
+                        week_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+                    ),
+                    "average_resolved_count": round(
+                        week_insights.values("resolved_count").aggregate(
+                            Avg("resolved_count")
+                        )["resolved_count__avg"],
+                        2,
+                    ),
+                    "average_service_level": round(
+                        week_insights.values("service_level").aggregate(
+                            Avg("service_level")
+                        )["service_level__avg"],
+                        2,
+                    ),
+                    "average_csat": round(
+                        week_insights.values("csat").aggregate(Avg("csat"))[
+                            "csat__avg"
+                        ],
+                        2,
+                    ),
+                    "average_overall_score": round(
+                        week_insights.values("overall_score").aggregate(
+                            Avg("overall_score")
+                        )["overall_score__avg"],
+                        2,
+                    ),
                 }
 
             else:
@@ -667,27 +825,58 @@ class NewGetAllSasaiInsightsStatisticsWithWeekView(GenericAPIView):
 
         all_sasai_insights_stats = {
             "Year": year,
+            "managed_by": managed_by,
             "Month": month,
             "agent_type": agent_type,
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": {
-                "average_aes": round(sasai_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-                "average_resolved_count": round(sasai_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-                "average_service_level": round(sasai_insights.values("service_level").aggregate(Avg("service_level"))["service_level__avg"], 2),
-                "average_csat": round(sasai_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-                "average_overall_score": round(sasai_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+                "average_aes": round(
+                    sasai_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+                ),
+                "average_resolved_count": round(
+                    sasai_insights.values("resolved_count").aggregate(
+                        Avg("resolved_count")
+                    )["resolved_count__avg"],
+                    2,
+                ),
+                "average_service_level": round(
+                    sasai_insights.values("service_level").aggregate(
+                        Avg("service_level")
+                    )["service_level__avg"],
+                    2,
+                ),
+                "average_csat": round(
+                    sasai_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2
+                ),
+                "average_overall_score": round(
+                    sasai_insights.values("overall_score").aggregate(
+                        Avg("overall_score")
+                    )["overall_score__avg"],
+                    2,
+                ),
             },
             "weekily_average_stats": weekly_average_stats,
         }
 
         return Response(all_sasai_insights_stats, status=status.HTTP_200_OK)
+
 
 class NewGetAllSasaiInsightsStatisticsWithMonthView(GenericAPIView):
     permission_classes = []
@@ -709,6 +898,7 @@ class NewGetAllSasaiInsightsStatisticsWithMonthView(GenericAPIView):
             year=year,
         )
 
+        managed_by = sasai_insights.first().managed_by
         if not sasai_insights.exists():
             return Response(
                 {"message": "No sasai insights data found for the given organisation"},
@@ -716,29 +906,67 @@ class NewGetAllSasaiInsightsStatisticsWithMonthView(GenericAPIView):
             )
 
         grade_counts = sasai_insights.values("grade").annotate(count=Count("grade"))
-        total_agents = sasai_insights.values("user_id").annotate(count=Count("user_id")).count()
+        total_agents = (
+            sasai_insights.values("user_id").annotate(count=Count("user_id")).count()
+        )
 
         male_agents = User.objects.filter(
             organisation=organisation,
             gender="MALE",
-            id__in=sasai_insights.values_list("user_id", flat=True)
+            id__in=sasai_insights.values_list("user_id", flat=True),
         ).count()
         female_agents = User.objects.filter(
             organisation=organisation,
             gender="FEMALE",
-            id__in=sasai_insights.values_list("user_id", flat=True)
+            id__in=sasai_insights.values_list("user_id", flat=True),
         ).count()
 
         monthly_average_stats = {}
-        for month in ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]:
+        for month in [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+        ]:
             month_insights = sasai_insights.filter(month=month)
             if month_insights.exists():
                 monthly_average_stats[month] = {
-                    "average_aes": round(month_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-                    "average_resolved_count": round(month_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-                    "average_service_level": round(month_insights.values("service_level").aggregate(Avg("service_level"))["service_level__avg"], 2),
-                    "average_csat": round(month_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-                    "average_overall_score": round(month_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+                    "average_aes": round(
+                        month_insights.values("aes").aggregate(Avg("aes"))["aes__avg"],
+                        2,
+                    ),
+                    "average_resolved_count": round(
+                        month_insights.values("resolved_count").aggregate(
+                            Avg("resolved_count")
+                        )["resolved_count__avg"],
+                        2,
+                    ),
+                    "average_service_level": round(
+                        month_insights.values("service_level").aggregate(
+                            Avg("service_level")
+                        )["service_level__avg"],
+                        2,
+                    ),
+                    "average_csat": round(
+                        month_insights.values("csat").aggregate(Avg("csat"))[
+                            "csat__avg"
+                        ],
+                        2,
+                    ),
+                    "average_overall_score": round(
+                        month_insights.values("overall_score").aggregate(
+                            Avg("overall_score")
+                        )["overall_score__avg"],
+                        2,
+                    ),
                 }
 
             else:
@@ -746,23 +974,209 @@ class NewGetAllSasaiInsightsStatisticsWithMonthView(GenericAPIView):
 
         all_sasai_insights_stats = {
             "Year": year,
+            "managed_by": managed_by,
             "agent_type": agent_type,
             "total_male_agents": male_agents,
             "total_female_agents": female_agents,
             "total_agents": total_agents,
-            "total_SPs": next((item["count"] for item in grade_counts if item["grade"] == "SP"), 0),
-            "total_As": next((item["count"] for item in grade_counts if item["grade"] == "A"), 0),
-            "total_Bs": next((item["count"] for item in grade_counts if item["grade"] == "B"), 0),
-            "total_Cs": next((item["count"] for item in grade_counts if item["grade"] == "C"), 0),
-            "total_Ds": next((item["count"] for item in grade_counts if item["grade"] == "D"), 0),
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
             "average_stats": {
-                "average_aes": round(sasai_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2),
-                "average_resolved_count": round(sasai_insights.values("resolved_count").aggregate(Avg("resolved_count"))["resolved_count__avg"], 2),
-                "average_service_level": round(sasai_insights.values("service_level").aggregate(Avg("service_level"))["service_level__avg"], 2),
-                "average_csat": round(sasai_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2),
-                "average_overall_score": round(sasai_insights.values("overall_score").aggregate(Avg("overall_score"))["overall_score__avg"], 2),
+                "average_aes": round(
+                    sasai_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+                ),
+                "average_resolved_count": round(
+                    sasai_insights.values("resolved_count").aggregate(
+                        Avg("resolved_count")
+                    )["resolved_count__avg"],
+                    2,
+                ),
+                "average_service_level": round(
+                    sasai_insights.values("service_level").aggregate(
+                        Avg("service_level")
+                    )["service_level__avg"],
+                    2,
+                ),
+                "average_csat": round(
+                    sasai_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2
+                ),
+                "average_overall_score": round(
+                    sasai_insights.values("overall_score").aggregate(
+                        Avg("overall_score")
+                    )["overall_score__avg"],
+                    2,
+                ),
             },
             "monthly_average_stats": monthly_average_stats,
+        }
+
+        return Response(all_sasai_insights_stats, status=status.HTTP_200_OK)
+
+
+class GetUserMonthlyInsightsStatisticsView(GenericAPIView):
+    permission_classes = []
+    serializer_class = SasaiInsightsRetrieveSerializer
+    queryset = SasaiInsights.objects.all()
+
+    def get(self, request, user_id, year, month, *args, **kwargs):
+        try:
+            User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        sasai_insights = self.queryset.filter(
+            user_id=user_id,
+            year=year,
+            month=month,
+        )
+
+        if not sasai_insights.exists():
+            return Response(
+                {"message": "No sasai insights data found for the given user"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        managed_by = sasai_insights.first().managed_by
+        grade_counts = sasai_insights.values("grade").annotate(count=Count("grade"))
+
+        all_sasai_insights_stats = {
+            "Year": year,
+            "Month": month,
+            "managed_by": managed_by,
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
+            "average_stats": {
+                "average_aes": round(
+                    sasai_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+                ),
+                "average_resolved_count": round(
+                    sasai_insights.values("resolved_count").aggregate(
+                        Avg("resolved_count")
+                    )["resolved_count__avg"],
+                    2,
+                ),
+                "average_service_level": round(
+                    sasai_insights.values("service_level").aggregate(
+                        Avg("service_level")
+                    )["service_level__avg"],
+                    2,
+                ),
+                "average_csat": round(
+                    sasai_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2
+                ),
+                "average_overall_score": round(
+                    sasai_insights.values("overall_score").aggregate(
+                        Avg("overall_score")
+                    )["overall_score__avg"],
+                    2,
+                ),
+            },
+        }
+
+        return Response(all_sasai_insights_stats, status=status.HTTP_200_OK)
+
+
+class GetUserYearlyInsightsStatisticsView(GenericAPIView):
+    permission_classes = []
+    serializer_class = SasaiInsightsRetrieveSerializer
+    queryset = SasaiInsights.objects.all()
+
+    def get(self, request, user_id, year, *args, **kwargs):
+        try:
+            User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        sasai_insights = self.queryset.filter(
+            user_id=user_id,
+            year=year,
+        )
+
+        if not sasai_insights.exists():
+            return Response(
+                {"message": "No sasai insights data found for the given user"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        managed_by = sasai_insights.first().managed_by
+        grade_counts = sasai_insights.values("grade").annotate(count=Count("grade"))
+
+        all_sasai_insights_stats = {
+            "Year": year,
+            "managed_by": managed_by,
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
+            "average_stats": {
+                "average_aes": round(
+                    sasai_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+                ),
+                "average_resolved_count": round(
+                    sasai_insights.values("resolved_count").aggregate(
+                        Avg("resolved_count")
+                    )["resolved_count__avg"],
+                    2,
+                ),
+                "average_service_level": round(
+                    sasai_insights.values("service_level").aggregate(
+                        Avg("service_level")
+                    )["service_level__avg"],
+                    2,
+                ),
+                "average_csat": round(
+                    sasai_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2
+                ),
+                "average_overall_score": round(
+                    sasai_insights.values("overall_score").aggregate(
+                        Avg("overall_score")
+                    )["overall_score__avg"],
+                    2,
+                ),
+            },
         }
 
         return Response(all_sasai_insights_stats, status=status.HTTP_200_OK)
