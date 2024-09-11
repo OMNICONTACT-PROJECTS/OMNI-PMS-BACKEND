@@ -4,12 +4,11 @@ from departments.serializers import MinimizedDepartmentSerializer
 from personal_development_plans.models import Pdp, PdpReviewer
 
 
-
 class PdpSerializer(ModelSerializer):
 
     class Meta:
         model = Pdp
-        fields = "__all__"
+        exclude = ["status"]
 
         extra_kwargs = {
             "user": {"required": True},
@@ -41,6 +40,13 @@ class PdpUpdateSerializer(ModelSerializer):
         fields = "__all__"
 
 
+class PdpUpdateStatusSerializer(ModelSerializer):
+
+    class Meta:
+        model = Pdp
+        fields = []
+
+
 class PdpReviewerSerializer(ModelSerializer):
 
     class Meta:
@@ -57,7 +63,7 @@ class PdpReviewerSerializer(ModelSerializer):
 
 class PdpReviewerRetrieveSerializer(ModelSerializer):
     user = MinimizedUserSerializer()
-   
+
     pdp = PdpSerializer()
 
     class Meta:
