@@ -1,23 +1,27 @@
-from .serializers import SubscriberSerializer, SubscriberRetrieveSerializer
-from .models import Subscriber
+from organisations.models import Organisation
+from .serializers import AgentSerializer, AgentRetrieveSerializer
+from .models import Agent
 from rest_framework.response import Response
 from rest_framework.generics import (
     CreateAPIView,
     RetrieveUpdateDestroyAPIView,
     ListAPIView,
+    GenericAPIView
 )
 from rest_framework import status
 from django.conf import settings
 from accounts.models import User
 from django.core.mail import send_mail
+from rest_framework.parsers import MultiPartParser, FormParser
+from tablib import Dataset
 
 # Create your views here.
 
 
-class CreateSubscriberView(CreateAPIView):
+class CreateAgentView(CreateAPIView):
     permission_classes = []
-    serializer_class = SubscriberSerializer
-    queryset = Subscriber.objects.all()
+    serializer_class = AgentSerializer
+    queryset = Agent.objects.all()
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -27,7 +31,7 @@ class CreateSubscriberView(CreateAPIView):
             if serializer.is_valid():
                 self.perform_create(serializer)
                 data = {
-                    "message": "Subscriber created successfully",
+                    "message": "Agent created successfully",
                     "data": serializer.data,
                 }
 
@@ -36,13 +40,13 @@ class CreateSubscriberView(CreateAPIView):
                 # username = serializer.validated_data['user']['username']
                 email = serializer.validated_data["user"]["email"]
                 full_name = f"{first_name } { last_name}"
-                password = "omni-subscriber-123"
+                password = "omni-Agent-123"
 
                 this_instance = User.objects.get(pk=serializer.data["user"]["id"])
                 username = this_instance.username
                 role = this_instance.role
 
-                email_subject = f"Welcome to the OMNI PMS SYSTEM, Your SUBSCRIBER Account has been Created Successfully"
+                email_subject = f"Welcome to the OMNI PMS SYSTEM, Your Agent Account has been Created Successfully"
                 email_to = email
                 email_from = settings.EMAIL_HOST_USER
                 email_body = (
@@ -71,7 +75,7 @@ class CreateSubscriberView(CreateAPIView):
 
             return Response(
                 {
-                    "message": "Failed to create subscriber, Validation error occurred.",
+                    "message": "Failed to create agent, Validation error occurred.",
                     "error": serializer.errors,
                 },
                 status=status.HTTP_400_BAD_REQUEST,
@@ -80,20 +84,58 @@ class CreateSubscriberView(CreateAPIView):
         except Exception as e:
             return Response(
                 {
-                    "message": "Failed to create subscriber. Exception error occurred",
+                    "message": "Failed to create agent. Exception error occurred",
                     "error": str(e),
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
 
-class GetAllSubscribers(ListAPIView):
+class GetAllAgents(ListAPIView):
     permission_classes = []
-    serializer_class = SubscriberRetrieveSerializer
-    queryset = Subscriber.objects.all()
+    serializer_class = AgentRetrieveSerializer
+    queryset = Agent.objects.all()
 
 
-class SubscriberReadUpdateDestroyView(RetrieveUpdateDestroyAPIView):
+class AgentReadUpdateDestroyView(RetrieveUpdateDestroyAPIView):
     permission_classes = []
-    serializer_class = SubscriberRetrieveSerializer
-    queryset = Subscriber.objects.all()
+    serializer_class = AgentRetrieveSerializer
+    queryset = Agent.objects.all()
+
+
+class GetAllAgentByOrganisationId(GenericAPIView):
+    permission_classes = []
+    serializer_class = AgentRetrieveSerializer
+    queryset = Agent.objects.all()
+
+    def get(self, request, organisation_id):
+        try:
+            organisation = Organisation.objects.get(pk=organisation_id)
+        except Organisation.DoesNotExist:
+            return Response(
+                data={"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        else:
+            agent_info_by_organisation = self.queryset.filter(user__organisation_id=organisation_id)
+            serializer = self.serializer_class(agent_info_by_organisation, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class GetAllAgentByUserId(GenericAPIView):
+    permission_classes = []
+    serializer_class = AgentRetrieveSerializer
+    queryset = Agent.objects.all()
+
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                data={"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        else:
+            agent_info_by_user_id = (self.queryset.filter(user__id=user_id)).first()
+            serializer = self.serializer_class(agent_info_by_user_id)
+            return Response(serializer.data, status=status.HTTP_200_OK)

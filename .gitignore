@@ -152,6 +152,14 @@ venv.bak/
 ./env/
 ./env
 /env
+.env.render-production
+.env.secrets.render-production
+.env.local
+.env.anoe
+.env.mutepfa
+.env.ilah
+.env.tyronetest
+
 
 # Spyder project settings
 .spyderproject
@@ -567,33 +575,3 @@ pip-selfcheck.json
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/django,pycharm,pycharm+all,pycharm+iml,database,venv,virtualenv,visualstudiocode,python,pythonvanilla
-/end_term_exams/migrations/0001_initial.py
-/end_term_papers/migrations/0001_initial.py
-/student_end_term_marks/migrations/0001_initial.py
-/teacher_exam_comments/migrations/0001_initial.py
-/inclusive_needs/migrations/0002_inclusiveneed_created_inclusiveneed_lastupdate.py
-/inclusive_need_name/migrations/0002_inclusiveneedname_created_and_more.py
-
-static/
-/student_classes/migrations/0002_alter_studentclass_academicyear.py
-/subject_allocation/migrations/0002_subjectallocation_created_and_more.py
-/subject_allocation/migrations/0003_remove_subjectallocation_student_class_and_more.py
-/academic_years/migrations/0001_initial.py
-/accounts/migrations/0001_initial.py
-/administrators/migrations/0001_initial.py
-/banking_details/migrations/0001_initial.py
-/class_rooms/migrations/0001_initial.py
-/departments/migrations/0001_initial.py
-/grading_scale/migrations/0001_initial.py
-/inclusive_need_name/migrations/0001_initial.py
-/inclusive_needs/migrations/0001_initial.py
-/institution_owners/migrations/0001_initial.py
-/institutions/migrations/0001_initial.py
-/levels/migrations/0001_initial.py
-/parents/migrations/0001_initial.py
-/student_classes/migrations/0001_initial.py
-/students/migrations/0001_initial.py
-/subject_allocation/migrations/0001_initial.py
-/subjects/migrations/0001_initial.py
-/teachers/migrations/0001_initial.py
-/terms/migrations/0001_initial.py

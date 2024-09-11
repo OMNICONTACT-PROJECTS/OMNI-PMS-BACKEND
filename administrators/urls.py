@@ -6,4 +6,8 @@ urlpatterns = [
     path("<int:pk>/", views.AdministratorReadDestroyView.as_view()),
     path("update/<int:pk>/", views.AdministratorUpdateView.as_view()),
     path("get-all/", views.GetAllAdministrators.as_view()),
+    path(
+        "get-all-by-organisation-id/<int:organisation_id>/",
+        views.GetAllAdministratorByOrganisationId.as_view(),
+    ),
 ]
