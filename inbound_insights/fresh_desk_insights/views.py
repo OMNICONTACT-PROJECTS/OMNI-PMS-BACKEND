@@ -23,7 +23,7 @@ from .resources import FreshDeskInsightsResource
 from rest_framework.parsers import MultiPartParser, FormParser
 from tablib import Dataset
 import pandas as pd
-from django.db.models import Avg, Count
+from django.db.models import Avg, Count,Sum
 
 # Create your views here.
 
@@ -1240,3 +1240,65 @@ class GetUserYearlyInsightsStatisticsView(GenericAPIView):
         }
 
         return Response(all_fresh_desk_insights_stats, status=status.HTTP_200_OK)
+    
+class GetAllInsightsMonthlyStatisticsPerUserView(GenericAPIView):
+    permission_classes = []
+    serializer_class = FreshDeskInsightsRetrieveSerializer
+    queryset = FreshDeskInsights.objects.all()
+
+    def get(self, request, organisation_id, agent_type,year,user_id, *args, **kwargs):
+        try:
+            organisation = Organisation.objects.get(pk=organisation_id)
+        except Organisation.DoesNotExist:
+            return Response(
+                {"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        freshDeskInsights = self.queryset.filter(
+            user__organisation=organisation,
+            agent_type=agent_type,
+            year=year,
+            user_id=user_id,
+        )
+
+    
+
+        if not freshDeskInsights.exists():
+            return Response(
+                {"message": "No freshDesk insights data found for the given organisation"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        
+
+        monthly_totals = freshDeskInsights.values('month').annotate(
+            aes=Avg('aes'),
+            resolved_count=Sum('resolved_count'),
+            complaints=Sum('complaints'),
+            csat=Avg('csat'),
+            overall_score=Avg('overall_score')
+        )
+
+        def calculate_grade(avg_score):
+            if avg_score >= 5:
+                return 'A'
+            elif avg_score >= 4:
+                return 'B'
+            elif avg_score >= 3:
+                return 'C'
+            else:
+                return 'D'
+
+    
+        totals = {item['month']: {
+                        'aes': item['aes'],
+                        'resolved_count': item['resolved_count'],
+                        'complaints': item['complaints'],
+                        'csat': item['csat'],
+                        'overall_score': item['overall_score'],
+                        'grade': calculate_grade(item['overall_score'])
+                    } for item in monthly_totals}
+
+        return Response(totals, status=status.HTTP_200_OK)
+
+
