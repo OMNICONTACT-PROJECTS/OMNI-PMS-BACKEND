@@ -23,7 +23,7 @@ from .resources import VoiceInsightsResource
 from rest_framework.parsers import MultiPartParser, FormParser
 from tablib import Dataset
 import pandas as pd
-from django.db.models import Avg, Count
+from django.db.models import Avg, Count,Sum
 
 # Create your views here.
 
@@ -1266,3 +1266,150 @@ class GetUserYearlyVoiceInsightsStatisticsView(GenericAPIView):
         }
 
         return Response(all_voice_insights_stats, status=status.HTTP_200_OK)
+
+
+class GetUserVoiceInsightsStatisticsByRangeView(GenericAPIView):
+    permission_classes = []
+    serializer_class = VoiceInsightsRetrieveSerializer
+    queryset = VoiceInsights.objects.all()
+
+    def get(self, request, user_id, year, month, *args, **kwargs):
+        try:
+            User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        voice_insights = self.queryset.filter(
+            user_id=user_id,
+            year=year,
+            month=month,
+        )
+
+        print("voice_insights returned: ", voice_insights)
+        if not voice_insights.exists():
+            return Response(
+                {"message": "No voice insights data found for the given user"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        managed_by = voice_insights.first().managed_by
+        grade_counts = voice_insights.values("grade").annotate(count=Count("grade"))
+
+        all_voice_insights_stats = {
+            "Year": year,
+            "Month": month,
+            "managed_by": managed_by,
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
+            "average_stats": {
+                "average_aes": round(
+                    voice_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+                ),
+                "average_outbound": round(
+                    voice_insights.values("actual_outbound_calls").aggregate(
+                        Avg("actual_outbound_calls")
+                    )["actual_outbound_calls__avg"],
+                    2,
+                ),
+                "average_talktime": round(
+                    voice_insights.values("actual_talktime").aggregate(
+                        Avg("actual_talktime")
+                    )["actual_talktime__avg"],
+                    2,
+                ),
+                "average_inbound_calls": round(
+                    voice_insights.values("actual_inbound_calls").aggregate(
+                        Avg("actual_inbound_calls")
+                    )["actual_inbound_calls__avg"],
+                    2,
+                ),
+                "average_csat": round(
+                    voice_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2
+                ),
+                "average_overall_score": round(
+                    voice_insights.values("overall_score").aggregate(
+                        Avg("overall_score")
+                    )["overall_score__avg"],
+                    2,
+                ),
+            },
+        }
+
+        return Response(all_voice_insights_stats, status=status.HTTP_200_OK)
+    
+class GetAllVoiceInsightsMonthlyStatisticsPerUserView(GenericAPIView):
+    permission_classes = []
+    serializer_class = VoiceInsightsRetrieveSerializer
+    queryset = VoiceInsights.objects.all()
+
+    def get(self, request, organisation_id, agent_type,year,user_id, *args, **kwargs):
+        try:
+            organisation = Organisation.objects.get(pk=organisation_id)
+        except Organisation.DoesNotExist:
+            return Response(
+                {"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        voice_insights = self.queryset.filter(
+            user__organisation=organisation,
+            agent_type=agent_type,
+            year=year,
+            user_id=user_id,
+        )
+
+    
+
+        if not voice_insights.exists():
+            return Response(
+                {"message": "No voice insights data found for the given organisation"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        
+
+        monthly_totals = voice_insights.values('month').annotate(
+            actual_inbound_calls=Sum('actual_inbound_calls'),
+            actual_talktime=Sum('actual_talktime'),
+            actual_outbound_calls=Sum('actual_outbound_calls'),
+            after_call_work=Sum('after_call_work'),
+            csat=Avg('csat'),
+            overall_score=Avg('overall_score')
+        )
+
+        def calculate_grade(avg_score):
+            if avg_score >= 5:
+                return 'A'
+            elif avg_score >= 4:
+                return 'B'
+            elif avg_score >= 3:
+                return 'C'
+            else:
+                return 'D'
+
+    
+        totals = {item['month']: {
+                        'actual_inbound_calls': item['actual_inbound_calls'],
+                        'actual_talktime': item['actual_talktime'],
+                        'actual_outbound_calls': item['actual_outbound_calls'],
+                        'csat': item['csat'],
+                        'overall_score': item['overall_score'],
+                        'grade': calculate_grade(item['overall_score'])
+                    } for item in monthly_totals}
+
+        return Response(totals, status=status.HTTP_200_OK)

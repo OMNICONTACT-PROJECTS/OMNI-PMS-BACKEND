@@ -25,5 +25,5 @@ urlpatterns = [
         "pdp-reviewer/get-all-by-organisation-id/<int:organisation_id>/",
         views.GetAllPdpReviewerByOrganisationId.as_view(),
     ),
-    
+    path("status/update/<int:pdp_id>/", views.PdpStatusUpdateView.as_view()),
 ]
