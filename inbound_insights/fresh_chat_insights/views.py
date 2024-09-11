@@ -23,7 +23,7 @@ from .resources import FreshChatInsightsResource
 from rest_framework.parsers import MultiPartParser, FormParser
 from tablib import Dataset
 import pandas as pd
-from django.db.models import Avg, Count,Sum
+from django.db.models import Avg, Count
 
 # Create your views here.
 
@@ -1268,64 +1268,3 @@ class GetUserYearlyInsightsStatisticsView(GenericAPIView):
         }
 
         return Response(all_fresh_chat_insights_stats, status=status.HTTP_200_OK)
-
-
-class GetAllInsightsMonthlyStatisticsPerUserView(GenericAPIView):
-    permission_classes = []
-    serializer_class = FreshChatInsightsRetrieveSerializer
-    queryset = FreshChatInsights.objects.all()
-
-    def get(self, request, organisation_id, agent_type,year,user_id, *args, **kwargs):
-        try:
-            organisation = Organisation.objects.get(pk=organisation_id)
-        except Organisation.DoesNotExist:
-            return Response(
-                {"message": "Organisation does not exist"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        freshChatInsights = self.queryset.filter(
-            user__organisation=organisation,
-            agent_type=agent_type,
-            year=year,
-            user_id=user_id,
-        )
-
-    
-
-        if not freshChatInsights.exists():
-            return Response(
-                {"message": "No freshchat insights data found for the given organisation"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        
-
-        monthly_totals = freshChatInsights.values('month').annotate(
-            aes=Avg('aes'),
-            actual_interactions=Sum('actual_interactions'),
-            handling_time=Sum('handling_time'),
-            csat=Avg('csat'),
-            overall_score=Avg('overall_score')
-        )
-
-        def calculate_grade(avg_score):
-            if avg_score >= 5:
-                return 'A'
-            elif avg_score >= 4:
-                return 'B'
-            elif avg_score >= 3:
-                return 'C'
-            else:
-                return 'D'
-
-    
-        totals = {item['month']: {
-                        'aes': item['aes'],
-                        'actual_interactions': item['actual_interactions'],
-                        'handling_time': item['handling_time'],
-                        'csat': item['csat'],
-                        'overall_score': item['overall_score'],
-                        'grade': calculate_grade(item['overall_score'])
-                    } for item in monthly_totals}
-
-        return Response(totals, status=status.HTTP_200_OK)
