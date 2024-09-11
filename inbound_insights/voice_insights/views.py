@@ -23,7 +23,7 @@ from .resources import VoiceInsightsResource
 from rest_framework.parsers import MultiPartParser, FormParser
 from tablib import Dataset
 import pandas as pd
-from django.db.models import Avg, Count,Sum
+from django.db.models import Avg, Count
 
 # Create your views here.
 
@@ -1267,7 +1267,7 @@ class GetUserYearlyVoiceInsightsStatisticsView(GenericAPIView):
 
         return Response(all_voice_insights_stats, status=status.HTTP_200_OK)
 
-
+      
 class GetUserVoiceInsightsStatisticsByRangeView(GenericAPIView):
     permission_classes = []
     serializer_class = VoiceInsightsRetrieveSerializer
@@ -1352,6 +1352,7 @@ class GetUserVoiceInsightsStatisticsByRangeView(GenericAPIView):
         }
 
         return Response(all_voice_insights_stats, status=status.HTTP_200_OK)
+    
     
 class GetAllVoiceInsightsMonthlyStatisticsPerUserView(GenericAPIView):
     permission_classes = []
