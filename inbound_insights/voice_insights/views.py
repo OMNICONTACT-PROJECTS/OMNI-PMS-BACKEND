@@ -23,7 +23,7 @@ from .resources import VoiceInsightsResource
 from rest_framework.parsers import MultiPartParser, FormParser
 from tablib import Dataset
 import pandas as pd
-from django.db.models import Avg, Count
+from django.db.models import Avg, Count, Sum
 
 # Create your views here.
 
