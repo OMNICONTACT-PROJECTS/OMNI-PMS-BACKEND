@@ -1290,6 +1290,11 @@ class GetAllVoiceInsightsMonthlyStatisticsPerUserView(GenericAPIView):
             user_id=user_id,
         )
 
+        calendar_order = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ]
+
        
 
         if not voice_insights.exists():
@@ -1305,6 +1310,7 @@ class GetAllVoiceInsightsMonthlyStatisticsPerUserView(GenericAPIView):
             actual_outbound_calls=Sum('actual_outbound_calls'),
             after_call_work=Sum('after_call_work'),
             csat=Avg('csat'),
+            aes=Avg('aes'),
             overall_score=Avg('overall_score')
         )
 
@@ -1324,10 +1330,13 @@ class GetAllVoiceInsightsMonthlyStatisticsPerUserView(GenericAPIView):
                         'actual_talktime': item['actual_talktime'],
                         'actual_outbound_calls': item['actual_outbound_calls'],
                         'csat': item['csat'],
+                        'aes': item['aes'],
                         'overall_score': item['overall_score'],
                         'grade': calculate_grade(item['overall_score'])
                     } for item in monthly_totals}
+        
+        calendar_ordered_totals = {month: totals[month] for month in calendar_order if month in totals}
 
-        return Response(totals, status=status.HTTP_200_OK)
+        return Response(calendar_ordered_totals, status=status.HTTP_200_OK)
 
     

@@ -1300,7 +1300,10 @@ class GetAllInsightsMonthlyStatisticsPerUserView(GenericAPIView):
             user_id=user_id,
         )
 
-    
+        calendar_order = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ]
 
         if not higherLifeFoundationInsights.exists():
             return Response(
@@ -1336,6 +1339,8 @@ class GetAllInsightsMonthlyStatisticsPerUserView(GenericAPIView):
                         'overall_score': item['overall_score'],
                         'grade': calculate_grade(item['overall_score'])
                     } for item in monthly_totals}
+        
+        calendar_ordered_totals = {month: totals[month] for month in calendar_order if month in totals}
 
-        return Response(totals, status=status.HTTP_200_OK)
+        return Response(calendar_ordered_totals, status=status.HTTP_200_OK)
 
