@@ -141,6 +141,7 @@ class GetFreshChatInsightsForLVCAgentsByOrganisationId(GenericAPIView):
             fresh_chat_insights = self.queryset.filter(agent_type="LVC").order_by(
                 "-date_created"
             )
+            print("fresh_chat_insights:: ", fresh_chat_insights)
             serializer = self.serializer_class(fresh_chat_insights, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
