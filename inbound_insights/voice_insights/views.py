@@ -1435,6 +1435,11 @@ class GetUserVoiceInsightsTotalStatisticsByRangeView(GenericAPIView):
             month__lte=end_month,
         )
 
+        calendar_order = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ]
+
         if not voice_insights.exists():
             return Response(
                 {"message": "No voice insights data found for the given user"},
@@ -1483,3 +1488,40 @@ class GetUserVoiceInsightsTotalStatisticsByRangeView(GenericAPIView):
         }
 
         return Response(all_voice_insights_stats, status=status.HTTP_200_OK)
+
+        
+
+        monthly_totals = voice_insights.values('month').annotate(
+            actual_inbound_calls=Sum('actual_inbound_calls'),
+            actual_talktime=Sum('actual_talktime'),
+            actual_outbound_calls=Sum('actual_outbound_calls'),
+            after_call_work=Sum('after_call_work'),
+            csat=Avg('csat'),
+            aes=Avg('aes'),
+            overall_score=Avg('overall_score')
+        )
+
+        def calculate_grade(avg_score):
+            if avg_score >= 5:
+                return 'A'
+            elif avg_score >= 4:
+                return 'B'
+            elif avg_score >= 3:
+                return 'C'
+            else:
+                return 'D'
+
+    
+        totals = {item['month']: {
+                        'actual_inbound_calls': item['actual_inbound_calls'],
+                        'actual_talktime': item['actual_talktime'],
+                        'actual_outbound_calls': item['actual_outbound_calls'],
+                        'csat': item['csat'],
+                        'aes': item['aes'],
+                        'overall_score': item['overall_score'],
+                        'grade': calculate_grade(item['overall_score'])
+                    } for item in monthly_totals}
+        
+        calendar_ordered_totals = {month: totals[month] for month in calendar_order if month in totals}
+
+        return Response(calendar_ordered_totals, status=status.HTTP_200_OK)
