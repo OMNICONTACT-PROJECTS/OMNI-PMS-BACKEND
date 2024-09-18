@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     "inbound_insights.apps.InboundInsightsConfig",
     "import_export",
     "personal_development_plans.apps.PersonalDevelopmentPlansConfig",
+    "scorecard.apps.ScorecardConfig",
 ]
 
 MIDDLEWARE = [

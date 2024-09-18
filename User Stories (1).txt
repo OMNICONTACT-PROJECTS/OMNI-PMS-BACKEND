@@ -293,22 +293,10 @@ INBOUND
 Scorecard:
 	-pk
 	-user_id
-	-department
 	-name
 	-actual_score
 	-manager_score
 	-document_proof
-
-
-
-
-
-
-	strategy: {}
-	customer
-	function
-	innovation
-	operations
 
 Strategy:
 	-scorecard(fk)
@@ -332,7 +320,7 @@ Operations:
 
 
 ScorecardReview:
-	-scorecad(foreign_key)
+	-scorecard(foreign_key)
 	-reviewer_user_id(foreign_key)
 	-manager_comment
 	-date_created
