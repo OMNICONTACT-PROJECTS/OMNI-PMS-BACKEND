@@ -23,7 +23,7 @@ from .resources import FollowUpInsightsResource
 from rest_framework.parsers import MultiPartParser, FormParser
 from tablib import Dataset
 import pandas as pd
-from django.db.models import Avg, Count
+from django.db.models import Avg, Count,Sum
 
 # Create your views here.
 
@@ -1182,3 +1182,78 @@ class GetUserYearlyInsightsStatisticsView(GenericAPIView):
         }
 
         return Response(all_follow_up_insights_stats, status=status.HTTP_200_OK)
+    
+class GetAllFollowUpInsightsMonthlyStatisticsPerUserView(GenericAPIView):
+    permission_classes = []
+    serializer_class = FollowUpInsightsRetrieveSerializer
+    queryset = FollowUpInsights.objects.all()
+
+    def get(self, request, organisation_id, agent_type,year,user_id, *args, **kwargs):
+        try:
+            organisation = Organisation.objects.get(pk=organisation_id)
+        except Organisation.DoesNotExist:
+            return Response(
+                {"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        
+        try:
+            user= User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        followUpInsights = self.queryset.filter(
+            user__organisation=organisation,
+            agent_type=agent_type,
+            year=year,
+            user = user,
+        )
+
+        
+        calendar_order = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ]
+
+    
+
+        if not followUpInsights.exists():
+            return Response(
+                {"message": "No followup insights data found for the given organisation"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        
+
+        monthly_totals = followUpInsights.values('month').annotate(
+            aes=Avg('aes'),
+            outbound=Sum('outbound'),
+            csat=Avg('csat'),
+            overall_score=Avg('overall_score')
+        )
+
+        def calculate_grade(avg_score):
+            if avg_score >= 5:
+                return 'A'
+            elif avg_score >= 4:
+                return 'B'
+            elif avg_score >= 3:
+                return 'C'
+            else:
+                return 'D'
+
+    
+        totals = {item['month']: {
+                        'aes': item['aes'],
+                        'outbound': item['outbound'],
+                        'csat': item['csat'],
+                        'overall_score': item['overall_score'],
+                        'grade': calculate_grade(item['overall_score'])
+                    } for item in monthly_totals}
+        
+        
+        calendar_ordered_totals = {month: totals[month] for month in calendar_order if month in totals}
+
+        return Response(calendar_ordered_totals, status=status.HTTP_200_OK)

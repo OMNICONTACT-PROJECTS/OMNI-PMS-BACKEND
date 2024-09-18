@@ -136,6 +136,6 @@ class GetAllAgentByUserId(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
         else:
-            agent_info_by_user_id = self.queryset.filter(user__id=user_id)
-            serializer = self.serializer_class(agent_info_by_user_id, many=True)
+            agent_info_by_user_id = (self.queryset.filter(user__id=user_id)).first()
+            serializer = self.serializer_class(agent_info_by_user_id)
             return Response(serializer.data, status=status.HTTP_200_OK)
