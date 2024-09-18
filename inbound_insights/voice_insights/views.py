@@ -23,7 +23,7 @@ from .resources import VoiceInsightsResource
 from rest_framework.parsers import MultiPartParser, FormParser
 from tablib import Dataset
 import pandas as pd
-from django.db.models import Avg, Count,Sum
+from django.db.models import Avg, Count, Sum
 
 # Create your views here.
 
@@ -1273,7 +1273,7 @@ class GetUserVoiceInsightsStatisticsByRangeView(GenericAPIView):
     serializer_class = VoiceInsightsRetrieveSerializer
     queryset = VoiceInsights.objects.all()
 
-    def get(self, request, user_id, year, month, *args, **kwargs):
+    def get(self, request, user_id, year, start_month, end_month, *args, **kwargs):
         try:
             User.objects.get(pk=user_id)
         except User.DoesNotExist:
@@ -1285,10 +1285,10 @@ class GetUserVoiceInsightsStatisticsByRangeView(GenericAPIView):
         voice_insights = self.queryset.filter(
             user_id=user_id,
             year=year,
-            month=month,
+            month__gte=start_month,
+            month__lte=end_month,
         )
 
-        print("voice_insights returned: ", voice_insights)
         if not voice_insights.exists():
             return Response(
                 {"message": "No voice insights data found for the given user"},
@@ -1300,7 +1300,8 @@ class GetUserVoiceInsightsStatisticsByRangeView(GenericAPIView):
 
         all_voice_insights_stats = {
             "Year": year,
-            "Month": month,
+            "start_month": start_month,
+            "end_month": end_month,
             "managed_by": managed_by,
             "total_SPs": next(
                 (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
@@ -1352,13 +1353,85 @@ class GetUserVoiceInsightsStatisticsByRangeView(GenericAPIView):
         }
 
         return Response(all_voice_insights_stats, status=status.HTTP_200_OK)
-    
+
+
+class GetUserVoiceInsightsTotalStatisticsByRangeView(GenericAPIView):
+    permission_classes = []
+    serializer_class = VoiceInsightsRetrieveSerializer
+    queryset = VoiceInsights.objects.all()
+
+    def get(self, request, user_id, year, start_month, end_month, *args, **kwargs):
+        try:
+            User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        voice_insights = self.queryset.filter(
+            user_id=user_id,
+            year=year,
+            month__gte=start_month,
+            month__lte=end_month,
+        )
+
+        if not voice_insights.exists():
+            return Response(
+                {"message": "No voice insights data found for the given user"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        managed_by = voice_insights.first().managed_by
+        grade_counts = voice_insights.values("grade").annotate(count=Count("grade"))
+
+        all_voice_insights_stats = {
+            "Year": year,
+            "start_month": start_month,
+            "end_month": end_month,
+            "managed_by": managed_by,
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
+            "total_stats": {
+                "total_aes": sum(voice_insights.values_list("aes", flat=True)),
+                "total_outbound": sum(
+                    voice_insights.values_list("actual_outbound_calls", flat=True)
+                ),
+                "total_talktime": sum(
+                    voice_insights.values_list("actual_talktime", flat=True)
+                ),
+                "total_inbound_calls": sum(
+                    voice_insights.values_list("actual_inbound_calls", flat=True)
+                ),
+                "total_csat": sum(voice_insights.values_list("csat", flat=True)),
+                "total_overall_score": sum(
+                    voice_insights.values_list("overall_score", flat=True)
+                ),
+            },
+        }
+
+        return Response(all_voice_insights_stats, status=status.HTTP_200_OK)
+
+
 class GetAllVoiceInsightsMonthlyStatisticsPerUserView(GenericAPIView):
     permission_classes = []
     serializer_class = VoiceInsightsRetrieveSerializer
     queryset = VoiceInsights.objects.all()
 
-    def get(self, request, organisation_id, agent_type,year,user_id, *args, **kwargs):
+    def get(self, request, organisation_id, agent_type, year, user_id, *args, **kwargs):
         try:
             organisation = Organisation.objects.get(pk=organisation_id)
         except Organisation.DoesNotExist:
@@ -1366,50 +1439,78 @@ class GetAllVoiceInsightsMonthlyStatisticsPerUserView(GenericAPIView):
                 {"message": "Organisation does not exist"},
                 status=status.HTTP_404_NOT_FOUND,
             )
+        
+        try:
+            user= User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         voice_insights = self.queryset.filter(
             user__organisation=organisation,
             agent_type=agent_type,
             year=year,
-            user_id=user_id,
+            user=user,
         )
 
-    
+        calendar_order = [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+        ]
 
         if not voice_insights.exists():
             return Response(
                 {"message": "No voice insights data found for the given organisation"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        
 
-        monthly_totals = voice_insights.values('month').annotate(
-            actual_inbound_calls=Sum('actual_inbound_calls'),
-            actual_talktime=Sum('actual_talktime'),
-            actual_outbound_calls=Sum('actual_outbound_calls'),
-            after_call_work=Sum('after_call_work'),
-            csat=Avg('csat'),
-            overall_score=Avg('overall_score')
+        monthly_totals = voice_insights.values("month").annotate(
+            actual_inbound_calls=Sum("actual_inbound_calls"),
+            actual_talktime=Sum("actual_talktime"),
+            actual_outbound_calls=Sum("actual_outbound_calls"),
+            after_call_work=Sum("after_call_work"),
+            csat=Avg("csat"),
+            aes=Avg("aes"),
+            overall_score=Avg("overall_score"),
         )
 
         def calculate_grade(avg_score):
             if avg_score >= 5:
-                return 'A'
+                return "A"
             elif avg_score >= 4:
-                return 'B'
+                return "B"
             elif avg_score >= 3:
-                return 'C'
+                return "C"
             else:
-                return 'D'
+                return "D"
 
-    
-        totals = {item['month']: {
-                        'actual_inbound_calls': item['actual_inbound_calls'],
-                        'actual_talktime': item['actual_talktime'],
-                        'actual_outbound_calls': item['actual_outbound_calls'],
-                        'csat': item['csat'],
-                        'overall_score': item['overall_score'],
-                        'grade': calculate_grade(item['overall_score'])
-                    } for item in monthly_totals}
+        totals = {
+            item["month"]: {
+                "actual_inbound_calls": item["actual_inbound_calls"],
+                "actual_talktime": item["actual_talktime"],
+                "actual_outbound_calls": item["actual_outbound_calls"],
+                "csat": item["csat"],
+                "aes": item["aes"],
+                "overall_score": item["overall_score"],
+                "grade": calculate_grade(item["overall_score"]),
+            }
+            for item in monthly_totals
+        }
 
-        return Response(totals, status=status.HTTP_200_OK)
+        calendar_ordered_totals = {
+            month: totals[month] for month in calendar_order if month in totals
+        }
+
+        return Response(calendar_ordered_totals, status=status.HTTP_200_OK)

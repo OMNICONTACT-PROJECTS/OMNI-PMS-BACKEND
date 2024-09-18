@@ -23,7 +23,7 @@ from .resources import FollowUpInsightsResource
 from rest_framework.parsers import MultiPartParser, FormParser
 from tablib import Dataset
 import pandas as pd
-from django.db.models import Avg, Count,Sum
+from django.db.models import Avg, Count, Sum
 
 # Create your views here.
 
@@ -1182,13 +1182,14 @@ class GetUserYearlyInsightsStatisticsView(GenericAPIView):
         }
 
         return Response(all_follow_up_insights_stats, status=status.HTTP_200_OK)
-    
+
+
 class GetAllFollowUpInsightsMonthlyStatisticsPerUserView(GenericAPIView):
     permission_classes = []
     serializer_class = FollowUpInsightsRetrieveSerializer
     queryset = FollowUpInsights.objects.all()
 
-    def get(self, request, organisation_id, agent_type,year,user_id, *args, **kwargs):
+    def get(self, request, organisation_id, agent_type, year, user_id, *args, **kwargs):
         try:
             organisation = Organisation.objects.get(pk=organisation_id)
         except Organisation.DoesNotExist:
@@ -1196,47 +1197,217 @@ class GetAllFollowUpInsightsMonthlyStatisticsPerUserView(GenericAPIView):
                 {"message": "Organisation does not exist"},
                 status=status.HTTP_404_NOT_FOUND,
             )
+        
+        try:
+            user= User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         followUpInsights = self.queryset.filter(
             user__organisation=organisation,
             agent_type=agent_type,
             year=year,
-            user_id=user_id,
+            user = user,
         )
 
-    
+        calendar_order = [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+        ]
 
         if not followUpInsights.exists():
             return Response(
-                {"message": "No followup insights data found for the given organisation"},
+                {
+                    "message": "No followup insights data found for the given organisation"
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
-        
 
-        monthly_totals = followUpInsights.values('month').annotate(
-            aes=Avg('aes'),
-            outbound=Sum('outbound'),
-            csat=Avg('csat'),
-            overall_score=Avg('overall_score')
+        monthly_totals = followUpInsights.values("month").annotate(
+            aes=Avg("aes"),
+            outbound=Sum("outbound"),
+            csat=Avg("csat"),
+            overall_score=Avg("overall_score"),
         )
 
         def calculate_grade(avg_score):
             if avg_score >= 5:
-                return 'A'
+                return "A"
             elif avg_score >= 4:
-                return 'B'
+                return "B"
             elif avg_score >= 3:
-                return 'C'
+                return "C"
             else:
-                return 'D'
+                return "D"
 
-    
-        totals = {item['month']: {
-                        'aes': item['aes'],
-                        'outbound': item['outbound'],
-                        'csat': item['csat'],
-                        'overall_score': item['overall_score'],
-                        'grade': calculate_grade(item['overall_score'])
-                    } for item in monthly_totals}
+        totals = {
+            item["month"]: {
+                "aes": item["aes"],
+                "outbound": item["outbound"],
+                "csat": item["csat"],
+                "overall_score": item["overall_score"],
+                "grade": calculate_grade(item["overall_score"]),
+            }
+            for item in monthly_totals
+        }
 
-        return Response(totals, status=status.HTTP_200_OK)
+        calendar_ordered_totals = {
+            month: totals[month] for month in calendar_order if month in totals
+        }
+
+        return Response(calendar_ordered_totals, status=status.HTTP_200_OK)
+
+
+class GetUserFollowUpInsightsStatisticsByRangeView(GenericAPIView):
+    permission_classes = []
+    serializer_class = FollowUpInsightsRetrieveSerializer
+    queryset = FollowUpInsights.objects.all()
+
+    def get(self, request, user_id, year, start_month, end_month, *args, **kwargs):
+        try:
+            User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        followup_insights = self.queryset.filter(
+            user_id=user_id,
+            year=year,
+            month__gte=start_month,
+            month__lte=end_month,
+        )
+
+        if not followup_insights.exists():
+            return Response(
+                {"message": "No followup insights data found for the given user"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        managed_by = followup_insights.first().managed_by
+        grade_counts = followup_insights.values("grade").annotate(count=Count("grade"))
+
+        all_followup_insights_stats = {
+            "Year": year,
+            "start_month": start_month,
+            "end_month": end_month,
+            "managed_by": managed_by,
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
+            "average_stats": {
+                "aes": round(
+                    followup_insights.values("aes").aggregate(Avg("aes"))["aes__avg"],
+                    2,
+                ),
+                "average_outbound": round(
+                    followup_insights.values("outbound").aggregate(Avg("outbound"))[
+                        "outbound__avg"
+                    ],
+                    2,
+                ),
+                "csat": round(
+                    followup_insights.values("csat").aggregate(Avg("csat"))[
+                        "csat__avg"
+                    ],
+                    2,
+                ),
+                "overall_score": round(
+                    followup_insights.values("overall_score").aggregate(
+                        Avg("overall_score")
+                    )["overall_score__avg"],
+                    2,
+                ),
+            },
+        }
+
+        return Response(all_followup_insights_stats, status=status.HTTP_200_OK)
+
+
+class GetUserFollowUpTotalStatisticsByRangeView(GenericAPIView):
+    permission_classes = []
+    serializer_class = FollowUpInsightsRetrieveSerializer
+    queryset = FollowUpInsights.objects.all()
+
+    def get(self, request, user_id, year, start_month, end_month, *args, **kwargs):
+        try:
+            User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        followup_insights = self.queryset.filter(
+            user_id=user_id,
+            year=year,
+            month__gte=start_month,
+            month__lte=end_month,
+        )
+
+        if not followup_insights.exists():
+            return Response(
+                {"message": "No followup insights data found for the given user"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        managed_by = followup_insights.first().managed_by
+        grade_counts = followup_insights.values("grade").annotate(count=Count("grade"))
+
+        all_followup_insights_stats = {
+            "Year": year,
+            "start_month": start_month,
+            "end_month": end_month,
+            "managed_by": managed_by,
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
+            "total_stats": {
+                "aes": sum(followup_insights.values_list("aes", flat=True)),
+                "outbound": sum(followup_insights.values_list("outbound", flat=True)),
+                "csat": sum(followup_insights.values_list("csat", flat=True)),
+                "total_overall_score": sum(
+                    followup_insights.values_list("overall_score", flat=True)
+                ),
+            },
+        }
+
+        return Response(all_followup_insights_stats, status=status.HTTP_200_OK)
