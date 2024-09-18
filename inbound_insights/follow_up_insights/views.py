@@ -1196,7 +1196,7 @@ class GetAllFollowUpInsightsMonthlyStatisticsPerUserView(GenericAPIView):
                 {"message": "Organisation does not exist"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        
+          
         try:
             user= User.objects.get(pk=user_id)
         except User.DoesNotExist:
@@ -1217,7 +1217,6 @@ class GetAllFollowUpInsightsMonthlyStatisticsPerUserView(GenericAPIView):
             'January', 'February', 'March', 'April', 'May', 'June',
             'July', 'August', 'September', 'October', 'November', 'December'
         ]
-
     
 
         if not followUpInsights.exists():
@@ -1251,8 +1250,7 @@ class GetAllFollowUpInsightsMonthlyStatisticsPerUserView(GenericAPIView):
                         'csat': item['csat'],
                         'overall_score': item['overall_score'],
                         'grade': calculate_grade(item['overall_score'])
-                    } for item in monthly_totals}
-        
+                    } for item in monthly_totals}        
         
         calendar_ordered_totals = {month: totals[month] for month in calendar_order if month in totals}
 
