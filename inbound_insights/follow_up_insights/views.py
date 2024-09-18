@@ -1197,7 +1197,7 @@ class GetAllFollowUpInsightsMonthlyStatisticsPerUserView(GenericAPIView):
                 {"message": "Organisation does not exist"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        
+          
         try:
             user= User.objects.get(pk=user_id)
         except User.DoesNotExist:

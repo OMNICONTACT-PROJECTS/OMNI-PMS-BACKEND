@@ -1285,7 +1285,7 @@ class GetAllInsightsMonthlyStatisticsPerUserView(GenericAPIView):
             "November",
             "December",
         ]
-
+        
         if not freshDeskInsights.exists():
             return Response(
                 {
