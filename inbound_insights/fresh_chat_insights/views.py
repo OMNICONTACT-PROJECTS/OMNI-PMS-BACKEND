@@ -172,7 +172,7 @@ class GetFreshChatInsightsByDateAndOrganisationId(GenericAPIView):
     serializer_class = FreshChatInsightsRetrieveSerializer
     queryset = FreshChatInsights.objects.all()
 
-    def get(self, request, year, month, week, organisation_id, *args, **kwargs):
+    def get(self, request, year, month, week, organisation_id,agent_type, *args, **kwargs):
         try:
             Organisation.objects.get(pk=organisation_id)
         except Organisation.DoesNotExist:
@@ -182,7 +182,11 @@ class GetFreshChatInsightsByDateAndOrganisationId(GenericAPIView):
             )
         else:
             fresh_chat_insights = self.queryset.filter(
-                user__organisation_id=organisation_id, year=year, month=month, week=week
+                user__organisation_id=organisation_id,
+                year=year,
+                month=month,
+                week=week,
+                agent_type=agent_type,
             ).order_by("-date_created")
             serializer = self.serializer_class(fresh_chat_insights, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
@@ -1284,13 +1288,26 @@ class GetAllInsightsMonthlyStatisticsPerUserView(GenericAPIView):
                 {"message": "Organisation does not exist"},
                 status=status.HTTP_404_NOT_FOUND,
             )
+        
+        try:
+            user= User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         freshChatInsights = self.queryset.filter(
             user__organisation=organisation,
             agent_type=agent_type,
             year=year,
-            user_id=user_id,
+            user = user,
         )
+
+        calendar_order = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ]
 
     
 
@@ -1328,5 +1345,7 @@ class GetAllInsightsMonthlyStatisticsPerUserView(GenericAPIView):
                         'overall_score': item['overall_score'],
                         'grade': calculate_grade(item['overall_score'])
                     } for item in monthly_totals}
+        
+        calendar_ordered_totals = {month: totals[month] for month in calendar_order if month in totals}
 
-        return Response(totals, status=status.HTTP_200_OK)
+        return Response(calendar_ordered_totals, status=status.HTTP_200_OK)
