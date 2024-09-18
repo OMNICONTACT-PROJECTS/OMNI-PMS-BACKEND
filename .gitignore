@@ -575,3 +575,5 @@ pip-selfcheck.json
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/django,pycharm,pycharm+all,pycharm+iml,database,venv,virtualenv,visualstudiocode,python,pythonvanilla
+docker-compose.yml
+Dockerfile
