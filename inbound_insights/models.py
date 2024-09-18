@@ -7,17 +7,9 @@ from accounts.models import User
 
 class VoiceInsights(models.Model):
     AGENT_TYPE = (
-        ("LVC", "LVC"),
-        ("HVC", "HVC"),
-        ("VOICE_HVC", "VOICE HVC"),
-        ("VOICE_LVC", "VOICE LVC"),
-        ("FRESHCHAT_LVC", "FRESHCHAT LVC"),
-        ("FRESHCHAT_HVC", "FRESHCHAT HVC"),
-        ("FRESHDESK_AGENT", "FRESHDESK AGENT"),
-        ("YAMURAI_AGENT", "YAMURAI AGENT"),
-        ("FOLLOWUP_AGENT", "FOLLOWUP AGENT"),
-        ("SASAI_AGENT", "SASAI AGENT"),
-        ("HLF_AGENT", "HLF AGENT"),
+       ("VOICE_HVC", "VOICE HVC"),
+       ("VOICE_LVC", "VOICE LVC"),
+        
     )
     GRADE = (
         ("SP", "SP"),
@@ -166,17 +158,9 @@ class CampaignInsightFile(models.Model):
 
 class FollowUpInsights(models.Model):
     AGENT_TYPE = (
-        ("LVC", "LVC"),
-        ("HVC", "HVC"),
-        ("VOICE_HVC", "VOICE HVC"),
-        ("VOICE_LVC", "VOICE LVC"),
-        ("FRESHCHAT_LVC", "FRESHCHAT LVC"),
-        ("FRESHCHAT_HVC", "FRESHCHAT HVC"),
-        ("FRESHDESK_AGENT", "FRESHDESK AGENT"),
-        ("YAMURAI_AGENT", "YAMURAI AGENT"),
+        
         ("FOLLOWUP_AGENT", "FOLLOWUP AGENT"),
-        ("SASAI_AGENT", "SASAI AGENT"),
-        ("HLF_AGENT", "HLF AGENT"),
+        
     )
     GRADE = (
         ("SP", "SP"),
@@ -241,16 +225,7 @@ class FollowUpInsights(models.Model):
 
 class HigherLifeFoundationInsights(models.Model):
     AGENT_TYPE = (
-        ("LVC", "LVC"),
-        ("HVC", "HVC"),
-        ("VOICE_HVC", "VOICE HVC"),
-        ("VOICE_LVC", "VOICE LVC"),
-        ("FRESHCHAT_LVC", "FRESHCHAT LVC"),
-        ("FRESHCHAT_HVC", "FRESHCHAT HVC"),
-        ("FRESHDESK_AGENT", "FRESHDESK AGENT"),
-        ("YAMURAI_AGENT", "YAMURAI AGENT"),
-        ("FOLLOWUP_AGENT", "FOLLOWUP AGENT"),
-        ("SASAI_AGENT", "SASAI AGENT"),
+        
         ("HLF_AGENT", "HLF AGENT"),
     )
     GRADE = (
@@ -310,17 +285,9 @@ class HigherLifeFoundationInsights(models.Model):
 
 class SasaiInsights(models.Model):
     AGENT_TYPE = (
-        ("LVC", "LVC"),
-        ("HVC", "HVC"),
-        ("VOICE_HVC", "VOICE HVC"),
-        ("VOICE_LVC", "VOICE LVC"),
-        ("FRESHCHAT_LVC", "FRESHCHAT LVC"),
-        ("FRESHCHAT_HVC", "FRESHCHAT HVC"),
-        ("FRESHDESK_AGENT", "FRESHDESK AGENT"),
-        ("YAMURAI_AGENT", "YAMURAI AGENT"),
-        ("FOLLOWUP_AGENT", "FOLLOWUP AGENT"),
+        
         ("SASAI_AGENT", "SASAI AGENT"),
-        ("HLF_AGENT", "HLF AGENT"),
+        
     )
     GRADE = (
         ("SP", "SP"),
@@ -379,17 +346,9 @@ class SasaiInsights(models.Model):
 
 class FreshDeskInsights(models.Model):
     AGENT_TYPE = (
-        ("LVC", "LVC"),
-        ("HVC", "HVC"),
-        ("VOICE_HVC", "VOICE HVC"),
-        ("VOICE_LVC", "VOICE LVC"),
-        ("FRESHCHAT_LVC", "FRESHCHAT LVC"),
-        ("FRESHCHAT_HVC", "FRESHCHAT HVC"),
+        
         ("FRESHDESK_AGENT", "FRESHDESK AGENT"),
-        ("YAMURAI_AGENT", "YAMURAI AGENT"),
-        ("FOLLOWUP_AGENT", "FOLLOWUP AGENT"),
-        ("SASAI_AGENT", "SASAI AGENT"),
-        ("HLF_AGENT", "HLF AGENT"),
+        
     )
     GRADE = (
         ("SP", "SP"),
@@ -468,17 +427,10 @@ class FreshDeskInsights(models.Model):
 
 class FreshChatInsights(models.Model):
     AGENT_TYPE = (
-        ("LVC", "LVC"),
-        ("HVC", "HVC"),
-        ("VOICE_HVC", "VOICE HVC"),
-        ("VOICE_LVC", "VOICE LVC"),
+        
         ("FRESHCHAT_LVC", "FRESHCHAT LVC"),
         ("FRESHCHAT_HVC", "FRESHCHAT HVC"),
-        ("FRESHDESK_AGENT", "FRESHDESK AGENT"),
-        ("YAMURAI_AGENT", "YAMURAI AGENT"),
-        ("FOLLOWUP_AGENT", "FOLLOWUP AGENT"),
-        ("SASAI_AGENT", "SASAI AGENT"),
-        ("HLF_AGENT", "HLF AGENT"),
+       
     )
     GRADE = (
         ("SP", "SP"),
@@ -590,17 +542,9 @@ class FreshChatInsights(models.Model):
 
 class YamuraiInsights(models.Model):
     AGENT_TYPE = (
-        ("LVC", "LVC"),
-        ("HVC", "HVC"),
-        ("VOICE_HVC", "VOICE HVC"),
-        ("VOICE_LVC", "VOICE LVC"),
-        ("FRESHCHAT_LVC", "FRESHCHAT LVC"),
-        ("FRESHCHAT_HVC", "FRESHCHAT HVC"),
-        ("FRESHDESK_AGENT", "FRESHDESK AGENT"),
+       
         ("YAMURAI_AGENT", "YAMURAI AGENT"),
-        ("FOLLOWUP_AGENT", "FOLLOWUP AGENT"),
-        ("SASAI_AGENT", "SASAI AGENT"),
-        ("HLF_AGENT", "HLF AGENT"),
+        
     )
     GRADE = (
         ("SP", "SP"),
