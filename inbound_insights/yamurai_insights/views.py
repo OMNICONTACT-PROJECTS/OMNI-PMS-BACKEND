@@ -1150,12 +1150,20 @@ class GetAllInsightsMonthlyStatisticsPerUserView(GenericAPIView):
                 {"message": "Organisation does not exist"},
                 status=status.HTTP_404_NOT_FOUND,
             )
+        
+        try:
+            user= User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         yamuraiInsights = self.queryset.filter(
             user__organisation=organisation,
             agent_type=agent_type,
             year=year,
-            user_id=user_id,
+            user=user,
         )
 
         calendar_order = [

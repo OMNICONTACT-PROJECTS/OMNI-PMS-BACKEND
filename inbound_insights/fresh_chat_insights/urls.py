@@ -43,7 +43,7 @@ urlpatterns = [
         views.GetFreshChatInsightsByGradeAndOrganisationId.as_view(),
     ),
     path(
-        "get-by-date/year/<int:year>/month/<str:month>/week/<int:week>/organisation_id/<int:organisation_id>/",
+        "get-by-date/year/<int:year>/month/<str:month>/week/<int:week>/organisation_id/<int:organisation_id>/agent-type/<str:agent_type>/",
         views.GetFreshChatInsightsByDateAndOrganisationId.as_view(),
     ),
     path(
