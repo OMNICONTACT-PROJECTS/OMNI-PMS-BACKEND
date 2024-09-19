@@ -23,7 +23,7 @@ from .resources import FreshDeskInsightsResource
 from rest_framework.parsers import MultiPartParser, FormParser
 from tablib import Dataset
 import pandas as pd
-from django.db.models import Avg, Count,Sum
+from django.db.models import Avg, Count, Sum
 
 # Create your views here.
 
@@ -1240,13 +1240,14 @@ class GetUserYearlyInsightsStatisticsView(GenericAPIView):
         }
 
         return Response(all_fresh_desk_insights_stats, status=status.HTTP_200_OK)
-    
+
+
 class GetAllInsightsMonthlyStatisticsPerUserView(GenericAPIView):
     permission_classes = []
     serializer_class = FreshDeskInsightsRetrieveSerializer
     queryset = FreshDeskInsights.objects.all()
 
-    def get(self, request, organisation_id, agent_type,year,user_id, *args, **kwargs):
+    def get(self, request, organisation_id, agent_type, year, user_id, *args, **kwargs):
         try:
             organisation = Organisation.objects.get(pk=organisation_id)
         except Organisation.DoesNotExist:
@@ -1271,49 +1272,213 @@ class GetAllInsightsMonthlyStatisticsPerUserView(GenericAPIView):
         )
 
         calendar_order = [
-            'January', 'February', 'March', 'April', 'May', 'June',
-            'July', 'August', 'September', 'October', 'November', 'December'
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
         ]
-
-    
-
+        
         if not freshDeskInsights.exists():
             return Response(
-                {"message": "No freshDesk insights data found for the given organisation"},
+                {
+                    "message": "No freshDesk insights data found for the given organisation"
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
-        
 
-        monthly_totals = freshDeskInsights.values('month').annotate(
-            aes=Avg('aes'),
-            resolved_count=Sum('resolved_count'),
-            complaints=Sum('complaints'),
-            csat=Avg('csat'),
-            overall_score=Avg('overall_score')
+        monthly_totals = freshDeskInsights.values("month").annotate(
+            aes=Avg("aes"),
+            resolved_count=Sum("resolved_count"),
+            complaints=Sum("complaints"),
+            csat=Avg("csat"),
+            overall_score=Avg("overall_score"),
         )
 
         def calculate_grade(avg_score):
             if avg_score >= 5:
-                return 'A'
+                return "A"
             elif avg_score >= 4:
-                return 'B'
+                return "B"
             elif avg_score >= 3:
-                return 'C'
+                return "C"
             else:
-                return 'D'
+                return "D"
 
-    
-        totals = {item['month']: {
-                        'aes': item['aes'],
-                        'resolved_count': item['resolved_count'],
-                        'complaints': item['complaints'],
-                        'csat': item['csat'],
-                        'overall_score': item['overall_score'],
-                        'grade': calculate_grade(item['overall_score'])
-                    } for item in monthly_totals}
-        
-        calendar_ordered_totals = {month: totals[month] for month in calendar_order if month in totals}
+        totals = {
+            item["month"]: {
+                "aes": item["aes"],
+                "resolved_count": item["resolved_count"],
+                "complaints": item["complaints"],
+                "csat": item["csat"],
+                "overall_score": item["overall_score"],
+                "grade": calculate_grade(item["overall_score"]),
+            }
+            for item in monthly_totals
+        }
+
+        calendar_ordered_totals = {
+            month: totals[month] for month in calendar_order if month in totals
+        }
 
         return Response(calendar_ordered_totals, status=status.HTTP_200_OK)
 
 
+class GetUserFreshDeskInsightsStatisticsByRangeView(GenericAPIView):
+    permission_classes = []
+    serializer_class = FreshDeskInsightsRetrieveSerializer
+    queryset = FreshDeskInsights.objects.all()
+
+    def get(self, request, user_id, year, start_month, end_month, *args, **kwargs):
+        try:
+            User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        freshDesk_insights = self.queryset.filter(
+            user_id=user_id,
+            year=year,
+            month__gte=start_month,
+            month__lte=end_month,
+        )
+
+        if not freshDesk_insights.exists():
+            return Response(
+                {"message": "No freshDesk insights data found for the given user"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        managed_by = freshDesk_insights.first().managed_by
+        grade_counts = freshDesk_insights.values("grade").annotate(count=Count("grade"))
+
+        all_freshDesk_insights_stats = {
+            "Year": year,
+            "start_month": start_month,
+            "end_month": end_month,
+            "managed_by": managed_by,
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
+            "average_stats": {
+                "aes": round(
+                    freshDesk_insights.values("aes").aggregate(Avg("aes"))["aes__avg"],
+                    2,
+                ),
+                "resolved_count": round(
+                    freshDesk_insights.values("resolved_count").aggregate(
+                        Avg("resolved_count")
+                    )["resolved_count__avg"],
+                    2,
+                ),
+                "average_complaints": round(
+                    freshDesk_insights.values("complaints").aggregate(
+                        Avg("complaints")
+                    )["complaints__avg"],
+                    2,
+                ),
+                "csat": round(
+                    freshDesk_insights.values("csat").aggregate(Avg("csat"))[
+                        "csat__avg"
+                    ],
+                    2,
+                ),
+                "overall_score": round(
+                    freshDesk_insights.values("overall_score").aggregate(
+                        Avg("overall_score")
+                    )["overall_score__avg"],
+                    2,
+                ),
+            },
+        }
+
+        return Response(all_freshDesk_insights_stats, status=status.HTTP_200_OK)
+
+
+class GetUserFreshDeskTotalStatisticsByRangeView(GenericAPIView):
+    permission_classes = []
+    serializer_class = FreshDeskInsightsRetrieveSerializer
+    queryset = FreshDeskInsights.objects.all()
+
+    def get(self, request, user_id, year, start_month, end_month, *args, **kwargs):
+        try:
+            User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        freshDesk_insights = self.queryset.filter(
+            user_id=user_id,
+            year=year,
+            month__gte=start_month,
+            month__lte=end_month,
+        )
+
+        if not freshDesk_insights.exists():
+            return Response(
+                {"message": "No freshDesk insights data found for the given user"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        managed_by = freshDesk_insights.first().managed_by
+        grade_counts = freshDesk_insights.values("grade").annotate(count=Count("grade"))
+
+        all_freshDesk_insights_stats = {
+            "Year": year,
+            "start_month": start_month,
+            "end_month": end_month,
+            "managed_by": managed_by,
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
+            "total_stats": {
+                "aes": sum(freshDesk_insights.values_list("aes", flat=True)),
+                "resolved_count": sum(
+                    freshDesk_insights.values_list("resolved_count", flat=True)
+                ),
+                "complaints": sum(
+                    freshDesk_insights.values_list("complaints", flat=True)
+                ),
+                "csat": sum(freshDesk_insights.values_list("csat", flat=True)),
+                "total_overall_score": sum(
+                    freshDesk_insights.values_list("overall_score", flat=True)
+                ),
+            },
+        }
+
+        return Response(all_freshDesk_insights_stats, status=status.HTTP_200_OK)
