@@ -75,7 +75,16 @@ urlpatterns = [
         include("inbound_insights.yamurai_insights.urls"),
     ),
     path(
-        "api/v1/pdp/",include("personal_development_plans.urls"),
+        "api/v1/pdp/",
+        include("personal_development_plans.urls"),
+    ),
+    path(
+        "api/v1/pdp/",
+        include("personal_development_plans.urls"),
+    ),
+    path(
+        "api/v1/scorecard/",
+        include("scorecard.urls"),
     ),
 ]
 
