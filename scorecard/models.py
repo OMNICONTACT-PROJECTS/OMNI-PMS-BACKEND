@@ -9,7 +9,7 @@ class Scorecard(models.Model):
     STATUS = (
         ("PENDING", "PENDING"),
         ("APPROVED", "APPROVED"),
-        ("NOT APPROVED", "NOT APPROVED"),
+        ("REVIEWED", "REVIEWED"),
     )
 
     name = models.CharField(max_length=100, null=True, blank=True)
@@ -56,6 +56,13 @@ class Strategy(models.Model):
         max_digits=9, decimal_places=2, null=True, blank=True
     )
     rating = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
+    date_created = models.DateField(
+        auto_now_add=True,
+        blank=True,
+        null=True,
+        help_text="The date the scorecard was created",
+    )
+    last_updated = models.DateTimeField(auto_now=True, blank=True, null=True)
 
 
 class Customer(models.Model):
@@ -73,6 +80,13 @@ class Customer(models.Model):
         max_digits=9, decimal_places=2, null=True, blank=True
     )
     rating = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
+    date_created = models.DateField(
+        auto_now_add=True,
+        blank=True,
+        null=True,
+        help_text="The date the scorecard was created",
+    )
+    last_updated = models.DateTimeField(auto_now=True, blank=True, null=True)
 
 
 class Innovation(models.Model):
@@ -90,6 +104,13 @@ class Innovation(models.Model):
         max_digits=9, decimal_places=2, null=True, blank=True
     )
     rating = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
+    date_created = models.DateField(
+        auto_now_add=True,
+        blank=True,
+        null=True,
+        help_text="The date the scorecard was created",
+    )
+    last_updated = models.DateTimeField(auto_now=True, blank=True, null=True)
 
 
 class Function(models.Model):
@@ -107,9 +128,16 @@ class Function(models.Model):
         max_digits=9, decimal_places=2, null=True, blank=True
     )
     rating = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
+    date_created = models.DateField(
+        auto_now_add=True,
+        blank=True,
+        null=True,
+        help_text="The date the scorecard was created",
+    )
+    last_updated = models.DateTimeField(auto_now=True, blank=True, null=True)
 
 
-class Operations(models.Model):
+class Operation(models.Model):
     scorecard = models.ForeignKey(
         Scorecard, related_name="operations", on_delete=models.CASCADE
     )
@@ -124,6 +152,13 @@ class Operations(models.Model):
         max_digits=9, decimal_places=2, null=True, blank=True
     )
     rating = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
+    date_created = models.DateField(
+        auto_now_add=True,
+        blank=True,
+        null=True,
+        help_text="The date the scorecard was created",
+    )
+    last_updated = models.DateTimeField(auto_now=True, blank=True, null=True)
 
 
 class ScorecardReview(models.Model):
@@ -141,7 +176,11 @@ class ScorecardReview(models.Model):
         null=False,
         related_name="scorecard_reviewer",
     )
-    manager_comment = models.TextField(
+    initial_manager_comment = models.TextField(
+        null=True,
+        blank=True,
+    )
+    last_manager_comment = models.TextField(
         null=True,
         blank=True,
     )
