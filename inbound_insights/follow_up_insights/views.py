@@ -121,24 +121,7 @@ class GetFollowUpInsightsAgentsByOrganisationId(GenericAPIView):
             serializer = self.serializer_class(follow_up_insights, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
-    permission_classes = []
-    serializer_class = FollowUpInsightsRetrieveSerializer
-    queryset = FollowUpInsights.objects.all()
-
-    def get(self, request, organisation_id, *args, **kwargs):
-        try:
-            Organisation.objects.get(pk=organisation_id)
-        except Organisation.DoesNotExist:
-            return Response(
-                {"message": "Organisation does not exist"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        else:
-            follow_up_insights = self.queryset.filter(agent_type="LVC").order_by(
-                "-date_created"
-            )
-            serializer = self.serializer_class(follow_up_insights, many=True)
-            return Response(data=serializer.data, status=status.HTTP_200_OK)
+    
 
 
 class GetFollowUpInsightsByGradeAndOrganisationId(GenericAPIView):
