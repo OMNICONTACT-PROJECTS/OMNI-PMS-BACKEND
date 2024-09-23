@@ -49,7 +49,9 @@ class Strategy(models.Model):
     performance_measure = models.TextField(blank=True, null=True)
     unit_measurement = models.TextField(blank=True, null=True)
     weight = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
-    fy_target = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
+    fy_target = models.DecimalField(
+        max_digits=9, decimal_places=2, null=True, blank=True
+    )
     actual_score = models.DecimalField(
         max_digits=9, decimal_places=2, null=True, blank=True
     )
@@ -73,7 +75,9 @@ class Customer(models.Model):
     strategic_objective = models.TextField(blank=True, null=True)
     performance_measure = models.TextField(blank=True, null=True)
     unit_measurement = models.TextField(blank=True, null=True)
-    fy_target = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
+    fy_target = models.DecimalField(
+        max_digits=9, decimal_places=2, null=True, blank=True
+    )
     weight = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
     actual_score = models.DecimalField(
         max_digits=9, decimal_places=2, null=True, blank=True
@@ -99,7 +103,9 @@ class Innovation(models.Model):
     performance_measure = models.TextField(blank=True, null=True)
     unit_measurement = models.TextField(blank=True, null=True)
     weight = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
-    fy_target = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
+    fy_target = models.DecimalField(
+        max_digits=9, decimal_places=2, null=True, blank=True
+    )
     actual_score = models.DecimalField(
         max_digits=9, decimal_places=2, null=True, blank=True
     )
@@ -124,7 +130,9 @@ class Function(models.Model):
     performance_measure = models.TextField(blank=True, null=True)
     unit_measurement = models.TextField(blank=True, null=True)
     weight = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
-    fy_target = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
+    fy_target = models.DecimalField(
+        max_digits=9, decimal_places=2, null=True, blank=True
+    )
     actual_score = models.DecimalField(
         max_digits=9, decimal_places=2, null=True, blank=True
     )
@@ -149,7 +157,9 @@ class Operation(models.Model):
     performance_measure = models.TextField(blank=True, null=True)
     unit_measurement = models.TextField(blank=True, null=True)
     weight = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
-    fy_target = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
+    fy_target = models.DecimalField(
+        max_digits=9, decimal_places=2, null=True, blank=True
+    )
     actual_score = models.DecimalField(
         max_digits=9, decimal_places=2, null=True, blank=True
     )
