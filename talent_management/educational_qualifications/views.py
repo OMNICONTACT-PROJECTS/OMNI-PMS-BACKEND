@@ -30,7 +30,11 @@ class UserEducationalQualificationCreate(GenericAPIView):
         try:
             if serializer.is_valid():
                 serializer.save()
-                return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+                data = {
+                    "message": "Educational qualification created successfully",
+                    "data": serializer.data,
+                }
+                return Response(data, status=status.HTTP_201_CREATED)
 
             return Response(
                 {
@@ -43,7 +47,7 @@ class UserEducationalQualificationCreate(GenericAPIView):
             return (
                 Response(
                     {
-                        "message": "Failed to upload document, Validation error occurred.",
+                        "message": "Failed to upload document, Exception error occurred.",
                         "error": str(e),
                     },
                     status=status.HTTP_400_BAD_REQUEST,

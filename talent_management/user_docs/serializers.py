@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from ..models import UserPersonalDocument
-from ..serializers import RetrieveMinimizedUserSerializer
+from accounts.serializers import RetrieveMinimizedUserSerializer
 
 
 class UserPersonalDocumentSerializer(serializers.ModelSerializer):
