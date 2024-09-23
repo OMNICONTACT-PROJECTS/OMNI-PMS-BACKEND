@@ -98,15 +98,15 @@ class GetDocumentsByUserId(GenericAPIView):
 
     def get(self, request, user_id):
         try:
-            user = User.objects.get(pk=user_id)
+            User.objects.get(pk=user_id)
         except User.DoesNotExist:
             return Response(
                 data={"message": "User does not exist"},
                 status=status.HTTP_404_NOT_FOUND,
             )
         else:
-            personal_docs = self.queryset.filter(pk=user_id)
-            serializer = self.serializer_class(personal_docs, many=True)
+            educational_qualification = self.queryset.filter(user_id=user_id)
+            serializer = self.serializer_class(educational_qualification, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -117,7 +117,7 @@ class GetAllDocumentsByOrganisationId(GenericAPIView):
 
     def get(self, request, organisation_id):
         try:
-            organisation = Organisation.objects.get(pk=organisation_id)
+            Organisation.objects.get(pk=organisation_id)
         except Organisation.DoesNotExist:
             return Response(
                 data={"message": "Organisation does not exist"},
