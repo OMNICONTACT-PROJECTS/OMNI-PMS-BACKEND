@@ -40,6 +40,7 @@ DEBUG = os.getenv("DEBUG", "0").lower() in ["true", "t", "1"]
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
 
+
 ALLOWED_HOSTS = ["omni-pms-backend.onrender.com"]
 
 # Application definition
@@ -66,6 +67,7 @@ INSTALLED_APPS = [
     "import_export",
     "personal_development_plans.apps.PersonalDevelopmentPlansConfig",
     "scorecard.apps.ScorecardConfig",
+    "talent_management.apps.TalentManagementConfig",
 ]
 
 MIDDLEWARE = [
