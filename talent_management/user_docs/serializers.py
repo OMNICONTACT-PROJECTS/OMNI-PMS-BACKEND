@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from ..models import UserPersonalDocument
-from ..serializers import RetrieveMinimizedUserSerializer
+from accounts.serializers import MinimizedUserSerializer
 
 
 class UserPersonalDocumentSerializer(serializers.ModelSerializer):
@@ -10,7 +10,7 @@ class UserPersonalDocumentSerializer(serializers.ModelSerializer):
 
 
 class RetrieveUserPersonalDocumentSerializer(serializers.ModelSerializer):
-    user = RetrieveMinimizedUserSerializer()
+    user = MinimizedUserSerializer()
 
     class Meta:
         model = UserPersonalDocument
