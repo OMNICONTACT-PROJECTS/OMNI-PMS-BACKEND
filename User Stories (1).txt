@@ -289,6 +289,60 @@ INBOUND
 	-last_updated
 
 
+################SCORECARD#################################
+Scorecard:
+	-pk
+	-user_id
+	-name
+	-actual_score
+	-manager_score
+	-document_proof
+
+Strategy:
+	-scorecard(fk)
+	-All
+
+Customer:
+	-scorecard(fk)
+	-All
+
+Innovation:
+	-scorecard(fk)
+	-All
+
+Function:
+	-scorecard(fk)
+	-All
+
+Operations:
+	-scorecard(fk)
+	-All
+
+
+ScorecardReview:
+	-scorecard(foreign_key)
+	-reviewer_user_id(foreign_key)
+	-manager_comment
+	-date_created
+	-last_updated
+
+***Cloning the scorecard****
+
+ScorecardClone:
+	-scorecard(fk)
+	-approver
+	-recipient
+
+
+##########################promotions####################################
+
+Promotions:
+	user(fk)
+	position
+	start_date
+	status(CURRENT, PREVIOUS)
+
+
 
 
 

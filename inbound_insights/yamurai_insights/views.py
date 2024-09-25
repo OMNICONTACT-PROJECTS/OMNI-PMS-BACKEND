@@ -1150,14 +1150,26 @@ class GetAllInsightsMonthlyStatisticsPerUserView(GenericAPIView):
                 {"message": "Organisation does not exist"},
                 status=status.HTTP_404_NOT_FOUND,
             )
+        
+        try:
+            user= User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         yamuraiInsights = self.queryset.filter(
             user__organisation=organisation,
             agent_type=agent_type,
             year=year,
-            user_id=user_id,
+            user=user,
         )
 
+        calendar_order = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ]
     
 
         if not yamuraiInsights.exists():
@@ -1192,6 +1204,148 @@ class GetAllInsightsMonthlyStatisticsPerUserView(GenericAPIView):
                         'overall_score': item['overall_score'],
                         'grade': calculate_grade(item['overall_score'])
                     } for item in monthly_totals}
+        
+        calendar_ordered_totals = {month: totals[month] for month in calendar_order if month in totals}
 
-        return Response(totals, status=status.HTTP_200_OK)
+        return Response(calendar_ordered_totals, status=status.HTTP_200_OK)
+
+class GetUserYamuraiInsightsStatisticsByRangeView(GenericAPIView):
+    permission_classes = []
+    serializer_class = YamuraiInsightsRetrieveSerializer
+    queryset = YamuraiInsights.objects.all()
+
+    def get(self, request, user_id, year, start_month, end_month, *args, **kwargs):
+        try:
+            User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        yamurai_insights = self.queryset.filter(
+            user_id=user_id,
+            year=year,
+            month__gte=start_month,
+            month__lte=end_month,
+        )
+
+        if not yamurai_insights.exists():
+            return Response(
+                {"message": "No yamurai insights data found for the given user"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        managed_by = yamurai_insights.first().managed_by
+        grade_counts = yamurai_insights.values("grade").annotate(count=Count("grade"))
+
+        all_yamurai_insights_stats = {
+            "Year": year,
+            "start_month": start_month,
+            "end_month": end_month,
+            "managed_by": managed_by,
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
+            "average_stats": {
+                "aes": round(
+                    yamurai_insights.values("aes").aggregate(Avg("aes"))["aes__avg"], 2
+                ),
+                "resolved_queries": round(
+                    yamurai_insights.values("resolved_queries").aggregate(
+                        Avg("resolved_queries")
+                    )["resolved_queries__avg"],
+                    2,
+                ),
+                "csat": round(
+                    yamurai_insights.values("csat").aggregate(Avg("csat"))["csat__avg"], 2
+                ),
+                "overall_score": round(
+                    yamurai_insights.values("overall_score").aggregate(
+                        Avg("overall_score")
+                    )["overall_score__avg"],
+                    2,
+                ),
+            },
+        }
+
+        return Response(all_yamurai_insights_stats, status=status.HTTP_200_OK)
+
+
+class GetUserYamuraiInsightsTotalStatisticsByRangeView(GenericAPIView):
+    permission_classes = []
+    serializer_class = YamuraiInsightsRetrieveSerializer
+    queryset = YamuraiInsights.objects.all()
+
+    def get(self, request, user_id, year, start_month, end_month, *args, **kwargs):
+        try:
+            User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        yamurai_insights = self.queryset.filter(
+            user_id=user_id,
+            year=year,
+            month__gte=start_month,
+            month__lte=end_month,
+        )
+
+        if not yamurai_insights.exists():
+            return Response(
+                {"message": "No yamurai insights data found for the given user"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        managed_by = yamurai_insights.first().managed_by
+        grade_counts = yamurai_insights.values("grade").annotate(count=Count("grade"))
+
+        all_yamurai_insights_stats = {
+            "Year": year,
+            "start_month": start_month,
+            "end_month": end_month,
+            "managed_by": managed_by,
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
+            "total_stats": {
+                "aes": sum(yamurai_insights.values_list("aes", flat=True)),
+                
+                "resolved_queries": sum(
+                    yamurai_insights.values_list("resolved_queries", flat=True)
+                ),
+                "csat": sum(yamurai_insights.values_list("csat", flat=True)),
+                "total_overall_score": sum(
+                    yamurai_insights.values_list("overall_score", flat=True)
+                ),
+            },
+        }
+
+        return Response(all_yamurai_insights_stats, status=status.HTTP_200_OK)
 

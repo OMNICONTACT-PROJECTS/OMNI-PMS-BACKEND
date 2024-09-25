@@ -23,7 +23,7 @@ from .resources import FreshChatInsightsResource
 from rest_framework.parsers import MultiPartParser, FormParser
 from tablib import Dataset
 import pandas as pd
-from django.db.models import Avg, Count,Sum
+from django.db.models import Avg, Count, Sum
 
 # Create your views here.
 
@@ -172,7 +172,7 @@ class GetFreshChatInsightsByDateAndOrganisationId(GenericAPIView):
     serializer_class = FreshChatInsightsRetrieveSerializer
     queryset = FreshChatInsights.objects.all()
 
-    def get(self, request, year, month, week, organisation_id, *args, **kwargs):
+    def get(self, request, year, month, week, organisation_id,agent_type, *args, **kwargs):
         try:
             Organisation.objects.get(pk=organisation_id)
         except Organisation.DoesNotExist:
@@ -182,7 +182,11 @@ class GetFreshChatInsightsByDateAndOrganisationId(GenericAPIView):
             )
         else:
             fresh_chat_insights = self.queryset.filter(
-                user__organisation_id=organisation_id, year=year, month=month, week=week
+                user__organisation_id=organisation_id,
+                year=year,
+                month=month,
+                week=week,
+                agent_type=agent_type,
             ).order_by("-date_created")
             serializer = self.serializer_class(fresh_chat_insights, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
@@ -1276,7 +1280,7 @@ class GetAllInsightsMonthlyStatisticsPerUserView(GenericAPIView):
     serializer_class = FreshChatInsightsRetrieveSerializer
     queryset = FreshChatInsights.objects.all()
 
-    def get(self, request, organisation_id, agent_type,year,user_id, *args, **kwargs):
+    def get(self, request, organisation_id, agent_type, year, user_id, *args, **kwargs):
         try:
             organisation = Organisation.objects.get(pk=organisation_id)
         except Organisation.DoesNotExist:
@@ -1284,49 +1288,230 @@ class GetAllInsightsMonthlyStatisticsPerUserView(GenericAPIView):
                 {"message": "Organisation does not exist"},
                 status=status.HTTP_404_NOT_FOUND,
             )
+        
+        try:
+            user= User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         freshChatInsights = self.queryset.filter(
             user__organisation=organisation,
             agent_type=agent_type,
             year=year,
-            user_id=user_id,
+            user = user,
         )
 
-    
+        calendar_order = [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+        ]
 
         if not freshChatInsights.exists():
             return Response(
-                {"message": "No freshchat insights data found for the given organisation"},
+                {
+                    "message": "No freshchat insights data found for the given organisation"
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
-        
 
-        monthly_totals = freshChatInsights.values('month').annotate(
-            aes=Avg('aes'),
-            actual_interactions=Sum('actual_interactions'),
-            handling_time=Sum('handling_time'),
-            csat=Avg('csat'),
-            overall_score=Avg('overall_score')
+        monthly_totals = freshChatInsights.values("month").annotate(
+            aes=Avg("aes"),
+            actual_interactions=Sum("actual_interactions"),
+            handling_time=Sum("handling_time"),
+            csat=Avg("csat"),
+            overall_score=Avg("overall_score"),
         )
 
         def calculate_grade(avg_score):
             if avg_score >= 5:
-                return 'A'
+                return "A"
             elif avg_score >= 4:
-                return 'B'
+                return "B"
             elif avg_score >= 3:
-                return 'C'
+                return "C"
             else:
-                return 'D'
+                return "D"
 
-    
-        totals = {item['month']: {
-                        'aes': item['aes'],
-                        'actual_interactions': item['actual_interactions'],
-                        'handling_time': item['handling_time'],
-                        'csat': item['csat'],
-                        'overall_score': item['overall_score'],
-                        'grade': calculate_grade(item['overall_score'])
-                    } for item in monthly_totals}
+        totals = {
+            item["month"]: {
+                "aes": item["aes"],
+                "actual_interactions": item["actual_interactions"],
+                "handling_time": item["handling_time"],
+                "csat": item["csat"],
+                "overall_score": item["overall_score"],
+                "grade": calculate_grade(item["overall_score"]),
+            }
+            for item in monthly_totals
+        }
 
-        return Response(totals, status=status.HTTP_200_OK)
+        calendar_ordered_totals = {
+            month: totals[month] for month in calendar_order if month in totals
+        }
+
+        return Response(calendar_ordered_totals, status=status.HTTP_200_OK)
+
+
+class GetUserFreshChatInsightsStatisticsByRangeView(GenericAPIView):
+    permission_classes = []
+    serializer_class = FreshChatInsightsRetrieveSerializer
+    queryset = FreshChatInsights.objects.all()
+
+    def get(self, request, user_id, year, start_month, end_month, *args, **kwargs):
+        try:
+            User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        freshchat_insights = self.queryset.filter(
+            user_id=user_id,
+            year=year,
+            month__gte=start_month,
+            month__lte=end_month,
+        )
+
+        if not freshchat_insights.exists():
+            return Response(
+                {"message": "No freshchat insights data found for the given user"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        managed_by = freshchat_insights.first().managed_by
+        grade_counts = freshchat_insights.values("grade").annotate(count=Count("grade"))
+
+        all_freshchat_insights_stats = {
+            "Year": year,
+            "start_month": start_month,
+            "end_month": end_month,
+            "managed_by": managed_by,
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
+            "average_stats": {
+                "aes": round(
+                    freshchat_insights.values("aes").aggregate(Avg("aes"))["aes__avg"],
+                    2,
+                ),
+                "average_actual_interactions": round(
+                    freshchat_insights.values("actual_interactions").aggregate(
+                        Avg("actual_interactions")
+                    )["actual_interactions__avg"],
+                    2,
+                ),
+                "average_handling_time": round(
+                    freshchat_insights.values("handling_time").aggregate(
+                        Avg("handling_time")
+                    )["handling_time__avg"],
+                    2,
+                ),
+                "csat": round(
+                    freshchat_insights.values("csat").aggregate(Avg("csat"))[
+                        "csat__avg"
+                    ],
+                    2,
+                ),
+                "overall_score": round(
+                    freshchat_insights.values("overall_score").aggregate(
+                        Avg("overall_score")
+                    )["overall_score__avg"],
+                    2,
+                ),
+            },
+        }
+
+        return Response(all_freshchat_insights_stats, status=status.HTTP_200_OK)
+
+
+class GetUserFreshChatTotalStatisticsByRangeView(GenericAPIView):
+    permission_classes = []
+    serializer_class = FreshChatInsightsRetrieveSerializer
+    queryset = FreshChatInsights.objects.all()
+
+    def get(self, request, user_id, year, start_month, end_month, *args, **kwargs):
+        try:
+            User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {"message": "User does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        freshchat_insights = self.queryset.filter(
+            user_id=user_id,
+            year=year,
+            month__gte=start_month,
+            month__lte=end_month,
+        )
+
+        if not freshchat_insights.exists():
+            return Response(
+                {"message": "No freshchat insights data found for the given user"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        managed_by = freshchat_insights.first().managed_by
+        grade_counts = freshchat_insights.values("grade").annotate(count=Count("grade"))
+
+        all_freshchat_insights_stats = {
+            "Year": year,
+            "start_month": start_month,
+            "end_month": end_month,
+            "managed_by": managed_by,
+            "total_SPs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "SP"), 0
+            ),
+            "total_As": next(
+                (item["count"] for item in grade_counts if item["grade"] == "A"), 0
+            ),
+            "total_Bs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "B"), 0
+            ),
+            "total_Cs": next(
+                (item["count"] for item in grade_counts if item["grade"] == "C"), 0
+            ),
+            "total_Ds": next(
+                (item["count"] for item in grade_counts if item["grade"] == "D"), 0
+            ),
+            "total_stats": {
+                "aes": sum(freshchat_insights.values_list("aes", flat=True)),
+                "actual_interactions": sum(
+                    freshchat_insights.values_list("actual_interactions", flat=True)
+                ),
+                "handling_time": sum(
+                    freshchat_insights.values_list("handling_time", flat=True)
+                ),
+                "csat": sum(freshchat_insights.values_list("csat", flat=True)),
+                "total_overall_score": sum(
+                    freshchat_insights.values_list("overall_score", flat=True)
+                ),
+            },
+        }
+
+        return Response(all_freshchat_insights_stats, status=status.HTTP_200_OK)

@@ -36,11 +36,6 @@ urlpatterns = [
     path("api/v1/organisations/", include("organisations.urls")),
     path("api/v1/accounts/", include("accounts.urls")),
     path("api/v1/users/", include("accounts.users.urls")),
-    path("api/v1/user_documents/", include("accounts.user_docs.urls")),
-    path(
-        "api/v1/educational_qualification/",
-        include("accounts.educational_qualifications.urls"),
-    ),
     path("api/v1/devs/", include("devs.urls")),
     path("api/v1/superusers/", include("superusers.urls")),
     path("api/v1/administrators/", include("administrators.urls")),
@@ -75,7 +70,32 @@ urlpatterns = [
         include("inbound_insights.yamurai_insights.urls"),
     ),
     path(
-        "api/v1/pdp/",include("personal_development_plans.urls"),
+        "api/v1/pdp/",
+        include("personal_development_plans.urls"),
+    ),
+    path(
+        "api/v1/pdp/",
+        include("personal_development_plans.urls"),
+    ),
+    path(
+        "api/v1/scorecard/",
+        include("scorecard.urls"),
+    ),
+    path(
+        "api/v1/talent-management/user-documents/",
+        include("talent_management.user_docs.urls"),
+    ),
+    path(
+        "api/v1/talent-management/educational-qualifications/",
+        include("talent_management.educational_qualifications.urls"),
+    ),
+    path(
+        "api/v1/talent-management/work-experiences/",
+        include("talent_management.work_experiences.urls"),
+    ),
+    path(
+        "api/v1/talent-management/promotions/",
+        include("talent_management.promotions.urls"),
     ),
 ]
 

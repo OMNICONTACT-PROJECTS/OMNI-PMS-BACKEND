@@ -79,4 +79,12 @@ urlpatterns = [
         "get-total-monthly-statistics-by-organisation-id/<int:organisation_id>/user-id/<int:user_id>/year/<int:year>/agent-type/<str:agent_type>/",
         views.GetAllVoiceInsightsMonthlyStatisticsPerUserView.as_view(),
     ),
+    path(
+        "get-user-average-stats-by-range/<int:user_id>/year/<int:year>/start-month/<str:start_month>/end-month/<str:end_month>/",
+        views.GetUserVoiceInsightsStatisticsByRangeView.as_view(),
+    ),
+    path(
+        "get-user-total-stats-by-range/<int:user_id>/year/<int:year>/start-month/<str:start_month>/end-month/<str:end_month>/",
+        views.GetUserVoiceInsightsTotalStatisticsByRangeView.as_view(),
+    ),
 ]

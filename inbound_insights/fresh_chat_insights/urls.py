@@ -43,7 +43,7 @@ urlpatterns = [
         views.GetFreshChatInsightsByGradeAndOrganisationId.as_view(),
     ),
     path(
-        "get-by-date/year/<int:year>/month/<str:month>/week/<int:week>/organisation_id/<int:organisation_id>/",
+        "get-by-date/year/<int:year>/month/<str:month>/week/<int:week>/organisation_id/<int:organisation_id>/agent-type/<str:agent_type>/",
         views.GetFreshChatInsightsByDateAndOrganisationId.as_view(),
     ),
     path(
@@ -82,5 +82,13 @@ urlpatterns = [
      path(
         "get-total-monthly-statistics-by-organisation-id/<int:organisation_id>/user-id/<int:user_id>/year/<int:year>/agent-type/<str:agent_type>/",
         views.GetAllInsightsMonthlyStatisticsPerUserView.as_view(),
+    ),
+    path(
+        "get-user-average-stats-by-range/<int:user_id>/year/<int:year>/start-month/<str:start_month>/end-month/<str:end_month>/",
+        views.GetUserFreshChatInsightsStatisticsByRangeView.as_view(),
+    ),
+    path(
+        "get-user-total-stats-by-range/<int:user_id>/year/<int:year>/start-month/<str:start_month>/end-month/<str:end_month>/",
+        views.GetUserFreshChatTotalStatisticsByRangeView.as_view(),
     ),
 ]
