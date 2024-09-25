@@ -334,15 +334,6 @@ ScorecardClone:
 	-recipient
 
 
-##########################promotions####################################
-
-Promotions:
-	user(fk)
-	position
-	start_date
-	status(CURRENT, PREVIOUS)
-
-
 
 
 
