@@ -26,6 +26,10 @@ class Scorecard(models.Model):
     status = models.CharField(
         max_length=150, null=True, blank=True, default="PENDING", choices=STATUS
     )
+    comment = models.TextField(
+        null=True,
+        blank=True,
+    )
     date_created = models.DateField(
         auto_now_add=True,
         blank=True,
