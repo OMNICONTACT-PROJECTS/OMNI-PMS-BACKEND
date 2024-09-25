@@ -58,3 +58,16 @@ class UserPersonalDocument(models.Model):
 
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}"
+
+
+class Promotion(models.Model):
+    STATUS = (("CURRENT", "CURRENT"), ("PREVIOUS", "PREVIOUS"))
+    user = models.ForeignKey(User, blank=False, null=False, on_delete=models.CASCADE)
+    position = models.CharField(max_length=150, blank=False, null=False)
+    start_date = models.DateField(blank=True, null=True)
+    status = models.CharField(max_length=150, blank=True, null=True, choices=STATUS)
+    date_created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    last_updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user.first_name} {self.user.last_name}"
