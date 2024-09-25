@@ -93,10 +93,6 @@ urlpatterns = [
         "api/v1/talent-management/work-experiences/",
         include("talent_management.work_experiences.urls"),
     ),
-    path(
-        "api/v1/talent-management/promotions/",
-        include("talent_management.promotions.urls"),
-    ),
 ]
 
 if settings.DEBUG:
