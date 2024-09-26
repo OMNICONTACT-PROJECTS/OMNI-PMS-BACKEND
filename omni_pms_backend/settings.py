@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 ##################### SETTINGS FOR RENDER PRODUCTION DEPLOYMENT ####################
 
-load_dotenv(BASE_DIR / ".env.local")
+load_dotenv(BASE_DIR / ".env.render-production")
 SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG", "0").lower() in ["true", "t", "1"]
 # ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(" ")
@@ -41,7 +41,7 @@ DEBUG = os.getenv("DEBUG", "0").lower() in ["true", "t", "1"]
 # DEBUG = True
 
 
-ALLOWED_HOSTS = ["127.0.0.1"]
+ALLOWED_HOSTS = ["omni-pms-backend.onrender.com"]
 
 # Application definition
 
