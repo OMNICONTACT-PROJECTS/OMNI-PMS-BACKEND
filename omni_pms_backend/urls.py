@@ -36,18 +36,66 @@ urlpatterns = [
     path("api/v1/organisations/", include("organisations.urls")),
     path("api/v1/accounts/", include("accounts.urls")),
     path("api/v1/users/", include("accounts.users.urls")),
-    path("api/v1/user_documents/", include("accounts.user_docs.urls")),
-    path(
-        "api/v1/educational_qualification/",
-        include("accounts.educational_qualifications.urls"),
-    ),
     path("api/v1/devs/", include("devs.urls")),
     path("api/v1/superusers/", include("superusers.urls")),
     path("api/v1/administrators/", include("administrators.urls")),
-    path("api/v1/subscribers/", include("subscribers.urls")),
+    path("api/v1/agents/", include("agents.urls")),
+    path("api/v1/departments/", include("departments.urls")),
     path(
-        "api/v1/inbound/voice-insights/",
+        "api/v1/voice-insights/inbound/",
         include("inbound_insights.voice_insights.urls"),
+    ),
+    path(
+        "api/v1/follow-up-insights/inbound/",
+        include("inbound_insights.follow_up_insights.urls"),
+    ),
+    path(
+        "api/v1/higher-life-foundation-insights/inbound/",
+        include("inbound_insights.higher_life_foundation_insights.urls"),
+    ),
+    path(
+        "api/v1/sasai-insights/inbound/",
+        include("inbound_insights.sasai_insights.urls"),
+    ),
+    path(
+        "api/v1/fresh-desk-insights/inbound/",
+        include("inbound_insights.fresh_desk_insights.urls"),
+    ),
+    path(
+        "api/v1/fresh-chat-insights/inbound/",
+        include("inbound_insights.fresh_chat_insights.urls"),
+    ),
+    path(
+        "api/v1/yamurai-insights/inbound/",
+        include("inbound_insights.yamurai_insights.urls"),
+    ),
+    path(
+        "api/v1/pdp/",
+        include("personal_development_plans.urls"),
+    ),
+    path(
+        "api/v1/pdp/",
+        include("personal_development_plans.urls"),
+    ),
+    path(
+        "api/v1/scorecard/",
+        include("scorecard.urls"),
+    ),
+    path(
+        "api/v1/talent-management/user-documents/",
+        include("talent_management.user_docs.urls"),
+    ),
+    path(
+        "api/v1/talent-management/educational-qualifications/",
+        include("talent_management.educational_qualifications.urls"),
+    ),
+    path(
+        "api/v1/talent-management/work-experiences/",
+        include("talent_management.work_experiences.urls"),
+    ),
+    path(
+        "api/v1/talent-management/promotions/",
+        include("talent_management.promotions.urls"),
     ),
 ]
 

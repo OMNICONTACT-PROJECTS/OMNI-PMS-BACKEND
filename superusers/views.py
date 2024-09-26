@@ -1,3 +1,4 @@
+from organisations.models import Organisation
 from .serializers import SuperuserSerializer, SuperuserRetrieveSerializer
 from .models import Superuser
 from rest_framework.response import Response
@@ -5,6 +6,7 @@ from rest_framework.generics import (
     CreateAPIView,
     RetrieveUpdateDestroyAPIView,
     ListAPIView,
+    GenericAPIView
 )
 from rest_framework import status
 from django.conf import settings
@@ -97,3 +99,22 @@ class SuperuserReadUpdateDestroyView(RetrieveUpdateDestroyAPIView):
     permission_classes = []
     serializer_class = SuperuserRetrieveSerializer
     queryset = Superuser.objects.all()
+
+
+class GetAllSuperuserByOrganisationId(GenericAPIView):
+    permission_classes = []
+    serializer_class = SuperuserRetrieveSerializer
+    queryset = Superuser.objects.all()
+
+    def get(self, request, organisation_id):
+        try:
+            organisation = Organisation.objects.get(pk=organisation_id)
+        except Organisation.DoesNotExist:
+            return Response(
+                data={"message": "Organisation does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        else:
+            superuser_info_by_organisation = self.queryset.filter(user__organisation_id=organisation_id)
+            serializer = self.serializer_class(superuser_info_by_organisation, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)

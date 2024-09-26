@@ -35,11 +35,56 @@ urlpatterns = [
         views.GetVoiceInsightsForHVCAgentsByOrganisationId.as_view(),
     ),
     path(
-        "get-by-grade/<str:grade>/organisation_id/<int:organisation_id>/",
+        "get-by-grade/<str:grade>/organisation_id/<int:organisation_id>/agent-type/<str:agent_type>/",
         views.GetVoiceInsightsByGradeAndOrganisationId.as_view(),
     ),
     path(
-        "get-by-date/year/<int:year>/month/<str:month>/week/<int:week>/organisation_id/<int:organisation_id>/",
+        "get-by-date/year/<int:year>/month/<str:month>/week/<int:week>/organisation_id/<int:organisation_id>/agent-type/<str:agent_type>/",
         views.GetVoiceInsightsByDateAndOrganisationId.as_view(),
+    ),
+    path(
+        "get-all-average-statists-by-organisation-id/<int:organisation_id>/agent-type/<str:agent_type>/",
+        views.GetAllAverageVoiceInsightsStatisticsView.as_view(),
+    ),
+    path(
+        "get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/month/<str:month>/week/<int:week>/agent_type/<str:agent_type>/",
+        views.GetAllVoiceInsightsStatisticsView.as_view(),
+    ),
+    path(
+        "get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/month/<str:month>/agent_type/<str:agent_type>/",
+        views.GetAllVoiceInsightsStatisticsWithoutWeekView.as_view(),
+    ),
+    path(
+        "get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/agent_type/<str:agent_type>/",
+        views.GetAllVoiceInsightsStatisticsWithoutMonthAndWeekView.as_view(),
+    ),
+    ##########################
+    path(
+        "new-get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/month/<str:month>/agent_type/<str:agent_type>/",
+        views.NewGetAllVoiceInsightsStatisticsWithWeekView.as_view(),
+    ),
+    path(
+        "new-get-all-statistics-by-organisation-id/<int:organisation_id>/year/<int:year>/agent_type/<str:agent_type>/",
+        views.NewGetAllVoiceInsightsStatisticsWithMonthView.as_view(),
+    ),
+    path(
+        "get-user-monthly-statistics-by-user-id/<int:user_id>/year/<int:year>/month/<str:month>/",
+        views.GetUserMonthlyVoiceInsightsStatisticsView.as_view(),
+    ),
+    path(
+        "get-user-yearly-statistics-by-user-id/<int:user_id>/year/<int:year>/",
+        views.GetUserYearlyVoiceInsightsStatisticsView.as_view(),
+    ),
+    path(
+        "get-total-monthly-statistics-by-organisation-id/<int:organisation_id>/user-id/<int:user_id>/year/<int:year>/agent-type/<str:agent_type>/",
+        views.GetAllVoiceInsightsMonthlyStatisticsPerUserView.as_view(),
+    ),
+    path(
+        "get-user-average-stats-by-range/<int:user_id>/year/<int:year>/start-month/<str:start_month>/end-month/<str:end_month>/",
+        views.GetUserVoiceInsightsStatisticsByRangeView.as_view(),
+    ),
+    path(
+        "get-user-total-stats-by-range/<int:user_id>/year/<int:year>/start-month/<str:start_month>/end-month/<str:end_month>/",
+        views.GetUserVoiceInsightsTotalStatisticsByRangeView.as_view(),
     ),
 ]

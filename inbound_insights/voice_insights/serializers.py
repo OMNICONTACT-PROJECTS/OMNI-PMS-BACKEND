@@ -1,4 +1,4 @@
-from ..models import VoiceInsights, VoiceInsightsFile
+from ..models import VoiceInsights, CampaignInsightFile
 from accounts.serializers import MinimizedUserSerializer
 from organisations.serializers import MinimizedOrganisationSerializer
 from rest_framework.serializers import ModelSerializer
@@ -36,24 +36,4 @@ class VoiceInsightsUpdateSerializer(ModelSerializer):
 
     class Meta:
         model = VoiceInsights
-        fields = "__all__"
-
-
-class VoiceInsightsFileSerializer(ModelSerializer):
-    class Meta:
-        model = VoiceInsightsFile
-        exclude = ("date_created", "last_updated", "is_upload_template")
-
-        extra_kwargs = {
-            "organisation": {"required": True},
-            "file": {"required": True},
-            "file_type": {"required": True},
-        }
-
-
-class VoiceInsightsFileRetrieveSerializer(ModelSerializer):
-    organisation = MinimizedOrganisationSerializer()
-
-    class Meta:
-        model = VoiceInsightsFile
         fields = "__all__"

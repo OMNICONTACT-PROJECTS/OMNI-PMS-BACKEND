@@ -1,0 +1,375 @@
+**user stories**
+INSIGHTS
+
+Inbound Insights
+- Voice Insights (Table)
+    **fields: id (PK)
+              organisation_id
+              user_id (FK)
+              agent_type (LVC and HVC)
+              year
+              month
+              week
+              **aes (avg evaluation score /100)
+              speed_to_answer 
+              targeted_inbound_calls (160 LVC and 100 HVC)
+              **actual_inbound_calls 
+              targeted_talktime (6hr 30 LVC and HVC 4hrs 30)
+              **outbound_target (outgoing calls) (15 HVC and LVC)
+              after_call_work 
+              **customer_complaint
+              **csat (customer satisfactory survey)
+
+              calc_aes 
+              calc_speed_to_answer 
+              calc_targeted_inbound_calls 
+              calc_actual_inbound_calls 
+              calc_targeted_talktime 
+              calc_outbound_target 
+              calc_after_call_work 
+              calc_customer_complaint
+              calc_csat
+              
+
+              weighted_aes 
+              weighted_speed_to_answer 
+              weighted_targeted_inbound_calls 
+              weighted_actual_inbound_calls 
+              weighted_targeted_talktime 
+              weighted_outbound_target 
+              weighted_after_call_work 
+              weighted_customer_complaint
+              weighted_csat
+              
+
+             **overall_score (/5)
+             GRADE (SP,A,B,C,D)
+
+              
+    LVC target (160 incoming, 15 outgoing, 6hrs 30 talk time) 
+    HVC (100 incoming, 15 outgoing, 4hrs 30m talk time) 
+
+
+###########################################################
+- Follow ups Insights (Table)
+	FIELDS
+	-ID
+	-user_id
+	-year
+	-month
+	-week
+
+	-outbound
+	-csat
+	-aes_rating
+
+	-calc_outbound
+	-calc_csat
+	-calc_aes_rating
+
+	-weighted_outbound
+	-weighted_csat
+	-weighted_aes_rating
+	-overall_score
+	-grade
+	
+
+stats
+
+###########################################################
+- higher_life_foundation Insights (Table)
+	FIELDS
+	-ID
+	-user_id
+	-year
+	-month
+	-week
+
+	-aes
+	-resolved_count(int)
+	-service_level()
+	-csat
+	-overall_score
+	-grade
+	
+
+stats
+
+###########################################################
+- sassai Insights (Table)
+	FIELDS
+	-ID
+	-user_id
+	-year
+	-month
+	-week
+
+	-aes
+	-resolved_count(int)
+	-service_level()
+	-csat
+	-overall_score
+	-grade
+	
+
+stats
+
+###########################################################
+- freshdesk Insights (Table)
+	FIELDS
+	-ID
+	-user_id
+	-year
+	-month
+	-week
+
+	-aes
+	-resolved_count(int)
+	-complaints()
+	-csat
+
+	-calc_aes
+	-calc_resolved_count(int)
+	-calc_complaints()
+	-calc_csat
+
+	-weighted_aes
+	-weighted_resolved_count(int)
+	-weighted_complaints()
+	-weighted_csat
+	-overall_score
+	-grade
+	
+
+stats
+	
+###########################################################
+- freshchat (Table)
+    **fields: id (PK)
+              id
+              user_id (FK)
+              agent_type (LVC and HVC)
+              year
+              month
+              week
+              **aes (avg evaluation score /100)
+              targeted_interactions 
+		actual_interactions
+		login_time_variance
+		handling_time
+              **customer_complaint
+              **csat (customer satisfactory survey)
+
+		**calc_aes (avg evaluation score /100)
+              	calc_targeted_interactions 
+		calc_actual_interactions
+		calc_login_time_variance
+		calc_handling_time
+              **calc_customer_complaint
+              **calc_csat (customer satisfactory survey)
+
+		**weighted_aes (avg evaluation score /100)
+              	weighted_targeted_interactions 
+		weighted_actual_interactions
+		weighted_login_time_variance
+		weighted_handling_time
+              **weighted_customer_complaint
+              **weighted_csat (customer satisfactory survey)
+		
+              
+
+             **overall_score (/5)
+             GRADE (SP,A,B,C,D)
+
+##################################################################
+- yamurai Insights (Table)
+	FIELDS
+	-ID
+	-user_id
+	-year
+	-month
+	-week
+
+	-aes
+	-resolved_queries(int)
+	-csat
+
+	-calc_aes
+	-calc_resolved_queries(int)
+	-calc_csat
+
+	-weighted_aes
+	-weighted_resolved_queries(int)
+	-weighted_csat
+	-overall_score
+	-grade
+	
+
+stats
+
+***********************************************************
+
+- Digital Insights (Table)
+  LVC **fields
+  HVC **fields
+
+************************************************************
+
+- Quality (Table)
+  **fields
+
+**************************************************************
+
+- helpdesk (Table)
+  **fields
+
+**************************************************************
+
+
+
+
+Inbound Insights
+	**more to come***
+
+
+
+
+
+
+Overall Insights
+Inbound Voice (HVC and LVC)
+ - starred field average
+ - Top performers weekly / month / quarterly / annual (LVC, HVC and Follow Ups table of 10) 
+
+
+Access rights:
+
+Admin
+- Dashboard (read only)
+- Department (read and write)
+- Insights (read and write)
+- Agents (read and write)
+- Profile (read and write)
+
+
+Superuser and Dev - same rights as Admin + more
+
+Future Improvements
+- Automate calculations of grades
+
+
+##############################################################################################################################
+INBOUND
+
+
+******PDP DISSECTION********
+	#Pdp
+	-user
+	-department
+	-career_goals(string)
+	-career_journery(string)
+	-skills(string)
+	-opportunities(string)
+	-development_goals
+	-feedback(string)
+	-secondment(string)
+	-work_life_balance(string)
+	-personal_goals
+	-suggestions(string)
+	-career_expectations
+	-date_created
+	-last_updated
+
+	#PdpReviewer
+	-pdp(foreign_key)
+	-user(reviewer foreign_key)
+	-comment(string)
+	-reviewer_feedback()string
+	-date_created
+	-last_updated
+
+
+################SCORECARD#################################
+Scorecard:
+	-pk
+	-user_id
+	-name
+	-actual_score
+	-manager_score
+	-document_proof
+
+Strategy:
+	-scorecard(fk)
+	-All
+
+Customer:
+	-scorecard(fk)
+	-All
+
+Innovation:
+	-scorecard(fk)
+	-All
+
+Function:
+	-scorecard(fk)
+	-All
+
+Operations:
+	-scorecard(fk)
+	-All
+
+
+ScorecardReview:
+	-scorecard(foreign_key)
+	-reviewer_user_id(foreign_key)
+	-manager_comment
+	-date_created
+	-last_updated
+
+***Cloning the scorecard****
+
+ScorecardClone:
+	-scorecard(fk)
+	-approver
+	-recipient
+
+
+##########################promotions####################################
+
+Promotions:
+	user(fk)
+	position
+	start_date
+	status(CURRENT, PREVIOUS)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

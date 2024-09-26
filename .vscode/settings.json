@@ -2,17 +2,21 @@
     "cSpell.words": [
         "corsheaders",
         "csat",
+        "DBHOSTNAME",
         "devs",
+        "dotenv",
         "iazysgbhzmilstox",
         "iloc",
         "omni",
         "OMNICONTACT",
+        "onrender",
         "openpyxl",
         "Organisation",
         "Organisations",
         "redoc",
         "simplejwt",
         "tablib",
-        "talktime"
+        "talktime",
+        "whitenoise"
     ]
 }
