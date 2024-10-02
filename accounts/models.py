@@ -155,3 +155,24 @@ class UserPersonalDocument(models.Model):
 
     def __str__(self):
         return f"{self.id}"
+    
+
+class UserBukUploadFile(models.Model):
+    FILE_TYPE = (
+        ("XLSX", "XLSX"),
+        ("XLS", "XLS"),
+        ("CSV", "CSV"),
+        ("JSON", "JSON"),
+    )
+    organisation = models.ForeignKey(
+        Organisation, on_delete=models.CASCADE, blank=False, null=False
+    )
+    file_type = models.CharField(
+        max_length=50, blank=False, null=False, choices=FILE_TYPE
+    )
+    file = models.FileField(upload_to="voice_insights_files", blank=False, null=False)
+    date_created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    last_updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.file_type}"
