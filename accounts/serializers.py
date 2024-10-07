@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
-from .models import User
+from .models import User, UserBukUploadFile
 from organisations.serializers import MinimizedOrganisationSerializer
 
 
@@ -75,11 +75,8 @@ class CheckOldPasswordSerializer(serializers.Serializer):
     password = serializers.CharField()
 
     def validate(self, attrs):
-        # Validate the username and password.
         username = attrs["id"]
         password = attrs["password"]
-
-        # Check if the username and password are correct.
 
         return attrs
 
@@ -115,3 +112,23 @@ class MinimizedUserSerializer(ModelSerializer):
         fields = ["id", "first_name", "last_name", "organisation"]
 
         extra_kwargs = {"password": {"write_only": True}}
+
+
+class UserBulkUploadFileSerializer(ModelSerializer):
+    class Meta:
+        model = UserBukUploadFile
+        exclude = ("date_created", "last_updated")
+
+        extra_kwargs = {
+            "organisation": {"required": True},
+            "file": {"required": True},
+            "file_type": {"required": True},
+        }
+
+
+class UserBulkUploadFileRetrieveSerializer(ModelSerializer):
+    organisation = MinimizedOrganisationSerializer()
+
+    class Meta:
+        model = UserBukUploadFile
+        fields = "__all__"

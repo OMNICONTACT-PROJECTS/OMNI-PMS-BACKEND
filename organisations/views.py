@@ -9,7 +9,6 @@ from rest_framework.generics import (
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 
-
 # Create your views here.
 
 
