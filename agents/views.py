@@ -257,7 +257,6 @@ class BulkUploadAgentDataView(GenericAPIView):
                         current_location=row.get("current_location"),
                     )
                     user.role = "AGENT"
-                    print("user: ", user)
                     new_username = f"{user.username}AG"
                     user.username = new_username
                     user.set_password("omni-Agent-123")
