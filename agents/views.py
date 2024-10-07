@@ -255,6 +255,7 @@ class BulkUploadAgentDataView(GenericAPIView):
                         home_address=row.get("home_address"),
                         job_title=row.get("job_title"),
                         current_location=row.get("current_location"),
+                        agent_type=row.get("agent_type"),
                     )
                     user.role = "AGENT"
                     new_username = f"{user.username}AG"
