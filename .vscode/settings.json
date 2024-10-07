@@ -5,6 +5,8 @@
         "DBHOSTNAME",
         "devs",
         "dotenv",
+        "FRESHCHAT",
+        "FRESHDESK",
         "iazysgbhzmilstox",
         "iloc",
         "omni",
@@ -14,9 +16,11 @@
         "Organisation",
         "Organisations",
         "redoc",
+        "SASAI",
         "simplejwt",
         "tablib",
         "talktime",
-        "whitenoise"
+        "whitenoise",
+        "YAMURAI"
     ]
 }
