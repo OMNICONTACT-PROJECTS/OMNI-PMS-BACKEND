@@ -86,6 +86,7 @@ class User(AbstractUser):
         max_length=50,
         blank=False,
         null=False,
+        default="VOICE_HVC",
         choices=AGENT_TYPE,
     )
 
