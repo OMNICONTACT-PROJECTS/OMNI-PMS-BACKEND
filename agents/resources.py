@@ -26,6 +26,7 @@ class AgentResource(resources.ModelResource):
             "account_status",
             "contract_type",
             "contract_tenure",
+            "agent_type",
         )
 
         skip_unchanged = False
