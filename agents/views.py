@@ -291,3 +291,51 @@ class BulkUploadAgentDataView(GenericAPIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
+class AgentsGenderRatioByOrganisationIdView(GenericAPIView):
+    permission_classes = []
+    serializer_class = AgentRetrieveSerializer
+    queryset = Agent.objects.all()
+
+    def get(self, request, organisation_id):
+        try:
+            Organisation.objects.get(pk=organisation_id)
+        except Organisation.DoesNotExist:
+            return Response("Organisation not found", status=status.HTTP_404_NOT_FOUND)
+        else:
+            total_agents = self.queryset.filter(user__organisation_id=organisation_id).count()
+            total_male_agents = self.queryset.filter(user__gender="MALE").count()
+            total_female_agents = self.queryset.filter(user__gender="FEMALE").count()
+
+            if total_male_agents <= 0 and total_female_agents <= 0:
+                return Response(
+                    data={
+                        "male_agents": {"total": 0, "percentage": 0},
+                        "female_agents": {"total": 0, "percentage": 0},
+                    },
+                    status=status.HTTP_200_OK,
+                )
+
+            male_percentage = float(
+                (total_male_agents / (total_male_agents + total_female_agents)) * 100
+            )
+            female_percentage = float(
+                (total_female_agents / (total_male_agents + total_female_agents)) * 100
+            )
+
+            data = (
+                {
+                    "total_agents": total_agents,
+                    "male_agents": {
+                        "total": total_male_agents,
+                        "percentage": f"{male_percentage:.2f}",
+                    },
+                    "female_agents": {
+                        "total": total_female_agents,
+                        "percentage": f"{female_percentage:.2f}",
+                    },
+                },
+            )
+
+            return Response(data, status=status.HTTP_200_OK)

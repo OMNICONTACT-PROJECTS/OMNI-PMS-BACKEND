@@ -18,4 +18,8 @@ urlpatterns = [
         "get-all-by-user-id/<int:user_id>/",
         views.GetAllAgentByUserId.as_view(),
     ),
+    path(
+        "get-gender-ratio/<int:organisation_id>/",
+        views.AgentsGenderRatioByOrganisationIdView.as_view(),
+    ),
 ]
