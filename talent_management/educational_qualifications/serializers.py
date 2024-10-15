@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from ..models import EducationalQualification
-from ..serializers import RetrieveMinimizedUserSerializer
+from accounts.serializers import MinimizedUserSerializer
 
 
 class UserEducationalQualificationSerializer(serializers.ModelSerializer):
@@ -10,7 +10,7 @@ class UserEducationalQualificationSerializer(serializers.ModelSerializer):
 
 
 class RetrieveUserEducationalQualificationSerializer(serializers.ModelSerializer):
-    user = RetrieveMinimizedUserSerializer()
+    user = MinimizedUserSerializer()
 
     class Meta:
         model = EducationalQualification

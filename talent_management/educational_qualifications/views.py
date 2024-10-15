@@ -1,8 +1,8 @@
 from .serializers import (
-    UserPersonalDocumentSerializer,
-    RetrieveUserPersonalDocumentSerializer,
+    UserEducationalQualificationSerializer,
+    RetrieveUserEducationalQualificationSerializer,
 )
-from ..models import UserPersonalDocument
+from ..models import EducationalQualification
 from rest_framework.response import Response
 from rest_framework.generics import (
     GenericAPIView,
@@ -18,11 +18,11 @@ from organisations.models import Organisation
 # Create your views here.
 
 
-class UserPersonalDocumentCreate(GenericAPIView):
+class UserEducationalQualificationCreate(GenericAPIView):
     permission_classes = []
     parser_classes = [MultiPartParser, FormParser]
-    serializer_class = UserPersonalDocumentSerializer
-    queryset = UserPersonalDocument.objects.all()
+    serializer_class = UserEducationalQualificationSerializer
+    queryset = EducationalQualification.objects.all()
 
     def post(self, request):
         data = request.data
@@ -30,7 +30,11 @@ class UserPersonalDocumentCreate(GenericAPIView):
         try:
             if serializer.is_valid():
                 serializer.save()
-                return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+                data = {
+                    "message": "Educational qualification created successfully",
+                    "data": serializer.data,
+                }
+                return Response(data, status=status.HTTP_201_CREATED)
 
             return Response(
                 {
@@ -43,7 +47,7 @@ class UserPersonalDocumentCreate(GenericAPIView):
             return (
                 Response(
                     {
-                        "message": "Failed to upload document, Validation error occurred.",
+                        "message": "Failed to upload document, Exception error occurred.",
                         "error": str(e),
                     },
                     status=status.HTTP_400_BAD_REQUEST,
@@ -53,20 +57,20 @@ class UserPersonalDocumentCreate(GenericAPIView):
 
 class GetAllUserDocsView(ListAPIView):
     permission_classes = []
-    serializer_class = RetrieveUserPersonalDocumentSerializer
-    queryset = UserPersonalDocument.objects.all()
+    serializer_class = RetrieveUserEducationalQualificationSerializer
+    queryset = EducationalQualification.objects.all()
 
 
 class UpdateUserDocsView(GenericAPIView):
     permission_classes = []
     parser_classes = [MultiPartParser, FormParser]
-    serializer_class = UserPersonalDocumentSerializer
-    queryset = UserPersonalDocument.objects.all()
+    serializer_class = UserEducationalQualificationSerializer
+    queryset = EducationalQualification.objects.all()
 
     def put(self, request, pk):
         try:
             personal_doc = self.queryset.get(pk=pk)
-        except UserPersonalDocument.DoesNotExist:
+        except EducationalQualification.DoesNotExist:
             return Response(
                 data={"error": "User document not Found."},
                 status=status.HTTP_404_NOT_FOUND,
@@ -83,37 +87,37 @@ class UpdateUserDocsView(GenericAPIView):
 
 class RetrieveDestroyUserDocsView(RetrieveDestroyAPIView):
     permission_classes = []
-    serializer_class = RetrieveUserPersonalDocumentSerializer
-    queryset = UserPersonalDocument.objects.all()
+    serializer_class = RetrieveUserEducationalQualificationSerializer
+    queryset = EducationalQualification.objects.all()
 
 
 class GetDocumentsByUserId(GenericAPIView):
     permission_classes = []
-    serializer_class = RetrieveUserPersonalDocumentSerializer
-    queryset = UserPersonalDocument.objects.all()
+    serializer_class = RetrieveUserEducationalQualificationSerializer
+    queryset = EducationalQualification.objects.all()
 
     def get(self, request, user_id):
         try:
-            user = User.objects.get(pk=user_id)
+            User.objects.get(pk=user_id)
         except User.DoesNotExist:
             return Response(
                 data={"message": "User does not exist"},
                 status=status.HTTP_404_NOT_FOUND,
             )
         else:
-            personal_docs = self.queryset.filter(pk=user_id)
-            serializer = self.serializer_class(personal_docs, many=True)
+            educational_qualification = self.queryset.filter(user_id=user_id)
+            serializer = self.serializer_class(educational_qualification, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class GetAllDocumentsByOrganisationId(GenericAPIView):
     permission_classes = []
-    serializer_class = RetrieveUserPersonalDocumentSerializer
-    queryset = UserPersonalDocument.objects.all()
+    serializer_class = RetrieveUserEducationalQualificationSerializer
+    queryset = EducationalQualification.objects.all()
 
     def get(self, request, organisation_id):
         try:
-            organisation = Organisation.objects.get(pk=organisation_id)
+            Organisation.objects.get(pk=organisation_id)
         except Organisation.DoesNotExist:
             return Response(
                 data={"message": "Organisation does not exist"},
@@ -125,15 +129,15 @@ class GetAllDocumentsByOrganisationId(GenericAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class UserPersonalDocumentUpdateGetDeleteByID(GenericAPIView):
+class UserEducationalQualificationUpdateGetDeleteByID(GenericAPIView):
     permission_classes = []
-    serializer_class = RetrieveUserPersonalDocumentSerializer
-    queryset = UserPersonalDocument.objects.all()
+    serializer_class = RetrieveUserEducationalQualificationSerializer
+    queryset = EducationalQualification.objects.all()
 
     def get(self, request, pk):
         try:
             personal_doc = self.queryset.get(pk=pk)
-        except UserPersonalDocument.DoesNotExist:
+        except EducationalQualification.DoesNotExist:
             return Response(
                 data={"error": "User document not Found."},
                 status=status.HTTP_404_NOT_FOUND,
@@ -145,7 +149,7 @@ class UserPersonalDocumentUpdateGetDeleteByID(GenericAPIView):
     def delete(self, request, pk):
         try:
             personal_doc = self.queryset.get(pk=pk)
-        except UserPersonalDocument.DoesNotExist:
+        except EducationalQualification.DoesNotExist:
             return Response(
                 data={"error": "User document not Found."},
                 status=status.HTTP_404_NOT_FOUND,

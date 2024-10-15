@@ -11,7 +11,7 @@ class User(AbstractUser):
     email = None
 
     GENDER = (
-    ("MALE", "MALE"),
+        ("MALE", "MALE"),
         ("FEMALE", "FEMALE"),
     )
     ROLE = (
@@ -37,6 +37,17 @@ class User(AbstractUser):
         ("MNO", "MNO"),
         ("BUFFER", "BUFFER"),
     )
+    AGENT_TYPE = (
+        ("VOICE_HVC", "VOICE HVC"),
+        ("VOICE_LVC", "VOICE LVC"),
+        ("FOLLOWUP_AGENT", "FOLLOWUP AGENT"),
+        ("FRESHDESK_AGENT", "FRESHDESK AGENT"),
+        ("HLF_AGENT", "HLF AGENT"),
+        ("SASAI_AGENT", "SASAI AGENT"),
+        ("FRESHCHAT_LVC", "FRESHCHAT LVC"),
+        ("FRESHCHAT_HVC", "FRESHCHAT HVC"),
+        ("YAMURAI_AGENT", "YAMURAI AGENT"),
+    )
     organisation = models.ForeignKey(
         Organisation, blank=True, null=True, on_delete=models.CASCADE
     )
@@ -54,7 +65,9 @@ class User(AbstractUser):
     job_title = models.CharField(max_length=150, blank=True, null=True)
     dob = models.DateField(blank=True, null=True)
     current_location = models.CharField(max_length=155, blank=True, null=True)
-    department = models.ForeignKey(Department, blank=True, null=True, on_delete=models.CASCADE)
+    department = models.ForeignKey(
+        Department, blank=True, null=True, on_delete=models.CASCADE
+    )
     user_status = models.CharField(
         max_length=150, blank=True, null=True, choices=USER_STATUS
     )
@@ -68,6 +81,13 @@ class User(AbstractUser):
     account_creation_date = models.DateField(auto_now_add=True, null=True, blank=True)
     profile_picture = models.ImageField(
         upload_to="user_profile_pictures", blank=True, null=True
+    )
+    agent_type = models.CharField(
+        max_length=50,
+        blank=False,
+        null=False,
+        default="VOICE_HVC",
+        choices=AGENT_TYPE,
     )
 
     date_created = models.DateField(
@@ -155,3 +175,24 @@ class UserPersonalDocument(models.Model):
 
     def __str__(self):
         return f"{self.id}"
+
+
+class UserBukUploadFile(models.Model):
+    FILE_TYPE = (
+        ("XLSX", "XLSX"),
+        ("XLS", "XLS"),
+        ("CSV", "CSV"),
+        ("JSON", "JSON"),
+    )
+    organisation = models.ForeignKey(
+        Organisation, on_delete=models.CASCADE, blank=False, null=False
+    )
+    file_type = models.CharField(
+        max_length=50, blank=False, null=False, choices=FILE_TYPE
+    )
+    file = models.FileField(upload_to="voice_insights_files", blank=False, null=False)
+    date_created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    last_updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.file_type}"
