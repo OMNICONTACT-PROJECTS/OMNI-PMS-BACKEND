@@ -12,4 +12,8 @@ urlpatterns = [
         "upload-user-profile-picture/<int:pk>/",
         views.UploadUserProfilePicView.as_view(),
     ),
+    path(
+        "get-employees-gender-ratio/<int:organisation_id>/",
+        views.UsersGenderRatioByOrganisationIdView.as_view(),
+    ),
 ]
