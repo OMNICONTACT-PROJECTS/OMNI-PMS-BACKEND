@@ -41,7 +41,7 @@ DEBUG = os.getenv("DEBUG", "0").lower() in ["true", "t", "1"]
 # DEBUG = True
 
 
-ALLOWED_HOSTS = ["omni-pms-backend.onrender.com"]
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
@@ -126,16 +126,15 @@ WSGI_APPLICATION = "omni_pms_backend.wsgi.application"
 # }
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DATABASE_NAME"),
-        "USER": os.getenv("DATABASE_USER"),
-        "PASSWORD": os.getenv("DATABASE_PASSWORD"),
-        "HOST": os.getenv("DBHOSTNAME"),
-        "PORT": os.getenv("DATABASE_PORT"),
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'omni_pms_db',
+        'USER': 'omni_pms_user',
+        'PASSWORD': 'password',  # Use the same password you set earlier
+        'HOST': 'localhost',  # If your MySQL is running on the same machine
+        'PORT': '3306',  # Default MySQL port
     }
 }
-
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
@@ -182,7 +181,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
+CORS_ALLOWED_ORIGINS_ALLOW_ALL = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
